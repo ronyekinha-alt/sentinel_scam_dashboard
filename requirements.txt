@@ -1,6 +1,6 @@
 streamlit
 pandas
-pandas_ta
+ta
 ccxt
 requests
 plotly
