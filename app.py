@@ -103,7 +103,6 @@ with tab_radar:
         df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
 
-        # Cálculo dos indicadores via biblioteca `ta`
         df['EMA_8'] = ta.trend.ema_indicator(df['close'], window=8)
         df['EMA_21'] = ta.trend.ema_indicator(df['close'], window=21)
         df['EMA_50'] = ta.trend.ema_indicator(df['close'], window=50)
@@ -122,7 +121,7 @@ with tab_radar:
         col3.metric("EMA 8 vs 21", "ALTA 🟢" if atual['EMA_8'] > atual['EMA_21'] else "BAIXA 🔴")
         col4.metric("R:R Alvo", f"1:{rr_ratio}")
 
-        st.info(f"📍 **Plano de Entrada:** Compra: **${preco_atual:.4f}** | Stop Loss: **${stop_loss:.4f}** \vert{} Take Profit: **${take_profit:.4f}** (Alavancagem Máx Sugerida: 4x)")
+        st.info(f"📍 **Plano de Entrada:** Compra: **${preco_atual:.4f}** | Stop Loss: **${stop_loss:.4f}** | Take Profit: **${take_profit:.4f}** (Alavancagem Máx Sugerida: 4x)")
 
         if st.button(f"📌 Entrar no Trade ({selected_symbol})"):
             novo_trade = {
