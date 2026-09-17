@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import pandas_ta as ta
+import ta
 import ccxt
 import json
 import os
@@ -103,11 +103,12 @@ with tab_radar:
         df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
 
-        df['EMA_8'] = ta.ema(df['close'], length=8)
-        df['EMA_21'] = ta.ema(df['close'], length=21)
-        df['EMA_50'] = ta.ema(df['close'], length=50)
-        df['EMA_100'] = ta.ema(df['close'], length=100)
-        df['RSI'] = ta.rsi(df['close'], length=14)
+        # Cálculo dos indicadores via biblioteca `ta`
+        df['EMA_8'] = ta.trend.ema_indicator(df['close'], window=8)
+        df['EMA_21'] = ta.trend.ema_indicator(df['close'], window=21)
+        df['EMA_50'] = ta.trend.ema_indicator(df['close'], window=50)
+        df['EMA_100'] = ta.trend.ema_indicator(df['close'], window=100)
+        df['RSI'] = ta.momentum.rsi(df['close'], window=14)
 
         atual = df.iloc[-1]
         preco_atual = atual['close']
@@ -121,7 +122,7 @@ with tab_radar:
         col3.metric("EMA 8 vs 21", "ALTA 🟢" if atual['EMA_8'] > atual['EMA_21'] else "BAIXA 🔴")
         col4.metric("R:R Alvo", f"1:{rr_ratio}")
 
-        st.info(f"📍 **Plano de Entrada:** Compra: **${preco_atual:.4f}** | Stop Loss: **${stop_loss:.4f}** | Take Profit: **${take_profit:.4f}** (Alavancagem Máx Sugerida: 4x)")
+        st.info(f"📍 **Plano de Entrada:** Compra: **${preco_atual:.4f}** | Stop Loss: **${stop_loss:.4f}** \vert{} Take Profit: **${take_profit:.4f}** (Alavancagem Máx Sugerida: 4x)")
 
         if st.button(f"📌 Entrar no Trade ({selected_symbol})"):
             novo_trade = {
@@ -155,9 +156,9 @@ with tab_backtest:
         candles = exchange.fetch_ohlcv(bt_symbol, timeframe=bt_tf, limit=min(limit_candles, 1000))
         df_bt = pd.DataFrame(candles, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
 
-        df_bt['EMA_8'] = ta.ema(df_bt['close'], length=8)
-        df_bt['EMA_21'] = ta.ema(df_bt['close'], length=21)
-        df_bt['RSI'] = ta.rsi(df_bt['close'], length=14)
+        df_bt['EMA_8'] = ta.trend.ema_indicator(df_bt['close'], window=8)
+        df_bt['EMA_21'] = ta.trend.ema_indicator(df_bt['close'], window=21)
+        df_bt['RSI'] = ta.momentum.rsi(df_bt['close'], window=14)
 
         gains = 0
         losses = 0
