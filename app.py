@@ -7,237 +7,330 @@ import os
 from datetime import datetime
 
 # ---------------------------------------------------------
-# CONFIGURAÇÃO DA PÁGINA & ESTILO NEON EM FUNDO CLARO
+# CONFIGURAÇÃO DE PÁGINA E ESTILO DARK CYBERPUNK (CYAN/NEON)
 # ---------------------------------------------------------
-st.set_page_config(page_title="Sentinel Trade - MEXC Analytics", layout="wide")
+st.set_page_config(page_title="Radar Cripto - Análise Quantitativa", layout="wide")
 
 st.markdown("""
     <style>
+    /* Fundo Escuro Principal */
     .stApp {
-        background-color: #FAFAFC;
-        color: #1E1E24;
+        background-color: #0B0E14 !important;
+        color: #E0E6ED !important;
     }
-    div[data-testid="stMetric"] {
-        background-color: #FFFFFF;
-        border: 2px solid #00E5FF;
-        box-shadow: 0px 4px 12px rgba(0, 229, 255, 0.2);
-        border-radius: 12px;
-        padding: 12px 16px;
+    
+    /* Esconder Barra Lateral Padrão se Desejar */
+    [data-testid="stSidebar"] {
+        background-color: #121824 !important;
+        border-right: 1px solid #1E293B;
     }
+
+    /* Cards e Containers com Borda Neon Ciano */
+    div[data-testid="stMetric"], .css-card {
+        background-color: #121824 !important;
+        border: 1px solid #00F2FE !important;
+        box-shadow: 0px 0px 10px rgba(0, 242, 254, 0.15) !important;
+        border-radius: 8px !important;
+        padding: 10px !important;
+    }
+
+    /* Botões em Neon Verde/Ciano */
     .stButton>button {
-        background-color: #00FF66 !important;
-        color: #000000 !important;
+        background: linear-gradient(90deg, #00F2FE 0%, #4FACFE 100%) !important;
+        color: #0B0E14 !important;
         font-weight: bold !important;
-        border: 1px solid #00CC52 !important;
-        box-shadow: 0px 0px 10px rgba(0, 255, 102, 0.5);
-        border-radius: 8px;
+        border: none !important;
+        border-radius: 6px !important;
+        box-shadow: 0px 0px 8px rgba(0, 242, 254, 0.4) !important;
     }
-    h1, h2, h3 {
-        color: #D6006E !important;
+
+    /* Títulos em Tom Ciano/Verde */
+    h1, h2, h3, h4 {
+        color: #00F2FE !important;
+        font-family: 'Trebuchet MS', sans-serif;
+    }
+    
+    /* Subtextos e Labels */
+    .stMarkdown p {
+        color: #94A3B8;
     }
     </style>
 """, unsafe_allow_html=True)
 
-st.title("⚡ SENTINEL TRADE - MEXC ANALYTICS & BACKTEST")
-st.write("Conectado à **MEXC Exchange** em tempo real 24/7.")
-
 # ---------------------------------------------------------
-# CONEXÃO DIRETA COM A MEXC
+# CONEXÃO EXCHANGE (SOMENTE CRIPTOMOEDAS USDT)
 # ---------------------------------------------------------
 @st.cache_resource
-def get_mexc_exchange():
-    return ccxt.mexc({'enableRateLimit': True})
+def get_exchange():
+    return ccxt.binance({'enableRateLimit': True})
 
-exchange = get_mexc_exchange()
+exchange = get_exchange()
+
+@st.cache_data(ttl=600)
+def fetch_crypto_symbols():
+    try:
+        markets = exchange.load_markets()
+        symbols = []
+        # Excluir ativos alavancados, commodities e metais não-cripto
+        blacklisted = ['UP/', 'DOWN/', 'BEAR/', 'BULL/', 'PAXG/', 'XAU/', 'XAG/', 'EUR/', 'GBP/']
+        for s in markets:
+            if s.endswith('/USDT') and not any(b in s for b in blacklisted):
+                symbols.append(s)
+        return sorted(symbols)
+    except Exception:
+        return ["BTC/USDT", "ETH/USDT", "SOL/USDT", "ONDO/USDT", "NEAR/USDT", "API3/USDT", "TAO/USDT", "JTO/USDT"]
+
+symbols = fetch_crypto_symbols()
 
 # ---------------------------------------------------------
-# BANCO DE DADOS LOCAL SIMPLES DE TRADES
+# PERSISTÊNCIA LOCAL (BANCO DE TRADES)
 # ---------------------------------------------------------
-DB_FILE = "trades_db.json"
+DB_FILE = "trades_diario.json"
 
 def load_trades():
     if os.path.exists(DB_FILE):
-        with open(DB_FILE, "r") as f:
-            return json.load(f)
+        try:
+            with open(DB_FILE, "r") as f:
+                return json.load(f)
+        except Exception:
+            pass
     return {"open": [], "closed": []}
 
 def save_trades(data):
     with open(DB_FILE, "w") as f:
         json.dump(data, f, indent=4)
 
-trades_data = load_trades()
+trades_db = load_trades()
 
 # ---------------------------------------------------------
-# BARRA LATERAL - CONFIGURAÇÕES
+# CABEÇALHO DO PAINEL
 # ---------------------------------------------------------
-st.sidebar.header("⚙️ Filtros do Setup (MEXC)")
-timeframe = st.sidebar.selectbox("Tempo Gráfico", ["1h", "2h", "4h", "1d"], index=2)
-rsi_limit = st.sidebar.slider("Filtro RSI (Sobrevendido)", 10, 40, 30)
-rr_ratio = st.sidebar.selectbox("Risco : Retorno (R:R)", [2.0, 3.0, 4.0], index=1)
+col_head1, col_head2 = st.columns([3, 1])
+with col_head1:
+    st.caption("ANÁLISE QUANTITATIVA - SPOT")
+    st.title("Radar Cripto")
+    st.write("Uso educacional: o painel identifica condições técnicas, não oferece recomendação financeira nem me executa ordens.")
 
-@st.cache_data(ttl=300)
-def get_mexc_symbols():
+with col_head2:
+    st.write("")
+    if st.button("🔄 Atualizar scanner"):
+        st.cache_data.clear()
+        st.rerun()
+
+# ---------------------------------------------------------
+# FILTROS E PARÂMETROS SUPERIORES
+# ---------------------------------------------------------
+st.markdown("---")
+f1, f2, f3, f4 = st.columns(4)
+
+with f1:
+    num_ativos = st.selectbox("Ativos a analisar", [20, 50, 100, 200], index=1)
+with f2:
+    score_min = st.slider("Score mínimo", 50, 90, 68)
+with f3:
+    timeframe_input = st.selectbox("Tempo Gráfico Principal", ["15m", "1h", "4h", "1d"], index=2)
+with f4:
+    rr_target = st.selectbox("Risco : Retorno (R:R Target)", [2.0, 3.0, 4.0], index=0)
+
+# ---------------------------------------------------------
+# MÉTRICAS RESUMIDAS
+# ---------------------------------------------------------
+m1, m2, m3, m4, m5 = st.columns(5)
+
+open_count = len(trades_db["open"])
+closed_count = len(trades_db["closed"])
+gains = len([t for t in trades_db["closed"] if t.get("result") == "GAIN"])
+win_rate = (gains / closed_count * 100) if closed_count > 0 else 0.0
+
+m1.metric("Setups atuais", f"{len(symbols[:num_ativos])} Ativos")
+m2.metric("Entradas registradas", open_count)
+m3.metric("Taxa de acerto", f"{win_rate:.1f}%")
+m4.metric("Trades Fechados", closed_count)
+m5.metric("Gains / Losses", f"{gains}G / {closed_count - gains}L")
+
+# ---------------------------------------------------------
+# OPORTUNIDADES ATUAIS - SETUPS QUALIFICADOS
+# ---------------------------------------------------------
+st.markdown("---")
+st.subheader("OPORTUNIDADES ATUAIS - Setups Qualificados")
+st.caption("Confluência de Indicadores: Trend (EMA 8/21/50/100) + Momentum (RSI) + Estrutura")
+
+col_sel, col_info = st.columns([1, 2])
+
+with col_sel:
+    selected_pair = st.selectbox("Selecione o Par para Análise:", symbols[:num_ativos])
+
+if selected_pair:
     try:
-        markets = exchange.load_markets()
-        symbols = [s for s in markets if s.endswith('/USDT') and '3L/' not in s and '3S/' not in s and '5L/' not in s and '5S/' not in s]
-        return symbols[:200]
-    except Exception as e:
-        return ["BTC/USDT", "ETH/USDT", "SOL/USDT", "ONDO/USDT", "NEAR/USDT", "API3/USDT", "TAO/USDT", "JTO/USDT"]
-
-symbols = get_mexc_symbols()
-
-# ---------------------------------------------------------
-# ABAS DO PAINEL
-# ---------------------------------------------------------
-tab_radar, tab_backtest, tab_portfolio = st.tabs(["🔍 Radar MEXC", "📊 Backtest Histórico", "💼 Meus Trades"])
-
-# ---------------------------------------------------------
-# ABA 1: RADAR DE SETUPS MEXC
-# ---------------------------------------------------------
-with tab_radar:
-    st.subheader("Análise Gráfica MEXC & Setup")
-    selected_symbol = st.selectbox("Selecione o Ativo na MEXC:", symbols)
-
-    if selected_symbol:
-        ohlcv = exchange.fetch_ohlcv(selected_symbol, timeframe=timeframe, limit=150)
+        ohlcv = exchange.fetch_ohlcv(selected_pair, timeframe=timeframe_input, limit=100)
         df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
-        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
-
+        
+        # Indicadores Clássicos de Alta Assertividade
         df['EMA_8'] = ta.trend.ema_indicator(df['close'], window=8)
         df['EMA_21'] = ta.trend.ema_indicator(df['close'], window=21)
         df['EMA_50'] = ta.trend.ema_indicator(df['close'], window=50)
         df['EMA_100'] = ta.trend.ema_indicator(df['close'], window=100)
         df['RSI'] = ta.momentum.rsi(df['close'], window=14)
 
-        atual = df.iloc[-1]
-        preco_atual = atual['close']
-        stop_loss = atual['low'] * 0.985
-        risco = preco_atual - stop_loss
-        take_profit = preco_atual + (risco * rr_ratio)
+        last = df.iloc[-1]
+        price = last['close']
+        stop = last['low'] * 0.985
+        risk = price - stop
+        tp_2r = price + (risk * 2.0)
+        tp_3r = price + (risk * 3.0)
 
-        col1, col2, col3, col4 = st.columns(4)
-        col1.metric("Preço Atual (MEXC)", f"${preco_atual:.4f}")
-        col2.metric("RSI (14)", f"{atual['RSI']:.1f}")
-        col3.metric("EMA 8 vs 21", "ALTA 🟢" if atual['EMA_8'] > atual['EMA_21'] else "BAIXA 🔴")
-        col4.metric("R:R Alvo", f"1:{rr_ratio}")
+        # Cálculo do Score de Confluência
+        score = 50
+        validations = []
 
-        st.info(f"📍 **Plano de Entrada:** Compra: **${preco_atual:.4f}** | Stop Loss: **${stop_loss:.4f}** | Take Profit: **${take_profit:.4f}** (Alavancagem Máx Sugerida: 4x)")
+        if last['EMA_8'] > last['EMA_21']:
+            score += 15
+            validations.append("EMA 8 x 21 Alinhadas")
+        if last['close'] > last['EMA_50']:
+            score += 15
+            validations.append("Preço acima da EMA 50")
+        if 40 <= last['RSI'] <= 65:
+            score += 10
+            validations.append(f"RSI Saudável ({last['RSI']:.1f})")
+        if last['volume'] > df['volume'].tail(20).mean():
+            score += 10
+            validations.append("Volume acima da Média")
 
-        if st.button(f"📌 Entrar no Trade ({selected_symbol})"):
-            novo_trade = {
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Score do Setup", f"{score}/100")
+        c2.metric("Preço Entrada", f"${price:.4f}")
+        c3.metric("Stop Loss", f"${stop:.4f}")
+        c4.metric("Alvo TP (2R / 3R)", f"${tp_2r:.4f} / ${tp_3r:.4f}")
+
+        st.write(f"**Validações identificadas:** {', '.join(validations)}")
+
+        if st.button(f"⚡ Validar Entrada ({selected_pair})"):
+            new_trade = {
                 "id": str(datetime.now().timestamp()),
-                "symbol": selected_symbol,
-                "entry_price": preco_atual,
-                "stop_loss": stop_loss,
-                "take_profit": take_profit,
-                "timeframe": timeframe,
+                "symbol": selected_pair,
+                "entry": price,
+                "stop": stop,
+                "tp_2r": tp_2r,
+                "tp_3r": tp_3r,
                 "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
-            trades_data["open"].append(novo_trade)
-            save_trades(trades_data)
-            st.success("Trade registrado no seu diário!")
+            trades_db["open"].append(new_trade)
+            save_trades(trades_db)
+            st.success("Entrada Validada e Registrada no Diário!")
+            st.rerun()
 
-        st.line_chart(df.set_index('timestamp')[['close', 'EMA_8', 'EMA_21', 'EMA_50', 'EMA_100']])
-
-# ---------------------------------------------------------
-# ABA 2: BACKTEST HISTÓRICO
-# ---------------------------------------------------------
-with tab_backtest:
-    st.subheader("🧪 Backtest de Sinais no Histórico da MEXC")
-    
-    c1, c2, c3 = st.columns(3)
-    bt_symbol = c1.selectbox("Ativo na MEXC:", symbols, key="bt_sym")
-    dias_teste = c2.selectbox("Período (Dias):", [7, 15, 30, 45, 60, 90], index=2)
-    bt_tf = c3.selectbox("Tempo Gráfico:", ["1h", "2h", "4h", "1d"], index=2, key="bt_tf")
-
-    if st.button("🚀 Executar Backtest"):
-        limit_candles = dias_teste * (24 if bt_tf == "1h" else 6 if bt_tf == "4h" else 1)
-        candles = exchange.fetch_ohlcv(bt_symbol, timeframe=bt_tf, limit=min(limit_candles, 1000))
-        df_bt = pd.DataFrame(candles, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
-
-        df_bt['EMA_8'] = ta.trend.ema_indicator(df_bt['close'], window=8)
-        df_bt['EMA_21'] = ta.trend.ema_indicator(df_bt['close'], window=21)
-        df_bt['RSI'] = ta.momentum.rsi(df_bt['close'], window=14)
-
-        gains = 0
-        losses = 0
-
-        for i in range(21, len(df_bt)-5):
-            if df_bt['RSI'].iloc[i] <= rsi_limit and df_bt['EMA_8'].iloc[i] > df_bt['EMA_21'].iloc[i]:
-                p_entrada = df_bt['close'].iloc[i]
-                p_stop = df_bt['low'].iloc[i] * 0.985
-                p_tp = p_entrada + ((p_entrada - p_stop) * rr_ratio)
-
-                for j in range(i+1, min(i+15, len(df_bt))):
-                    if df_bt['high'].iloc[j] >= p_tp:
-                        gains += 1
-                        break
-                    elif df_bt['low'].iloc[j] <= p_stop:
-                        losses += 1
-                        break
-
-        total_ops = gains + losses
-        win_rate = (gains / total_ops * 100) if total_ops > 0 else 0.0
-
-        m1, m2, m3, m4 = st.columns(4)
-        m1.metric("Sinais Gerados", total_ops)
-        m2.metric("Gains 🟢", gains)
-        m3.metric("Losses 🔴", losses)
-        m4.metric("Taxa de Acerto", f"{win_rate:.1f}%")
+    except Exception as e:
+        st.error(f"Erro ao carregar dados do par {selected_pair}: {e}")
 
 # ---------------------------------------------------------
-# ABA 3: MEUS TRADES
+# DIÁRIO DE OPERAÇÕES - RESULTADO DAS ENTRADAS
 # ---------------------------------------------------------
-with tab_portfolio:
-    st.subheader("💼 Gestão e Acompanhamento em Tempo Real")
+st.markdown("---")
+st.subheader("DIÁRIO DE OPERAÇÕES - Resultados das entradas")
 
-    fechados = trades_data["closed"]
-    total_f = len(fechados)
-    gains_f = len([t for t in fechados if t["result"] == "GAIN"])
-    winrate_f = (gains_f / total_f * 100) if total_f > 0 else 0.0
+col_d1, col_d2 = st.columns([3, 1])
+with col_d2:
+    if st.button("🔄 Checar preço atual (Ao Vivo)"):
+        st.rerun()
 
-    k1, k2, k3, k4 = st.columns(4)
-    k1.metric("Trades Encerrados", total_f)
-    k2.metric("Gains", gains_f)
-    k3.metric("Losses", total_f - gains_f)
-    k4.metric("Assertividade Real", f"{winrate_f:.1f}%")
-
-    st.markdown("---")
-    st.subheader("⏳ Posições Abertas (Preço Vivo na MEXC)")
-
-    em_aberto = trades_data["open"]
-    if not em_aberto:
-        st.info("Nenhuma posição aberta.")
-    else:
-        for idx, t in enumerate(em_aberto):
+if not trades_db["open"]:
+    st.info("Valide uma entrada em um setup para começar o histórico.")
+else:
+    for idx, t in enumerate(trades_db["open"]):
+        try:
             ticker = exchange.fetch_ticker(t["symbol"])
-            preco_agora = ticker['last']
-            pnl_pct = ((preco_agora - t["entry_price"]) / t["entry_price"]) * 100
+            curr_price = ticker['last']
+            pnl = ((curr_price - t['entry']) / t['entry']) * 100
+            
+            card_col1, card_col2, card_col3, card_col4, card_col5 = st.columns([2, 2, 2, 2, 2])
+            card_col1.write(f"**{t['symbol']}**\n{t['date']}")
+            card_col2.write(f"Entrada: **${t['entry']:.4f}**")
+            card_col3.write(f"Atual: **${curr_price:.4f}**")
+            card_col4.write(f"PnL: **{pnl:+.2f}%**")
 
-            col_a, col_b, col_c, col_d, col_e = st.columns([2, 2, 2, 2, 3])
-            col_a.write(f"**{t['symbol']}**")
-            col_b.write(f"Entrada: ${t['entry_price']:.4f}")
-            col_c.write(f"Atual: ${preco_agora:.4f}")
-            col_d.write(f"Lucro/Prejuízo: **{pnl_pct:+.2f}%**")
-
-            with col_e:
-                c_btn1, c_btn2 = st.columns(2)
-                if c_btn1.button("🟢 GAIN", key=f"g_{t['id']}"):
+            with card_col5:
+                btn_g, btn_l = st.columns(2)
+                if btn_g.button("🟢 GAIN", key=f"gain_{t['id']}"):
                     t["result"] = "GAIN"
-                    t["close_price"] = preco_agora
-                    trades_data["closed"].append(t)
-                    trades_data["open"].pop(idx)
-                    save_trades(trades_data)
-                    st.rerun()
-                if c_btn2.button("🔴 LOSS", key=f"l_{t['id']}"):
-                    t["result"] = "LOSS"
-                    t["close_price"] = preco_agora
-                    trades_data["closed"].append(t)
-                    trades_data["open"].pop(idx)
-                    save_trades(trades_data)
+                    t["close_price"] = curr_price
+                    trades_db["closed"].append(t)
+                    trades_db["open"].pop(idx)
+                    save_trades(trades_db)
                     st.rerun()
 
+                if btn_l.button("🔴 LOSS", key=f"loss_{t['id']}"):
+                    t["result"] = "LOSS"
+                    t["close_price"] = curr_price
+                    trades_db["closed"].append(t)
+                    trades_db["open"].pop(idx)
+                    save_trades(trades_db)
+                    st.rerun()
+        except Exception:
+            st.warning(f"Não foi possível obter preço atual para {t['symbol']}")
+
+# Backup de Histórico (Para garantir que não perca dados na nuvem gratuita)
+if trades_db["closed"]:
     st.markdown("---")
-    st.subheader("📜 Histórico Registrado")
-    if fechados:
-        st.dataframe(pd.DataFrame(fechados)[['date', 'symbol', 'entry_price', 'close_price', 'result']], use_container_width=True)
+    st.caption("📜 Histórico de Trades Fechados")
+    st.dataframe(pd.DataFrame(trades_db["closed"])[['date', 'symbol', 'entry', 'close_price', 'result']], use_container_width=True)
+    st.download_button(
+        label="💾 Baixar Backup de Trades (JSON)",
+        data=json.dumps(trades_db, indent=4),
+        file_name="backup_diario_trades.json",
+        mime="application/json"
+    )
+
+# ---------------------------------------------------------
+# SIMULAÇÃO HISTÓRICA / VALIDACÃO DE SETUP (BACKTEST)
+# ---------------------------------------------------------
+st.markdown("---")
+st.subheader("SIMULAÇÃO HISTÓRICA - Validação do setup")
+st.caption("Candles reais · sem taxas, slippage ou funding · alvo 2R")
+
+b_col1, b_col2, b_col3 = st.columns([2, 2, 1])
+
+with b_col1:
+    bt_pair = st.selectbox("Par USDT", symbols[:num_ativos], key="bt_pair_sim")
+with b_col2:
+    bt_period = st.selectbox("Período", ["7 dias", "15 dias", "30 dias", "60 dias"], index=2)
+
+if st.button("🚀 Simular setup"):
+    days = int(bt_period.split()[0])
+    limit_c = days * 24
+    
+    try:
+        candles_bt = exchange.fetch_ohlcv(bt_pair, timeframe="1h", limit=min(limit_c, 500))
+        df_sim = pd.DataFrame(candles_bt, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+
+        df_sim['EMA_8'] = ta.trend.ema_indicator(df_sim['close'], window=8)
+        df_sim['EMA_21'] = ta.trend.ema_indicator(df_sim['close'], window=21)
+        df_sim['RSI'] = ta.momentum.rsi(df_sim['close'], window=14)
+
+        sim_gains = 0
+        sim_losses = 0
+
+        for i in range(21, len(df_sim)-5):
+            if df_sim['RSI'].iloc[i] <= 40 and df_sim['EMA_8'].iloc[i] > df_sim['EMA_21'].iloc[i]:
+                p_in = df_sim['close'].iloc[i]
+                p_st = df_sim['low'].iloc[i] * 0.985
+                p_target = p_in + ((p_in - p_st) * rr_target)
+
+                for j in range(i+1, min(i+15, len(df_sim))):
+                    if df_sim['high'].iloc[j] >= p_target:
+                        sim_gains += 1
+                        break
+                    elif df_sim['low'].iloc[j] <= p_st:
+                        sim_losses += 1
+                        break
+
+        tot_sim = sim_gains + sim_losses
+        acc_sim = (sim_gains / tot_sim * 100) if tot_sim > 0 else 0.0
+
+        sb1, sb2, sb3, sb4 = st.columns(4)
+        sb1.metric("Entradas Simuladas", tot_sim)
+        sb2.metric("Gains", sim_gains)
+        sb3.metric("Losses", sim_losses)
+        sb4.metric("Assertividade", f"{acc_sim:.1f}%")
+
+    except Exception as err:
+        st.error(f"Erro ao rodar simulação: {err}")
