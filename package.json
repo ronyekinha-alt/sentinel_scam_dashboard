@@ -1,0 +1,13 @@
+{
+  "name": "sentinel-trade",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check app.js && node --check server.js && node --check sentinel-core.js && node --check sentinel-backtest.js && node --check telegram-scanner.mjs && node --check backtest-cli.mjs",
+    "test": "node tests/parity.test.cjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

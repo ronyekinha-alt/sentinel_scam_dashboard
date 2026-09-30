@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sentinel Trade | Setups</title>
+  <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="light.css" />
+    <link rel="stylesheet" href="backtest-ui.css" />
+    <style>
+      .mexc-metrics-performance { grid-template-columns: repeat(7, minmax(125px, 1fr)); }
+      .mexc-metric-gain { background: #dcfce7 !important; border-color: #22c55e !important; }
+      .mexc-metric-gain .value { color: #15803d !important; }
+      .mexc-metric-loss { background: #fee2e2 !important; border-color: #ef4444 !important; }
+      .mexc-metric-loss .value { color: #b91c1c !important; }
+      @media (max-width: 1200px) {
+        .mexc-metrics-performance { grid-template-columns: repeat(4, minmax(135px, 1fr)); }
+      }
+    </style>
+  <style>
+    :root{--bg:#050615;--surface:#0b0c22;--surface2:#121337;--line:#292a61;--text:#f1f3ff;--muted:#a5a9ca;--cyan:#22f7d3;--green:#64ff9b;--red:#ff5d86;--gold:#ffe95b;--violet:#ae67ff}
+    body{background:radial-gradient(circle at 82% -10%,#351170 0,transparent 31%),radial-gradient(circle at 5% 10%,#003d52 0,transparent 30%),var(--bg)}.topbar{box-shadow:0 1px 25px #5522aa44}.topbar h1{ text-shadow:0 0 16px #22f7d399}.eyebrow{text-shadow:0 0 9px #22f7d3aa}.primary{box-shadow:0 0 18px #22f7d366}.primary:hover{box-shadow:0 0 28px #22f7d3aa}.secondary{color:#dedcff;border-color:var(--violet)}.secondary:hover{box-shadow:0 0 15px #ae67ff88}.controls,.panel{background:linear-gradient(135deg,#0b0c22,#0c1530);box-shadow:0 0 22px #1b208844}.controls .check{display:flex;align-items:center;gap:7px;padding-bottom:7px}.controls .check input{accent-color:var(--cyan)}.stat{background:linear-gradient(135deg,#101037,#091627);box-shadow:0 0 15px #2636a644}.stat .value,.score{color:var(--cyan);text-shadow:0 0 12px #22f7d388}dialog{border-color:var(--violet);box-shadow:0 0 40px #ae67ff88}
+    .best-setup{background:linear-gradient(90deg,#eaf3ff,#fff)!important}.best-setup td:first-child{border-left:5px solid #f59e0b}.best-badge{display:inline-block;margin-left:6px;padding:3px 6px;border-radius:4px;background:#f59e0b;color:#1e1600;font-size:10px;font-weight:900;letter-spacing:.3px}
+    .exchange-badge{display:inline-block;margin-top:4px;padding:3px 6px;border-radius:4px;font-size:9px;letter-spacing:.45px;font-weight:900}.exchange-badge.mexc{background:#0ea5e9;color:#fff;box-shadow:0 0 9px #22d3eeaa}.exchange-badge.binance{background:#f59e0b;color:#211600;box-shadow:0 0 8px #f59e0b88}.vehicle-badge{display:inline-block;margin-top:4px;padding:3px 6px;border-radius:4px;font-size:9px;letter-spacing:.45px;font-weight:900;color:#07111f;background:#a5f3fc;box-shadow:0 0 8px #67e8f988}.vehicle-badge.futures{background:#c4b5fd;box-shadow:0 0 8px #a78bfa88}.timeframe-badge{display:inline-block;padding:3px 7px;border-radius:5px;font-size:10px;font-weight:900;letter-spacing:.35px;color:#111;box-shadow:0 0 7px #22c55e55}.timeframe-badge.tf-1h{background:#86efac}.timeframe-badge.tf-2h{background:#fde68a}.timeframe-badge.tf-4h{background:#cbd5e1}.direction-badge{display:inline-block;margin-top:4px;padding:4px 8px;border-radius:4px;font-size:10px;letter-spacing:.6px;font-weight:900;color:#fff}.direction-badge.long{background:#14532d;box-shadow:0 0 9px #22c55e66}.direction-badge.short{background:#7f1d1d;box-shadow:0 0 9px #ef444466}.result-win,.result-loss{font-weight:800;color:#111!important}.result-win{background:#bbf7d0!important}.result-loss{background:#fecaca!important}
+    .backtest-section-heading{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:11px 14px;margin-top:14px;border-radius:6px;font-size:13px}.backtest-section-heading span{font-weight:700}.backtest-strategy-heading{background:#14532d;color:#fff}.backtest-best-heading{background:#bbf7d0;color:#14532d}.backtest-period-heading{background:#166534;color:#fff}.backtest-recommendation{background:#fef3c7!important;color:#713f12!important;font-weight:900}
+  </style>
+  <link rel="stylesheet" href="light.css" />
+<style>
+    #backtestPanel .backtest-date-field input { background:#fff1e6; border:2px solid #f97316; box-shadow:0 0 10px #fb923c66; color:#7c2d12; }
+    #backtestPanel .backtest-date-field input:focus { outline:2px solid #fdba74; background:#ffedd5; }
+    #importedTradesPanel > .section-heading, #importedTradesPanel .mexc-balance-heading { background:linear-gradient(135deg,#fff7ed,#fed7aa 58%,#fdba74); color:#7c2d12; border-color:#fb923c; box-shadow:0 0 18px #fb923c66; }
+    #importedTradesPanel > .section-heading .muted, #importedTradesPanel .mexc-balance-heading .muted { color:#9a3412; }
+    #mexcHistoryRefreshButton { background:linear-gradient(135deg,#2563eb,#60a5fa); border-color:#bfdbfe; box-shadow:0 0 14px #60a5fa99; } #backtestPanel > .section-heading { background:linear-gradient(135deg,#dbeafe,#93c5fd 58%,#60a5fa); color:#0c4a6e; border-color:#60a5fa; } #backtestPanel > .section-heading .muted { color:#1e3a8a; }
+  </style>
+<style id="light-palette-overrides">
+  #importedTradesPanel > .section-heading,
+  #importedTradesPanel .mexc-balance-heading {
+    background: linear-gradient(135deg,#fffaf0,#ffedd5 58%,#fed7aa) !important;
+    color:#7c2d12 !important;
+    border-color:#fdba74 !important;
+    box-shadow:0 0 18px #fdba7466 !important;
+  }
+  #importedTradesPanel > .section-heading .muted,
+  #importedTradesPanel .mexc-balance-heading .muted { color:#9a3412 !important; }
+  #mexcPanel > .section-heading {
+    background:linear-gradient(135deg,#eff6ff,#dbeafe 58%,#bfdbfe) !important;
+    color:#1e3a8a !important;
+    border-color:#93c5fd !important;
+  }
+  #mexcPanel > .section-heading .muted { color:#1e40af !important; }
+  #backtestPanel > .section-heading {
+    background:linear-gradient(135deg,#eff6ff,#dbeafe 55%,#bfdbfe) !important;
+    color:#1e3a8a !important;
+    border-color:#93c5fd !important;
+    box-shadow:0 0 18px #93c5fd88 !important;
+  }
+  #backtestPanel > .section-heading .muted { color:#1e40af !important; }
+  #importedTradesPanel > .controls,
+  #mexcPanel > .controls,
+  #backtestPanel > .controls {
+    background:linear-gradient(135deg,#f8fafc,#eff6ff) !important;
+    color:#172554 !important;
+    border-color:#93c5fd !important;
+    box-shadow:0 0 16px #bfdbfe88 !important;
+  }
+  #importedTradesPanel > .controls .muted,
+  #mexcPanel > .controls .muted,
+  #backtestPanel > .controls .muted { color:#475569 !important; }
+  #importedTradesPanel > .controls input,
+  #mexcPanel > .controls input,
+  #backtestPanel > .controls input,
+  #backtestPanel > .controls select {
+    background:#ffffff !important;
+    color:#1e3a8a !important;
+    border-color:#93c5fd !important;
+  }
+  #backtestPanel .backtest-date-field input {
+    background:#fff7ed !important;
+    color:#9a3412 !important;
+    border-color:#fdba74 !important;
+  }
+</style><style id="contrast-palette-overrides">
+  #importedTradesPanel > .section-heading,
+  #importedTradesPanel .mexc-balance-heading {
+    background:linear-gradient(135deg,#fffaf0,#ffedd5 58%,#fed7aa) !important;
+    color:#1f2937 !important;
+    border:2px solid #f97316 !important;
+    box-shadow:0 0 14px #fdba7466 !important;
+  }
+  #importedTradesPanel > .section-heading .eyebrow,
+  #importedTradesPanel > .section-heading h2,
+  #importedTradesPanel > .section-heading h3,
+  #importedTradesPanel > .section-heading label,
+  #importedTradesPanel > .section-heading .muted,
+  #importedTradesPanel .mexc-balance-heading .eyebrow,
+  #importedTradesPanel .mexc-balance-heading h2,
+  #importedTradesPanel .mexc-balance-heading h3,
+  #importedTradesPanel .mexc-balance-heading .muted {
+    color:#1f2937 !important;
+    text-shadow:none !important;
+  }
+  #mexcPanel > .section-heading,
+  #backtestPanel > .section-heading {
+    background:linear-gradient(135deg,#dbeafe,#bfdbfe 58%,#93c5fd) !important;
+    color:#172554 !important;
+    border:2px solid #60a5fa !important;
+    box-shadow:0 0 14px #93c5fd66 !important;
+  }
+  #mexcPanel > .section-heading .eyebrow,
+  #mexcPanel > .section-heading h2,
+  #mexcPanel > .section-heading .muted,
+  #backtestPanel > .section-heading .eyebrow,
+  #backtestPanel > .section-heading h2,
+  #backtestPanel > .section-heading .muted {
+    color:#172554 !important;
+    text-shadow:none !important;
+  }
+  #mexcPanel > .controls,
+  #backtestPanel > .controls,
+  #importedTradesPanel > .controls {
+    background:linear-gradient(135deg,#f8fafc,#eef6ff) !important;
+    color:#1f2937 !important;
+  }
+  #mexcPanel > .controls label,
+  #backtestPanel > .controls label,
+  #importedTradesPanel > .controls label,
+  #mexcPanel > .controls .muted,
+  #backtestPanel > .controls .muted,
+  #importedTradesPanel > .controls .muted {
+    color:#334155 !important;
+  }
+</style><style id="mexc-solid-tab-color">
+  #mexcPanel > .section-heading {
+    background:#bfdbfe !important;
+  }
+</style><style id="imported-solid-tab-color">
+  #importedTradesPanel > .section-heading,
+  #importedTradesPanel .mexc-balance-heading {
+    background:#bfdbfe !important;
+  }
+</style><style id="imported-orange-solid-color">
+  #importedTradesPanel > .section-heading,
+  #importedTradesPanel .mexc-balance-heading {
+    background:#ffedd5 !important;
+  }
+</style><style id="imported-orange-border-fill">
+  #importedTradesPanel > .section-heading,
+  #importedTradesPanel .mexc-balance-heading {
+    background:#f97316 !important;
+    color:#172554 !important;
+  }
+  #importedTradesPanel > .section-heading .eyebrow,
+  #importedTradesPanel > .section-heading h2,
+  #importedTradesPanel > .section-heading h3,
+  #importedTradesPanel > .section-heading label,
+  #importedTradesPanel > .section-heading .muted,
+  #importedTradesPanel .mexc-balance-heading .eyebrow,
+  #importedTradesPanel .mexc-balance-heading h2,
+  #importedTradesPanel .mexc-balance-heading h3,
+  #importedTradesPanel .mexc-balance-heading .muted {
+    color:#172554 !important;
+  }
+</style><style id="imported-orange-lightened">
+  #importedTradesPanel > .section-heading,
+  #importedTradesPanel .mexc-balance-heading {
+    background:#fb9650 !important;
+  }
+</style><style id="imported-gold-card-color">
+  #importedTradesPanel > .section-heading,
+  #importedTradesPanel .mexc-balance-heading {
+    background:#eab308 !important;
+  }
+</style><style id="imported-soft-gold-fill">
+  #importedTradesPanel > .section-heading,
+  #importedTradesPanel .mexc-balance-heading {
+    background:#f1d36b !important;
+    border-color:#f1d36b !important;
+  }
+</style><style id="backtest-period-readability">
+  #mexcMetricsPrimary { grid-template-columns:repeat(6,minmax(125px,1fr)); }
+  #backtestPeriodsBody tr.backtest-period-month td {
+    background:#e5e7eb !important;
+    color:#172554 !important;
+    font-weight:700;
+    border-top:3px solid #64748b !important;
+  }
+  #backtestPeriodsBody tr.backtest-period-week td {
+    background:#f8fafc !important;
+    border-left:3px solid #93c5fd;
+  }
+  #backtestPeriodsBody tr.backtest-period-weekday td {
+    background:#ffffff !important;
+    border-left:3px solid #cbd5e1;
+  }
+  #backtestPeriodsBody tr.backtest-recommendation td {
+    background:#fef3c7 !important;
+    color:#172554 !important;
+  }
+  .strategy-name strong { font-weight:800; color:#172554; }
+  @media (max-width:1000px) {
+    #mexcMetricsPrimary { grid-template-columns:repeat(3,minmax(135px,1fr)); }
+  }
+  @media (max-width:600px) {
+    #mexcMetricsPrimary { grid-template-columns:repeat(2,minmax(135px,1fr)); }
+  }
+  </style><style id="value-tone-overrides">
+    .positive { color:#15803d !important; }
+    .negative { color:#b91c1c !important; }
+    .zero { color:#111827 !important; }
+    .result-win { color:#15803d !important; }
+    .result-loss { color:#b91c1c !important; }
+  </style></head>
+<body>
+  <header class="topbar">
+    <div><p class="eyebrow">ANÁLISE QUANTITATIVA · SPOT</p><h1>Sentinel Trade</h1></div>
+    <div class="header-actions"><span id="connection" class="pill neutral">Aguardando consulta</span><button id="scanButton" class="primary">Atualizar scanner</button></div>
+  </header>
+  <main>
+    <section class="controls" aria-label="Filtros do scanner">
+      <label>Ativos a analisar por market cap <select id="assetLimit"><option value="50">50</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="700">700</option><option value="1000" selected>1000</option><option value="1500">1500 (demorado)</option></select></label>
+      <label title="Score é uma pontuação de confluência técnica, não uma probabilidade matemática garantida.">Score mínimo <select id="minScore"><option value="90" selected>90</option><option value="100">100</option></select><span class="sub">90 ou 100 · mesmo score do Telegram</span></label>
+      <label>Estratégia do scanner <select id="strategySelect"><option value="both" selected>Ambos os critérios</option><option value="aggressive-pullback">Pullback 2H + confirmação 4H</option><option value="trend">Tendência + pivô</option></select><span id="strategyHelp" class="sub">Executa os dois critérios e mantém somente o sinal mais forte por ativo. Futuros limitados a 3×.</span></label>
+      <label>Volume mínimo 24h <select id="volumeLimit"><option value="1000000" selected>US$ 1 mi</option><option value="2000000">US$ 2 mi</option><option value="5000000">US$ 5 mi</option></select></label>
+      <label>Atualização automática <select id="autoRefresh"><option value="5" selected>A cada 5 min</option><option value="10">A cada 10 min</option><option value="20">A cada 20 min</option><option value="30">A cada 30 min</option><option value="60">A cada 1 hora</option><option value="120">A cada 2 horas</option><option value="180">A cada 3 horas</option><option value="240">A cada 4 horas</option></select></label>
+      <label class="check"><input id="browserAlerts" type="checkbox" /> Alertar novos setups neste navegador</label>
+      <p id="scanStatus" class="muted">Clique em “Atualizar scanner” para buscar o mercado.</p>
+    </section>
+    <section class="stats" id="summaryCards"></section>
+    <section class="panel" id="signalsPanel">
+      <div class="section-heading"><div><p class="eyebrow">OPORTUNIDADES ATUAIS · TOP 10</p><h2>Setups qualificados</h2></div><p class="muted">Melhor critério por ativo · sem entrada esticada · futuros até 3×</p></div>
+      <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Score</th><th>Contexto macro</th><th>Validações</th><th>Entrada</th><th>Stop</th><th>TP 2R / 3R</th><th></th></tr></thead><tbody id="signalsBody"><tr><td colspan="8" class="empty">Nenhuma análise executada ainda.</td></tr></tbody></table></div>
+    </section>
+    <section class="panel" id="realTradesPanel">
+      <div class="section-heading"><div><p class="eyebrow">TRADES REAIS · ACOMPANHAMENTO EM TEMPO REAL</p><h2>Entradas que você validou</h2></div><div><label class="check"><input id="tradeTrackingAuto" type="checkbox" checked /> Atualizar a cada 20 s</label><button id="refreshTracking" class="secondary">Atualizar trades</button></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Entrada</th><th>Stop / metas</th><th>Status</th><th>Resultado</th><th>Registro</th><th></th></tr></thead><tbody id="tradesBody"><tr><td colspan="7" class="empty">Valide uma entrada em um setup para começar o histórico.</td></tr></tbody></table></div>
+    </section>
+    <section class="panel" id="importedTradesPanel">
+      <div class="section-heading"><div><p class="eyebrow">HISTÓRICO IMPORTADO · MEXC</p><h2>Operações lidas da corretora</h2></div><div><label class="check"><input id="mexcHistoryAuto" type="checkbox" /> Atualizar a cada 20 s</label><button id="mexcHistoryRefreshButton" class="primary" type="button">Atualizar posições</button><p class="muted">Consulta somente leitura; não compõe as métricas do diário.</p></div></div>
+      <div class="controls" id="mexcPerformanceFilters"><label>Resultado mínimo para performance (US$) <input id="mexcMinResult" type="number" min="0" step="0.01" value="1" /></label><p class="muted">Operações menores permanecem no histórico bruto, mas não entram nos cards de acerto, gain, loss ou resultado líquido.</p></div>
+      <section class="stats mexc-metrics-primary" id="mexcMetricsPrimary"><div class="empty">Importe as operações da MEXC para ver as métricas reais.</div></section>
+      <section class="stats mexc-metrics-performance" id="mexcMetricsPerformance"></section>
+      <p id="mexcMetricsNote" class="muted"></p>
+      <div class="section-heading mexc-balance-heading"><div><p class="eyebrow">HISTÓRICO DE SALDO</p><h3>Saldo MEXC por período</h3></div><p class="muted">Registra um snapshot quando o saldo é consultado; valores antigos não são inventados.</p></div>
+      <div class="table-wrap"><table><thead><tr><th>Semana</th><th>Mês</th><th>Data do snapshot</th><th>Saldo (US$)</th><th>Saldo (R$)</th><th>Variação</th></tr></thead><tbody id="mexcBalanceHistoryBody"><tr><td colspan="6" class="empty">Atualize as posições para registrar o primeiro saldo.</td></tr></tbody></table></div>
+      <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Total de trades</th><th>Wins</th><th>Losses</th><th>% acerto</th><th>Gains</th><th>Losses</th><th>PnL líquido</th></tr></thead><tbody id="mexcResultsBody"><tr><td colspan="8" class="empty">Nenhuma operação fechada importada ainda.</td></tr></tbody></table></div>
+      <div class="table-wrap" id="importedTradesDetail" hidden><table><thead><tr><th>Ativo</th><th>Tipo</th><th>Preço executado</th><th>Data</th><th>Detalhes</th></tr></thead><tbody id="importedTradesBody"><tr><td colspan="5" class="empty">Detalhamento oculto.</td></tr></tbody></table></div>
+    </section>
+    <section class="panel" id="mexcLivePanel">
+      <div class="section-heading"><div><p class="eyebrow">MEXC · POSIÇÕES REAIS EM ABERTO</p><h2>Acompanhamento ao vivo</h2></div><div><label class="check"><input id="mexcLiveAuto" type="checkbox" /> Atualizar a cada 30 s</label><button id="mexcPositionsButton" class="primary">Atualizar posições</button></div></div>
+      <p id="mexcLiveStatus" class="muted">Importe ou atualize as posições para acompanhar operações em aberto.</p>
+      <section class="stats" id="mexcLiveMetrics"><div class="empty">Nenhuma posição consultada.</div></section>
+      <div class="table-wrap"><table><thead><tr><th>Ativo / direção</th><th>Entrada → atual</th><th>Alavancagem / margem</th><th>PnL estimado</th><th>SL / TP</th><th>Liquidação</th><th>Status</th></tr></thead><tbody id="mexcPositionsBody"><tr><td colspan="7" class="empty">Nenhuma posição consultada.</td></tr></tbody></table></div>
+    </section>
+    <section class="panel" id="mexcPanel">
+      <div class="section-heading"><div><p class="eyebrow">IMPORTAÇÃO MEXC · SOMENTE LEITURA</p><h2>Trazer operações realizadas</h2></div><p class="muted">Nenhuma ordem, saque ou movimentação é autorizado pelo painel.</p></div>
+      <div class="controls" aria-label="Importação de operações MEXC">
+        <label>API Key <input id="mexcApiKey" type="password" autocomplete="off" placeholder="Cole somente no painel local" /></label>
+        <label>Secret Key <input id="mexcSecret" type="password" autocomplete="off" placeholder="Nunca envie pelo chat" /></label>
+        <label>Pares Spot <input id="mexcSpotSymbol" value="BTCUSDT" maxlength="140" placeholder="BTCUSDT, ETHUSDT" /></label>
+        <label class="check"><input id="mexcRemember" type="checkbox" /> Lembrar chaves neste computador</label>
+        <button id="mexcImportButton" class="primary">Importar MEXC</button>
+        <button id="mexcForgetButton" type="button" class="secondary">Esquecer chaves</button>
+        <p id="mexcStatus" class="muted">Importa fills dos pares spot informados e ordens de futuros dos últimos 90 dias. A MEXC exige um par para consultar fills spot.</p>
+      </div>
+    </section>
+    <section class="panel" id="backtestPanel">
+      <div class="section-heading"><div><p class="eyebrow">SIMULAÇÃO HISTÓRICA</p><h2>Validação do setup</h2></div><p class="muted">Candles reais · sem taxas, slippage ou funding · alvo 2R</p></div>
+      <div class="controls" aria-label="Configuração da simulação">
+        <label class="backtest-symbol-field">Pares (separe por vírgula) <input id="backtestSymbol" value="LINK, ONDO, NEAR, ASTR, VET, ETH, SOL, RAY" maxlength="500" /></label>
+        <label class="backtest-date-field">Data inicial <input id="backtestStartDate" type="date" required /></label><label class="backtest-date-field">Data final <input id="backtestEndDate" type="date" required /></label>
+        <fieldset class="filter-group" id="backtestStrategyFilters"><legend>Setup <span>selecione um ou mais</span></legend><label class="filter-option filter-all"><input type="checkbox" data-backtest-all="strategy" checked /> Selecionar todos</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="trend" checked /> Tendência + pivô</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="aggressive-pullback" checked /> Pullback 2H + confirmação 4H</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="legacy-pullback-1h" /> Antecipado · Pullback 1H + confirmação</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="refined-early-ema-rsi" /> Experimental · EMA9/22 + RSI + reteste</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="refined-moderate-ema-rsi" /> Experimental · EMA9/22 + RSI moderado</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="refined-intermediate-ema-rsi" /> Experimental · EMA9/22 + RSI intermediário</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="breakout-30-2h-close" /> Rompimento 30 candles 2H · fechamento</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="breakout-30-2h-retest" /> Rompimento 30 candles 2H · reteste</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="breakout-30-2h-retest-fixed-3" /> Reteste 30 · stop 3% / alvo 3%</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="breakout-30-2h-retest-fixed-4" /> Reteste 30 · stop 3% / alvo 4%</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="breakout-30-2h-retest-fixed-7" /> Reteste 30 · stop 3% / alvo 7%</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="breakout-60-2h-close" /> Rompimento 60 candles 2H · fechamento</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="breakout-60-2h-retest" /> Rompimento 60 candles 2H · reteste</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="breakout-60-2h-retest-fixed-3" /> Reteste 60 · stop 3% / alvo 3%</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="breakout-60-2h-retest-fixed-4" /> Reteste 60 · stop 3% / alvo 4%</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="breakout-60-2h-retest-fixed-7" /> Reteste 60 · stop 3% / alvo 7%</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="expansion-retest-2h" /> Experimental · Rompimento + reteste 2H</label></fieldset>
+        <fieldset class="filter-group" id="backtestTimeframeFilters"><legend>Tempo do gatilho <span>selecione um ou mais</span></legend><label class="filter-option filter-all"><input type="checkbox" data-backtest-all="timeframe" checked /> Comparar todos</label><label class="filter-option"><input type="checkbox" name="backtestTimeframe" value="1h" checked /> 1H · antecipado</label><label class="filter-option"><input type="checkbox" name="backtestTimeframe" value="2h" checked /> 2H · intermediário</label><label class="filter-option"><input type="checkbox" name="backtestTimeframe" value="4h" checked /> 4H · confirmação</label><span class="sub">O resumo compara apenas os tempos selecionados.</span></fieldset>
+        <label class="capital-field"><span>Capital inicial (R$)</span><strong>Valor aplicado no teste</strong><input id="backtestCapital" type="number" min="1" step="0.01" value="500" /></label>
+        
+        <label class="check"><input id="backtestReinvest" type="checkbox" checked /> Destacar resultado com reinvestimento</label>
+        <button id="backtestButton" class="primary">Simular setup</button>
+        <p id="backtestStatus" class="muted">A simulação usa candles fechados e distribui o capital em 10 operações para diluir o risco. Os cards mostram o saldo sem reinvestimento e com reinvestimento; cálculo sem taxas, slippage, funding ou liquidação real.</p>
+      </div>
+      <section class="stats" id="backtestStats"><div class="empty">Escolha um par e execute a simulação.</div></section>
+      <div class="backtest-section-heading backtest-strategy-heading"><strong>Comparação geral das estratégias</strong><span id="backtestStrategyRecommendation">A recomendação aparecerá após a simulação.</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Estratégia</th><th>Trades</th><th>Wins</th><th>Losses</th><th>Taxa de acerto</th><th>Atingiu 2R</th><th>Atingiu 3R</th><th>Saldo reinvestido 1×</th><th>Saldo reinvestido 2×</th><th>Saldo reinvestido 3×</th><th>Saldo reinvestido 4×</th><th>Saldo reinvestido 5×</th><th>Melhor mês</th><th>Melhor semana</th><th>Melhor tempo gráfico</th></tr></thead><tbody id="backtestComparisonBody"><tr><td colspan="15" class="empty">Execute a simulação para comparar as estratégias.</td></tr></tbody></table></div>
+      <div class="backtest-section-heading backtest-audit-heading"><strong>Auditoria: modelo histórico × modelo atual</strong><span>Mesmos trades, duas formas de alocar o capital</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Setup</th><th>Gatilho</th><th>Trades</th><th>Acerto</th><th>Saldo histórico · composição integral</th><th>Saldo atual · 10 alocações</th></tr></thead><tbody id="backtestAuditBody"><tr><td colspan="6" class="empty">Execute a simulação para comparar os modelos.</td></tr></tbody></table></div>
+      <div class="backtest-section-heading backtest-best-heading"><strong>Melhores ativos por retorno composto</strong><span id="backtestAssetRecommendation">A recomendação aparecerá após a simulação.</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Trades</th><th>Wins</th><th>Losses</th><th>Taxa de acerto</th><th>Retorno composto 1×</th><th>Melhor alavancagem simulada</th></tr></thead><tbody id="backtestAssetsBody"><tr><td colspan="7" class="empty">Execute a simulação para comparar os ativos.</td></tr></tbody></table></div>
+      <div class="backtest-section-heading backtest-period-heading"><strong>Melhores períodos para operar</strong><span id="backtestPeriodRecommendation">A recomendação aparecerá após a simulação.</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Período de entrada</th><th>Trades</th><th>Wins</th><th>Losses</th><th>Taxa de acerto</th><th>Retorno médio</th></tr></thead><tbody id="backtestPeriodsBody"><tr><td colspan="6" class="empty">A análise por mês e semana do mês aparecerá aqui.</td></tr></tbody></table></div>
+      <div class="table-wrap" id="backtestDetailTable" hidden><table><thead><tr><th>Estratégia</th><th>Entrada</th><th>Stop</th><th>Alvo 2R</th><th>Saída</th><th>Resultado</th></tr></thead><tbody id="backtestBody"><tr><td colspan="6" class="empty">Detalhamento oculto.</td></tr></tbody></table></div>
+    </section>
+  </main>
+  <dialog id="entryDialog"><form method="dialog" id="entryForm"><div class="dialog-heading"><h2>Registrar entrada</h2><button value="cancel" class="icon-button" aria-label="Fechar">×</button></div><p id="entrySetup"></p><label>Preço executado <input id="executedPrice" type="number" step="any" required /></label><label>Valor aplicado (US$) <input id="tradeNotional" type="number" min="0" step="0.01" placeholder="Opcional, para calcular em R$" /></label><label>Data e hora <input id="entryTime" type="datetime-local" required /></label><label>Observação opcional <textarea id="tradeNote" rows="3" placeholder="Ex.: entrada parcial, motivo, contexto"></textarea></label><div class="dialog-actions"><button value="cancel" class="secondary">Cancelar</button><button id="saveTrade" value="default" class="primary">Confirmar entrada</button></div></form></dialog>
+  <footer>Dados de mercado: APIs públicas CoinGecko e Binance. Registros: somente neste navegador.</footer>
+  <script src="sentinel-core.js?v=20260930"></script>
+  <script src="sentinel-backtest.js?v=20260930"></script>
+  <script src="app.js?v=20260930"></script>
+</body>
+</html>
