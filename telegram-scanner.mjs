@@ -18,7 +18,7 @@ export function messageFor(signals) {
   const money=value=>Number(value).toLocaleString('pt-BR',{minimumFractionDigits:value<1?5:2,maximumFractionDigits:value<1?5:2});
   const escape=value=>String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const lines=['🚨 <b>SENTINEL TRADE · SINAIS LONG</b>',new Date().toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'}),''];
-  signals.forEach((s,i)=>lines.push('━━━━━━━━━━━━━━',`🟢 <b>${i+1}) ${escape(s.symbol.replace('USDT',''))}/USDT · LONG</b>`,`🧭 ${escape(s.strategyName)} · gatilho ${s.timeframe}`,`⭐ Score de confluência: <b>${s.score}/100</b>`,`🏦 BINANCE · ${s.vehicle} ${s.leverage}`,`🟦 Entrada: <b>US$ ${money(s.entry)}</b>`,`🛑 Stop: <b>US$ ${money(s.stop)}</b>`,`🎯 TP 2R: <b>US$ ${money(s.tp2)}</b> · TP 3R: <b>US$ ${money(s.tp3)}</b>`,`📊 ${escape(s.trigger)}`,''));
+  signals.forEach((s,i)=>lines.push('━━━━━━━━━━━━━━',`🟢 <b>${i+1}) ${escape(s.symbol.replace('USDT',''))}/USDT · LONG</b>`,`🧭 ${escape(s.strategyName)} · gatilho ${s.timeframe}`,`⭐ Score de confluência: <b>${s.score}/100</b>`,`🏦 ${escape(s.source||'BINANCE')} · ${s.vehicle} ${s.leverage}`,`🌐 ${escape(Core.rankingLabel(s))}`,`🟦 Entrada: <b>US$ ${money(s.entry)}</b>`,`🛑 Stop: <b>US$ ${money(s.stop)}</b>`,`🎯 TP 2R: <b>US$ ${money(s.tp2)}</b> · TP 3R: <b>US$ ${money(s.tp3)}</b>`,`📊 ${escape(s.trigger)}`,''));
   lines.push('⚠️ <i>Sinal analítico; confirme o contexto antes de operar.</i>');
   return lines.join('\n');
 }
@@ -46,7 +46,7 @@ export async function main(dependencies={}) {
   for(let i=0;i<fresh.length;i+=3){const batch=fresh.slice(i,i+3);await send(messageFor(batch));batch.forEach(s=>{sent[s.symbol]={at:now,entry:s.entry,candleTime:s.candleTime,score:s.score,strategy:s.strategy};});await save({sent});}
   if(!fresh.length&&FORCE_ALERT)await send('🧪 <b>TESTE DO SENTINEL TRADE</b>\nConexão funcionando; nenhum novo setup atingiu os filtros nesta consulta.');
   await save({sent});
-  const summary={engineVersion:Core.VERSION,config,universe:result.assets,found:result.signals.length,sent:fresh.length,failures:result.failures,warnings:result.warnings,symbols:fresh.map(s=>s.symbol)};
+  const summary={engineVersion:Core.VERSION,config,universe:result.assets,rankingMode:result.mode,found:result.signals.length,sent:fresh.length,failures:result.failures,warnings:result.warnings,symbols:fresh.map(s=>s.symbol)};
   console.log(JSON.stringify(summary));return summary;
 }
 if(process.argv[1] && path.resolve(process.argv[1])===fileURLToPath(import.meta.url))main().catch(error=>{console.error(error.message);process.exitCode=1;});

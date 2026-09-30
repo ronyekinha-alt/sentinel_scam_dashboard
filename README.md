@@ -11,13 +11,16 @@ O diário e as preferências continuam no navegador. A integração privada MEXC
 ## Padrão comum
 
 - Score mínimo **90**, com opção **100**. Score mede confluência técnica, não probabilidade estatística de acerto.
-- Até **1.000 ativos**, ambos os setups e volume mínimo de **US$ 1 milhão** nas últimas 24h **do próprio par spot Binance**.
-- CoinGecko é usado apenas para ranking por market cap. Quando indisponível, ambos usam o ranking por volume Binance e informam o fallback.
-- Candles fechados nativos de 1W, 1D, 4H, 2H e 1H na mesma fonte Binance (`data-api.binance.vision`). O horário da Binance fixa o instante de corte da consulta.
+- Top **1.000 por capitalização em cada fonte**, ambos os setups e volume mínimo de **US$ 1 milhão** nas últimas 24h **do próprio par spot da corretora selecionada**.
+- CoinGecko e CoinMarketCap selecionam o universo por capitalização: união dos top N de cada fonte, sem duplicar o mesmo par. A união pode exceder N; somente pares spot USDT negociáveis na Binance ou OKX e com o volume mínimo são analisados. BTC/ETH continuam excluídos.
+- CoinMarketCap usa a API pública oficial sem chave. O painel acessa pelo servidor local, pois a fonte não libera acesso direto do navegador. Cada sinal informa fonte e posição no ranking; símbolo duplicado dentro de uma fonte é ignorado nessa fonte para evitar atribuição ambígua.
+- Se um ranking falhar, o outro mantém a busca com aviso de cobertura parcial. Se ambos falharem, a consulta é interrompida com erro explícito; não escolhe ativos por volume fora dos rankings. Estar no ranking não acrescenta pontos nem substitui a confirmação técnica.
+- Candles fechados nativos de 1W, 1D, 4H, 2H e 1H: Binance prioritária (`data-api.binance.vision`); OKX somente quando o par spot USDT não está negociável na Binance. Não troca a fonte por falha de consulta ou volume baixo. Todos os tempos do ativo usam a mesma corretora. OKX usa semanas/dias UTC, `confirm=1`, ordem cronológica e volume real em USDT do par; sem inventar fluxo taker-buy não fornecido pela API. O horário da Binance fixa o instante de corte da consulta.
 - Confirmação alinhada e crescente em 1D/4H/2H, com 1H alinhado e momentum positivo; contexto semanal sem euforia.
 - Padrão comprador no gatilho: Engolfo de alta, Martelo comprador ou Rompimento de máxima (`pattern.bullish`).
 - Controle de entrada esticada, stop abaixo dos três candles anteriores com margem ATR, risco máximo 8%, alvo 2R de ao menos 3%, resistência distante ao menos 2R e alvo adicional 3R.
 - Um sinal por ativo, maior score; Tendência vence empate entre os dois setups do mesmo ativo. Até dez sinais por consulta.
+- Sinais OKX usam SPOT 1×; não são convertidos em futuros Binance. O acompanhamento de preços do diário também consulta OKX.
 - Binance Futures é consultada pelos dois canais apenas para sugerir veículo/alavancagem até 3×. Se não qualificar ou estiver indisponível, preserva o setup SPOT já confirmado. Não executa ordens.
 - Erros por ativo e consultas parciais são reportados. Falha em todas as consultas não é tratada como ausência legítima de sinais.
 
@@ -55,3 +58,5 @@ npm test
 Os testes cobrem paridade navegador/Node, padrões compradores, score 90/100, volume do par, confirmação multi-tempo, risco, candles fechados, deduplicação, falhas de fontes e persistência de envio. Não enviam mensagens reais.
 
 O motor e o backtest são distribuídos com conteúdo idêntico nos repositórios do painel e Telegram. Alterações nesses módulos devem ser publicadas e verificadas nos dois; o campo `engineVersion` identifica a versão em uso.
+
+Referências: [ranking público CoinMarketCap](https://coinmarketcap.com/api/documentation/pro-api-reference/keyless-public-api), [API OKX](https://www.okx.com/docs-v5/en/).

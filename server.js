@@ -29,14 +29,26 @@ const get = (url, headers = {}) => new Promise((resolve, reject) => {
 const signature = (secret, text) => crypto.createHmac('sha256', secret).update(text).digest('hex');
 const queryString = params => Object.entries(params).filter(([, value]) => value != null).sort(([a], [b]) => a.localeCompare(b)).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 const ninetyDaysAgo = () => String(Date.now() - 90 * 86400000);
-const publicMarketHosts = new Set(['api.coingecko.com', 'data-api.binance.vision', 'api.binance.com', 'fapi.binance.com']);
+const publicMarketHosts = new Set(['api.coingecko.com', 'data-api.binance.vision', 'api.binance.com', 'fapi.binance.com', 'pro-api.coinmarketcap.com', 'www.okx.com']);
+const rankingCache = new Map();
+async function publicData(target) {
+  if(target.hostname !== 'pro-api.coinmarketcap.com') return get(target.toString());
+  const key=target.toString(), cached=rankingCache.get(key);
+  if(cached && Date.now()-cached.at < 5*60000) return cached.promise;
+  // Share concurrent ranking requests; cache only successful official responses.
+  const item={at:Date.now(),promise:null};
+  item.promise=get(key).then(data=>{if(!Array.isArray(data.data)||Number(data.status?.error_code||0)!==0)throw new Error(data.status?.error_message||'Ranking CoinMarketCap inválido');return data;}).catch(error=>{rankingCache.delete(key);throw error;});
+  rankingCache.set(key,item);return item.promise;
+}
 function proxyPublicMarket(request, response) {
   const requested = new URL(request.url, `http://${host}:${port}`).searchParams.get('url');
   if (!requested) return json(response, 400, { error: 'URL pública ausente.' });
   let target;
   try { target = new URL(requested); } catch { return json(response, 400, { error: 'URL pública inválida.' }); }
   if (target.protocol !== 'https:' || !publicMarketHosts.has(target.hostname)) return json(response, 403, { error: 'Fonte pública não permitida.' });
-  return get(target.toString()).then(data => json(response, 200, data)).catch(error => json(response, 502, { error: error.message || 'Falha ao consultar fonte pública.' }));
+  if (target.hostname === 'pro-api.coinmarketcap.com' && (target.port || target.username || target.password || target.pathname !== '/public-api/v3/cryptocurrency/listings/latest')) return json(response, 403, { error: 'Consulta CoinMarketCap não permitida.' });
+  if (target.hostname === 'www.okx.com' && (target.port || target.username || target.password || !['/api/v5/public/instruments','/api/v5/market/tickers','/api/v5/market/history-candles','/api/v5/market/ticker'].includes(target.pathname))) return json(response, 403, { error: 'Consulta OKX não permitida.' });
+  return publicData(target).then(data => json(response, 200, data)).catch(error => json(response, 502, { error: error.message || 'Falha ao consultar fonte pública.' }));
 }
 async function mexcSpotTrades(apiKey, secret, symbols) { const time = await get('https://api.mexc.com/api/v3/time'), timestamp = String(time.serverTime || Date.now()), startTime = String(Number(timestamp) - 30 * 86400000); const jobs = symbols.map(async symbol => { const query = queryString({ symbol, limit: 1000, startTime, timestamp }); return get(`https://api.mexc.com/api/v3/myTrades?${query}&signature=${signature(secret, query)}`, { 'X-MEXC-APIKEY': apiKey }); }); const settled = await Promise.allSettled(jobs); return { trades: settled.filter(x => x.status === 'fulfilled').flatMap(x => x.value), errors: settled.filter(x => x.status === 'rejected').map(x => x.reason.message) }; }
 async function mexcFuturesOrders(apiKey, secret) { const ping = await get('https://contract.mexc.com/api/v1/contract/ping'), timestamp = String(ping.data || Date.now()), params = { end_time: timestamp, page_num: 1, page_size: 100, start_time: String(Number(timestamp) - 90 * 86400000) }, query = queryString(params), sign = signature(secret, `${apiKey}${timestamp}${query}`); return get(`https://contract.mexc.com/api/v1/private/order/list/history_orders?${query}`, { ApiKey: apiKey, 'Request-Time': timestamp, Signature: sign, 'Content-Type': 'application/json' }); }

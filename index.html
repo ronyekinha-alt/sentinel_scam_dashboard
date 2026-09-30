@@ -217,7 +217,7 @@
   </header>
   <main>
     <section class="controls" aria-label="Filtros do scanner">
-      <label>Ativos a analisar por market cap <select id="assetLimit"><option value="50">50</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="700">700</option><option value="1000" selected>1000</option><option value="1500">1500 (demorado)</option></select></label>
+      <label>Top por capitalização em cada fonte <select id="assetLimit"><option value="50">50</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="700">700</option><option value="1000" selected>1000</option><option value="1500">1500 (demorado)</option></select></label>
       <label title="Score é uma pontuação de confluência técnica, não uma probabilidade matemática garantida.">Score mínimo <select id="minScore"><option value="90" selected>90</option><option value="100">100</option></select><span class="sub">90 ou 100 · mesmo score do Telegram</span></label>
       <label>Estratégia do scanner <select id="strategySelect"><option value="both" selected>Ambos os critérios</option><option value="aggressive-pullback">Pullback 2H + confirmação 4H</option><option value="trend">Tendência + pivô</option></select><span id="strategyHelp" class="sub">Executa os dois critérios e mantém somente o sinal mais forte por ativo. Futuros limitados a 3×.</span></label>
       <label>Volume mínimo 24h <select id="volumeLimit"><option value="1000000" selected>US$ 1 mi</option><option value="2000000">US$ 2 mi</option><option value="5000000">US$ 5 mi</option></select></label>
@@ -289,7 +289,7 @@
     </section>
   </main>
   <dialog id="entryDialog"><form method="dialog" id="entryForm"><div class="dialog-heading"><h2>Registrar entrada</h2><button value="cancel" class="icon-button" aria-label="Fechar">×</button></div><p id="entrySetup"></p><label>Preço executado <input id="executedPrice" type="number" step="any" required /></label><label>Valor aplicado (US$) <input id="tradeNotional" type="number" min="0" step="0.01" placeholder="Opcional, para calcular em R$" /></label><label>Data e hora <input id="entryTime" type="datetime-local" required /></label><label>Observação opcional <textarea id="tradeNote" rows="3" placeholder="Ex.: entrada parcial, motivo, contexto"></textarea></label><div class="dialog-actions"><button value="cancel" class="secondary">Cancelar</button><button id="saveTrade" value="default" class="primary">Confirmar entrada</button></div></form></dialog>
-  <footer>Dados de mercado: APIs públicas CoinGecko e Binance. Registros: somente neste navegador.</footer>
+  <footer>Dados de mercado: APIs públicas CoinGecko, CoinMarketCap, Binance e OKX. Registros: somente neste navegador.</footer>
   <script src="sentinel-core.js?v=20260930"></script>
   <script src="sentinel-backtest.js?v=20260930"></script>
   <script src="app.js?v=20260930"></script>

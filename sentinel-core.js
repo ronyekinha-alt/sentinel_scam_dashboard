@@ -84,8 +84,8 @@ function pullback1hConfirmationCriteria(extension, day, confirmation, one) {
   const confirmed = confirmation.close >= confirmation.ema51 && confirmation.aligned && confirmation.rising && (confirmation.pivot.bullish || confirmation.pattern.bullish || confirmation.momentum);
   return { valid: macro && pullback1h && confirmed, pullback1h, confirmed };
 }
-const VERSION = '2026-09-30-shared-signals-v1';
-const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', ranking: 'https://api.coingecko.com/api/v3' });
+const VERSION = '2026-09-30-dual-ranking-okx-v2';
+const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', okx: 'https://www.okx.com/api/v5' });
 const DEFAULTS = Object.freeze({ minScore: 90, minVolume: 1000000, assetLimit: 1000, strategy: 'both', maxSignals: 10 });
 const INTERVALS = ['1w', '1d', '4h', '2h', '1h'];
 const STRATEGIES = Object.freeze({ trend: 'Tendência + pivô', 'aggressive-pullback': 'Pullback 2H + confirmação 4H' });
@@ -132,7 +132,7 @@ function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS,
   if (score < config.minScore) return null;
   const entry = timing.close, previousLow = Math.min(...triggerSeries.slice(-4,-1).map(c => c.low)), stop = previousLow - timing.atr * .12, risk = entry-stop, tp2 = entry+2*risk, tp3 = entry+3*risk;
   if (![entry,stop,risk,tp2,tp3].every(Number.isFinite) || risk <= 0 || risk/entry > .08 || (tp2-entry)/entry < .03 || (timing.levels.resistance && timing.levels.resistance-entry < 2*risk)) return null;
-  return { ...asset, source:'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:timing.relativeVolume, context:'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H', trigger:`${timing.pattern.name} · RSI ${timing.rsi.toFixed(1)} · volume ${timing.relativeVolume.toFixed(2)}x`, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, lateEntryAllowed:false, engineVersion:VERSION };
+  return { ...asset, source:asset.source||'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:timing.relativeVolume, context:'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H', trigger:`${timing.pattern.name} · RSI ${timing.rsi.toFixed(1)} · volume ${timing.relativeVolume.toFixed(2)}x`, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, lateEntryAllowed:false, engineVersion:VERSION };
 }
 function evaluate(asset, series, options = DEFAULTS) {
   const config = settings(options), analyses = analyseSet(series);
@@ -149,26 +149,61 @@ function isFresh(signal, previous, now = Date.now()) {
   if (previous.candleTime && Number(previous.candleTime) === Number(signal.candleTime)) return false;
   return now-Number(previous.at) > 12*3600000 || Math.abs(signal.entry-previous.entry)/Math.max(signal.entry,1e-12) >= .015;
 }
+function rankingLabel(asset) {
+  const labels=['CoinGecko','CoinMarketCap'].filter(source=>Number.isInteger(asset.rankings?.[source])).map(source=>`${source} #${asset.rankings[source]}`);
+  return labels.length ? labels.join(' · ') : 'Ranking por volume Binance; capitalização não confirmada';
+}
 async function marketUniverse(getJson, options = DEFAULTS) {
   const config=settings(options);
   const [exchange,tickers] = await Promise.all([getJson(`${SOURCES.spot}/exchangeInfo`),getJson(`${SOURCES.spot}/ticker/24hr`)]);
   if (!Array.isArray(exchange.symbols) || !Array.isArray(tickers)) throw new Error('Universo Binance inválido.');
   const pairs=new Set(exchange.symbols.filter(s=>s.status==='TRADING' && s.quoteAsset==='USDT' && s.isSpotTradingAllowed).map(s=>s.symbol));
   const volumes=new Map(tickers.map(t=>[t.symbol,Number(t.quoteVolume)||0]));
-  let ranking=[], mode='market cap', warnings=[];
-  try { for(let page=1;page<=Math.ceil(config.assetLimit/250);page++){const coins=await getJson(`${SOURCES.ranking}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${page}&sparkline=false`);if(!Array.isArray(coins)||!coins.length)throw new Error('Ranking indisponível');ranking.push(...coins);} }
-  catch(error){mode='volume 24h (fallback)';warnings.push(`CoinGecko: ${error.message}`);ranking=[];}
-  const candidates=ranking.length ? ranking.map(c=>({symbol:`${String(c.symbol).toUpperCase()}USDT`,name:c.name,rank:c.market_cap_rank||99999})) : tickers.slice().sort((a,b)=>(Number(b.quoteVolume)||0)-(Number(a.quoteVolume)||0)||a.symbol.localeCompare(b.symbol)).map((t,i)=>({symbol:t.symbol,name:t.symbol.replace(/USDT$/,''),rank:i+1}));
+  const warnings=[], rankings={};
+  const okxPairs=new Map(), okxVolumes=new Map();
+  const okxJob=Promise.all([getJson(`${SOURCES.okx}/public/instruments?instType=SPOT`),getJson(`${SOURCES.okx}/market/tickers?instType=SPOT`)]).then(([instruments,quotes])=>{
+    if(String(instruments.code)!=='0'||String(quotes.code)!=='0'||!Array.isArray(instruments.data)||!Array.isArray(quotes.data))throw new Error('Universo OKX inválido');
+    for(const p of instruments.data)if(p.state==='live'&&p.quoteCcy==='USDT')okxPairs.set(`${p.baseCcy}USDT`,p.instId);
+    for(const q of quotes.data)okxVolumes.set(q.instId,Number(q.volCcy24h)||0);
+  }).catch(error=>warnings.push(`OKX: ${error.message}`));
+  const jobs=[['CoinGecko',async()=>{const rows=[];for(let page=1;page<=Math.ceil(config.assetLimit/250);page++){const coins=await getJson(`${SOURCES.ranking}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${page}&sparkline=false`);if(!Array.isArray(coins)||!coins.length)throw new Error('Ranking indisponível');rows.push(...coins);}return rows.map(c=>({...c,rank:Number(c.market_cap_rank)}));}],['CoinMarketCap',async()=>{const result=await getJson(`${SOURCES.cmc}/cryptocurrency/listings/latest?start=1&limit=${config.assetLimit}&convert=USD&sort=market_cap&sort_dir=desc`);if(!Array.isArray(result.data)||(result.status?.error_code != null && Number(result.status.error_code)!==0))throw new Error(result.status?.error_message||'Ranking inválido');return result.data.map(c=>({...c,rank:Number(c.cmc_rank)}));}]];
+  const settled=await Promise.allSettled(jobs.map(([,load])=>load()));
+  await okxJob;
+  const merged=new Map();
+  settled.forEach((result,index)=>{
+    const source=jobs[index][0];
+    if(result.status==='rejected'){warnings.push(`${source}: ${result.reason.message}`);return;}
+    const rows=result.value.filter(c=>Number.isInteger(c.rank)&&c.rank>=1&&c.rank<=config.assetLimit&&/^[a-z0-9]+$/i.test(c.symbol||''));
+    if(!rows.length){warnings.push(`${source}: ranking sem ativos válidos`);return;}
+    rankings[source]=rows.length;
+    const symbols=new Map();for(const c of rows){const symbol=String(c.symbol).toUpperCase();symbols.set(symbol,(symbols.get(symbol)||0)+1);}
+    for(const c of rows){const symbol=`${String(c.symbol).toUpperCase()}USDT`;if(symbols.get(String(c.symbol).toUpperCase())>1){if(pairs.has(symbol)||okxPairs.has(symbol))warnings.push(`${source}: símbolo ambíguo ${symbol}, ignorado nessa fonte`);continue;}const old=merged.get(symbol)||{symbol,name:c.name,rank:c.rank,rankingSources:[],rankings:{}};old.rank=Math.min(old.rank,c.rank);old.rankingSources.push(source);old.rankings[source]=c.rank;merged.set(symbol,old);}
+  });
+  const sources=Object.keys(rankings);
+  if(!sources.length)throw new Error(`Nenhum ranking por capitalização disponível; scanner interrompido. ${warnings.join(' | ')}`);
+  const mode=`market cap (${sources.join(' + ')})`, candidates=[...merged.values()];
   const seen=new Set();
-  const assets=candidates.filter(c=>pairs.has(c.symbol) && !['BTCUSDT','ETHUSDT'].includes(c.symbol) && !seen.has(c.symbol) && (seen.add(c.symbol),true)).map(c=>({...c,source:'BINANCE',volume:volumes.get(c.symbol)||0,volume24h:volumes.get(c.symbol)||0})).filter(a=>a.volume >= config.minVolume).sort((a,b)=>a.rank-b.rank||a.symbol.localeCompare(b.symbol)).slice(0,config.assetLimit);
-  return {assets,mode,warnings};
+  const assets=candidates.filter(c=>(pairs.has(c.symbol)||okxPairs.has(c.symbol)) && !['BTCUSDT','ETHUSDT'].includes(c.symbol) && !seen.has(c.symbol) && (seen.add(c.symbol),true)).map(c=>{const binance=pairs.has(c.symbol),exchangeSymbol=binance?c.symbol:okxPairs.get(c.symbol),volume=binance?(volumes.get(c.symbol)||0):(okxVolumes.get(exchangeSymbol)||0);return {...c,source:binance?'BINANCE':'OKX',exchangeSymbol,volume,volume24h:volume};}).filter(a=>a.volume >= config.minVolume).sort((a,b)=>a.rank-b.rank||a.symbol.localeCompare(b.symbol));
+  return {assets,mode,warnings,rankings};
 }
 async function fetchSeries(getJson,symbol,asOf,source=SOURCES.spot) {
+  if(source===SOURCES.okx){
+    const bars={'1w':'1Wutc','1d':'1Dutc','4h':'4H','2h':'2H','1h':'1H'},instId=symbol.endsWith('-USDT')?symbol:symbol.replace(/USDT$/,'-USDT');
+    const values=await Promise.all(INTERVALS.map(async interval=>{const result=await getJson(`${SOURCES.okx}/market/history-candles?instId=${encodeURIComponent(instId)}&bar=${bars[interval]}&limit=210&after=${asOf}`);if(String(result.code)!=='0'||!Array.isArray(result.data))throw new Error(result.msg||'Candles OKX inválidos');return closedOkxCandles(result.data,interval,asOf);}));
+    return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
+  }
   const values=await Promise.all(INTERVALS.map(interval=>getJson(`${source}/klines?symbol=${encodeURIComponent(symbol)}&interval=${interval}&limit=210&endTime=${asOf-1}`).then(raw=>closedCandles(raw,asOf))));
   return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
 }
+function closedOkxCandles(raw,interval,asOf=Date.now()) {
+  const duration={'1w':7*86400000,'1d':86400000,'4h':4*3600000,'2h':2*3600000,'1h':3600000}[interval];
+  if(!duration||!Array.isArray(raw))throw new Error('Candles OKX inválidos');
+  // OKX returns newest first and does not expose taker-buy volume in this endpoint.
+  return closedCandles(raw.filter(row=>String(row[8])==='1').map(row=>[row[0],row[1],row[2],row[3],row[4],row[5],Number(row[0])+duration-1]),asOf);
+}
 async function vehicle(getJson,signal,asOf) {
-  const spot={...signal,vehicle:'SPOT',leverage:'1×',vehicleReason:'Setup SPOT confirmado na Binance.'};
+  const spot={...signal,vehicle:'SPOT',leverage:'1×',vehicleReason:`Setup SPOT confirmado na ${signal.source||'BINANCE'}.`};
+  if(signal.source==='OKX')return spot;
   try {
     const [series,premium]=await Promise.all([fetchSeries(getJson,signal.symbol,asOf,SOURCES.futures),getJson(`${SOURCES.futures}/premiumIndex?symbol=${signal.symbol}`)]);
     const analyses=analyseSet(series), funding=Number(premium.lastFundingRate);
@@ -182,7 +217,7 @@ async function scanMarket(getJson,options=DEFAULTS,onProgress=()=>{}) {
   const config=settings(options), clock=await getJson(`${SOURCES.spot}/time`), asOf=Number(clock.serverTime);
   if(!Number.isFinite(asOf))throw new Error('Horário Binance inválido.');
   const universe=await marketUniverse(getJson,config), signals=[], failures=[], warnings=[...universe.warnings];let next=0,done=0;
-  async function worker(){while(next<universe.assets.length){const asset=universe.assets[next++];try{const series=await fetchSeries(getJson,asset.symbol,asOf), signal=evaluate(asset,series,config);if(signal)signals.push(signal);}catch(error){failures.push({symbol:asset.symbol,error:error.message});}onProgress(++done,universe.assets.length);}}
+  async function worker(){while(next<universe.assets.length){const asset=universe.assets[next++];try{const series=await fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,asOf,asset.source==='OKX'?SOURCES.okx:SOURCES.spot), signal=evaluate(asset,series,config);if(signal)signals.push(signal);}catch(error){failures.push({symbol:asset.symbol,source:asset.source,error:error.message});}onProgress(++done,universe.assets.length);}}
   await Promise.all(Array.from({length:Math.min(4,universe.assets.length)},worker));
   if(universe.assets.length && failures.length===universe.assets.length)throw new Error(`Todas as ${failures.length} consultas de ativos falharam: ${failures[0].error}`);
   const qualified=consolidate(signals), selected=[];
@@ -190,5 +225,5 @@ async function scanMarket(getJson,options=DEFAULTS,onProgress=()=>{}) {
   return {signals:selected,assets:universe.assets.length,mode:universe.mode,failures,warnings,asOf,config,engineVersion:VERSION};
 }
 
-return Object.freeze({last,sma,ema,rsi,atr,macd,adx,stochRsi,candlePattern,bullishPivot,supportResistance,weeklyExtension,analyseTimeframe,lateEntry,pullbackStochCriteria,aggressivePullbackCriteria,pullback1hConfirmationCriteria,VERSION,SOURCES,DEFAULTS,STRATEGIES,settings,closedCandles,confirmedMacro,analyseSet,evaluateAnalyses,evaluate,compareSignals,consolidate,isFresh,marketUniverse,fetchSeries,vehicle,scanMarket});
+return Object.freeze({last,sma,ema,rsi,atr,macd,adx,stochRsi,candlePattern,bullishPivot,supportResistance,weeklyExtension,analyseTimeframe,lateEntry,pullbackStochCriteria,aggressivePullbackCriteria,pullback1hConfirmationCriteria,VERSION,SOURCES,DEFAULTS,STRATEGIES,settings,closedCandles,closedOkxCandles,confirmedMacro,analyseSet,evaluateAnalyses,evaluate,compareSignals,consolidate,isFresh,rankingLabel,marketUniverse,fetchSeries,vehicle,scanMarket});
 });
