@@ -164,7 +164,7 @@ async function marketUniverse(getJson, options = DEFAULTS) {
   return {assets,mode,warnings};
 }
 async function fetchSeries(getJson,symbol,asOf,source=SOURCES.spot) {
-  const values=await Promise.all(INTERVALS.map(interval=>getJson(`${source}/klines?symbol=${encodeURIComponent(symbol)}&interval=${interval}&limit=210`).then(raw=>closedCandles(raw,asOf))));
+  const values=await Promise.all(INTERVALS.map(interval=>getJson(`${source}/klines?symbol=${encodeURIComponent(symbol)}&interval=${interval}&limit=210&endTime=${asOf-1}`).then(raw=>closedCandles(raw,asOf))));
   return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
 }
 async function vehicle(getJson,signal,asOf) {
