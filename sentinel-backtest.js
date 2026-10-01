@@ -120,9 +120,9 @@ function historicalSetup(week, day, h4, h2, h1, strategy, triggerTimeframe = '1h
   return { entry, stop: fixedStop, target };
 }
 function backtestPortfolio(trades, capital, slots = 10, multiplier = 1) {
-  const closed = trades.filter(trade => trade.result !== 'open'), allocation = capital / Math.max(1, Math.min(10, slots));
+  const closed = trades.filter(trade => trade.result !== 'open'), allocation = capital / Math.max(1, slots);
   const withoutReinvestment = capital + closed.reduce((total, trade) => total + allocation * ((Number(trade.returnPct) || 0) * multiplier / 100), 0);
-  const withReinvestment = closed.reduce((balance, trade) => balance + (balance / Math.max(1, Math.min(10, slots))) * ((Number(trade.returnPct) || 0) * multiplier / 100), capital);
+  const withReinvestment = closed.reduce((balance, trade) => balance + (balance / Math.max(1, slots)) * ((Number(trade.returnPct) || 0) * multiplier / 100), capital);
   return { withoutReinvestment, withReinvestment, allocation };
 }
 
