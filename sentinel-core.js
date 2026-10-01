@@ -84,11 +84,11 @@ function pullback1hConfirmationCriteria(extension, day, confirmation, one) {
   const confirmed = confirmation.close >= confirmation.ema51 && confirmation.aligned && confirmation.rising && (confirmation.pivot.bullish || confirmation.pattern.bullish || confirmation.momentum);
   return { valid: macro && pullback1h && confirmed, pullback1h, confirmed };
 }
-const VERSION = '2026-10-01-dual-live-sources-binance-okx-kucoin-stretch11-v2';
+const VERSION = '2026-10-01-dual-live-sources-binance-okx-kucoin-stretch11-local-v1';
 const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', okx: 'https://www.okx.com/api/v5', kucoin: 'https://api.kucoin.com' });
 const DEFAULTS = Object.freeze({ minScore: 90, minVolume: 1000000, assetLimit: 1000, strategy: 'both', maxSignals: 10 });
 const INTERVALS = ['1w', '1d', '4h', '2h', '1h'];
-const STRATEGIES = Object.freeze({ trend: 'Tendência + pivô', 'aggressive-pullback': 'Pullback 2H + confirmação 4H' });
+const STRATEGIES = Object.freeze({ trend: 'Tendência + pivô', 'aggressive-pullback': 'Pullback 2H + confirmação 4H', 'flexible-pullback-2h': 'Pullback 2H · diário flexível' });
 function settings(input = {}) {
   const result = { ...DEFAULTS, ...input };
   if (![90, 100].includes(Number(result.minScore))) throw new Error('Score mínimo deve ser 90 ou 100.');
@@ -116,25 +116,27 @@ function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS,
   const { extension, day:d, four, two, one } = analyses;
   const timing = { '1h':one,'2h':two,'4h':four,'1d':d }[triggerTimeframe], triggerSeries = series[triggerTimeframe];
   const triggerBullish = timing.pattern.bullish || timing.pivot.bullish;
-  if (!triggerSeries?.length || !triggerBullish || !confirmedMacro(analyses)) return null;
+  if (!triggerSeries?.length || !triggerBullish) return null;
+  const flexibleMacro = !extension.blocked && extension.weekly.close >= extension.weekly.ema22 && d.close >= d.ema80 && d.rsi >= 40 && four.aligned && four.rising && two.close >= two.ema51 && one.aligned && one.momentum;
+  if (strategy === 'flexible-pullback-2h' ? (!flexibleMacro || triggerTimeframe !== '2h') : !confirmedMacro(analyses)) return null;
   const trendValid = !extension.blocked && extension.weekly.close >= extension.weekly.ema22 && d.close >= d.ema51 && d.rsi >= 48 && four.close >= four.ema51 && two.close >= two.ema51 && timing.close >= timing.ema51 && timing.rsi >= 46 && (timing.pivot.bullish || timing.pattern.bullish) && timing.relativeVolume >= .9;
   const pullback = aggressivePullbackCriteria(extension,d,four,two,one);
-  if (!(strategy === 'trend' ? trendValid : pullback.valid) || lateEntry(timing,triggerSeries,triggerTimeframe)) return null;
+  const flexiblePullback = flexibleMacro && one.close >= one.ema51 && (one.recentLow <= one.ema9 * 1.02 || one.recentLow <= one.ema22 * 1.02) && (one.pivot.bullish || one.pattern.bullish) && two.close >= two.ema51 && (two.pivot.bullish || two.pattern.bullish || two.momentum) && (one.buyerDominance || one.relativeVolume >= .9);
+  if (!(strategy === 'trend' ? trendValid : strategy === 'aggressive-pullback' ? pullback.valid : flexiblePullback) || lateEntry(timing,triggerSeries,triggerTimeframe)) return null;
   let score = strategy === 'trend' ? 58 : 60;
-  if (d.momentum) score += 8;
+  if (d.momentum) score += strategy === 'flexible-pullback-2h' ? 4 : 8;
   if (four.momentum) score += 10;
   if (two.momentum) score += 8;
   if (timing.pattern.bullish) score += 7;
   if (timing.pivot.bullish && two.pivot.bullish) score += 8;
   if (timing.relativeVolume >= 1.25) score += 9;
   if (two.strong || timing.strong) score += 7;
-  if (strategy === 'aggressive-pullback' && timing.pivot.bullish) score += 8;
+  if ((strategy === 'aggressive-pullback' || strategy === 'flexible-pullback-2h') && timing.pivot.bullish) score += 8;
   score = Math.min(score,100);
   if (score < config.minScore) return null;
   const entry = timing.close, previousLow = Math.min(...triggerSeries.slice(-4,-1).map(c => c.low)), stop = previousLow - timing.atr * .12, risk = entry-stop, tp2 = entry+2*risk, tp3 = entry+3*risk;
   if (![entry,stop,risk,tp2,tp3].every(Number.isFinite) || risk <= 0 || risk/entry > .08 || (tp2-entry)/entry < .03 || (timing.levels.resistance && timing.levels.resistance-entry < 2*risk)) return null;
-  const stretchPct = timing.ema9 ? (entry / timing.ema9 - 1) * 100 : 0;
-  const stretchWarning = stretchPct > 0 ? `Entrada esticada em ${stretchPct.toFixed(1)}% vs EMA9` : 'Entrada sem esticamento vs EMA9';
+  const stretchPct = timing.ema9 ? (entry / timing.ema9 - 1) * 100 : 0, stretchWarning = stretchPct > 0 ? `Entrada esticada em ${stretchPct.toFixed(1)}% vs EMA9` : 'Entrada sem esticamento vs EMA9';
   return { ...asset, source:asset.source||'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:timing.relativeVolume, context:'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H', trigger:`${timing.pattern.bullish ? timing.pattern.name : timing.pivot.label} · RSI ${timing.rsi.toFixed(1)} · volume ${timing.relativeVolume.toFixed(2)}x · ${stretchWarning}`, entryStretchPct:stretchPct, entryWarning:stretchWarning, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, lateEntryAllowed:false, engineVersion:VERSION };
 }
 function evaluate(asset, series, options = DEFAULTS) {
@@ -169,7 +171,11 @@ async function marketUniverse(getJson, options = DEFAULTS) {
     for(const p of instruments.data)if(p.state==='live'&&p.quoteCcy==='USDT')okxPairs.set(`${p.baseCcy}USDT`,p.instId);
     for(const q of quotes.data)okxVolumes.set(q.instId,Number(q.volCcy24h)||0);
   }).catch(error=>warnings.push(`OKX: ${error.message}`));
-  const kucoinJob=Promise.all([getJson(`${SOURCES.kucoin}/api/v1/symbols`),getJson(`${SOURCES.kucoin}/api/v1/market/allTickers`)]).then(([symbols,tickers])=>{if(String(symbols.code)!=='200000'||String(tickers.code)!=='200000'||!Array.isArray(symbols.data)||!Array.isArray(tickers.data?.ticker))throw new Error('Universo KuCoin inválido');for(const p of symbols.data)if(p.enable&&p.quoteCurrency==='USDT')kucoinPairs.set(`${p.baseCurrency}USDT`,p.symbol);for(const q of tickers.data.ticker)kucoinVolumes.set(q.symbol,Number(q.volValue)||0);}).catch(error=>warnings.push(`KuCoin: ${error.message}`));
+  const kucoinJob=Promise.all([getJson(`${SOURCES.kucoin}/api/v1/symbols`),getJson(`${SOURCES.kucoin}/api/v1/market/allTickers`)]).then(([symbols,tickers])=>{
+    if(String(symbols.code)!=='200000'||String(tickers.code)!=='200000'||!Array.isArray(symbols.data)||!Array.isArray(tickers.data?.ticker))throw new Error('Universo KuCoin inválido');
+    for(const p of symbols.data)if(p.enable&&p.quoteCurrency==='USDT')kucoinPairs.set(`${p.baseCurrency}USDT`,p.symbol);
+    for(const q of tickers.data.ticker)kucoinVolumes.set(q.symbol,Number(q.volValue)||0);
+  }).catch(error=>warnings.push(`KuCoin: ${error.message}`));
   const jobs=[['CoinGecko',async()=>{const rows=[];for(let page=1;page<=Math.ceil(config.assetLimit/250);page++){const coins=await getJson(`${SOURCES.ranking}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${page}&sparkline=false`);if(!Array.isArray(coins)||!coins.length)throw new Error('Ranking indisponível');rows.push(...coins);}return rows.map(c=>({...c,rank:Number(c.market_cap_rank)}));}],['CoinMarketCap',async()=>{const result=await getJson(`${SOURCES.cmc}/cryptocurrency/listings/latest?start=1&limit=${config.assetLimit}&convert=USD&sort=market_cap&sort_dir=desc`);if(!Array.isArray(result.data)||(result.status?.error_code != null && Number(result.status.error_code)!==0))throw new Error(result.status?.error_message||'Ranking inválido');return result.data.map(c=>({...c,rank:Number(c.cmc_rank)}));}]];
   const settled=await Promise.allSettled(jobs.map(([,load])=>load()));
   await Promise.all([okxJob,kucoinJob]);
@@ -196,8 +202,11 @@ async function fetchSeries(getJson,symbol,asOf,source=SOURCES.spot) {
     const values=await Promise.all(INTERVALS.map(async interval=>{const result=await getJson(`${SOURCES.okx}/market/history-candles?instId=${encodeURIComponent(instId)}&bar=${bars[interval]}&limit=210&after=${asOf}`);if(String(result.code)!=='0'||!Array.isArray(result.data))throw new Error(result.msg||'Candles OKX inválidos');return closedOkxCandles(result.data,interval,asOf);}));
     return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
   }
-  const kucoinIntervals={'1w':'1week','1d':'1day','4h':'4hour','2h':'2hour','1h':'1hour'};
-  if(source===SOURCES.kucoin){const instId=symbol.includes('-')?symbol:symbol.replace(/USDT$/,'-USDT');const values=await Promise.all(INTERVALS.map(async interval=>{const duration={'1w':604800,'1d':86400,'4h':14400,'2h':7200,'1h':3600}[interval],end=Math.floor(asOf/1000),start=end-210*duration,result=await getJson(`${SOURCES.kucoin}/api/v1/market/candles?symbol=${encodeURIComponent(instId)}&type=${kucoinIntervals[interval]}&startAt=${start}&endAt=${end}`);if(String(result.code)!=='200000'||!Array.isArray(result.data))throw new Error(result.msg||'Candles KuCoin inválidos');const rows=result.data.map(r=>[Number(r[0])*1000,r[1],r[3],r[4],r[2],r[5],Number(r[0])*1000+duration*1000-1]);return closedCandles(rows,asOf);}));return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));}
+  if(source===SOURCES.kucoin){
+    const types={'1w':'1week','1d':'1day','4h':'4hour','2h':'2hour','1h':'1hour'},instId=symbol.includes('-')?symbol:symbol.replace(/USDT$/,'-USDT');
+    const values=await Promise.all(INTERVALS.map(async interval=>{const duration={'1w':604800,'1d':86400,'4h':14400,'2h':7200,'1h':3600}[interval],end=Math.floor(asOf/1000),start=end-210*duration,result=await getJson(`${SOURCES.kucoin}/api/v1/market/candles?symbol=${encodeURIComponent(instId)}&type=${types[interval]}&startAt=${start}&endAt=${end}`);if(String(result.code)!=='200000'||!Array.isArray(result.data))throw new Error(result.msg||'Candles KuCoin inválidos');const rows=result.data.map(r=>[Number(r[0])*1000,r[1],r[3],r[4],r[2],r[5],Number(r[0])*1000+duration*1000-1]);return closedCandles(rows,asOf);}));
+    return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
+  }
   const values=await Promise.all(INTERVALS.map(interval=>getJson(`${source}/klines?symbol=${encodeURIComponent(symbol)}&interval=${interval}&limit=210&endTime=${asOf-1}`).then(raw=>closedCandles(raw,asOf))));
   return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
 }
@@ -223,7 +232,7 @@ async function scanMarket(getJson,options=DEFAULTS,onProgress=()=>{}) {
   const config=settings(options), clock=await getJson(`${SOURCES.spot}/time`), asOf=Number(clock.serverTime);
   if(!Number.isFinite(asOf))throw new Error('Horário Binance inválido.');
   const universe=await marketUniverse(getJson,config), signals=[], failures=[], warnings=[...universe.warnings];let next=0,done=0;
-  async function worker(){while(next<universe.assets.length){const asset=universe.assets[next++];try{const series=await fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,asOf,asset.source==='OKX'?SOURCES.okx:(asset.source==='KUCOIN'?SOURCES.kucoin:SOURCES.spot)), signal=evaluate(asset,series,config);if(signal)signals.push(signal);}catch(error){failures.push({symbol:asset.symbol,source:asset.source,error:error.message});}onProgress(++done,universe.assets.length);}}
+  async function worker(){while(next<universe.assets.length){const asset=universe.assets[next++];try{const source=asset.source==='OKX'?SOURCES.okx:(asset.source==='KUCOIN'?SOURCES.kucoin:SOURCES.spot),series=await fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,asOf,source), signal=evaluate(asset,series,config);if(signal)signals.push(signal);}catch(error){failures.push({symbol:asset.symbol,source:asset.source,error:error.message});}onProgress(++done,universe.assets.length);}}
   await Promise.all(Array.from({length:Math.min(4,universe.assets.length)},worker));
   if(universe.assets.length && failures.length===universe.assets.length)throw new Error(`Todas as ${failures.length} consultas de ativos falharam: ${failures[0].error}`);
   const qualified=consolidate(signals), selected=[];
@@ -233,3 +242,4 @@ async function scanMarket(getJson,options=DEFAULTS,onProgress=()=>{}) {
 
 return Object.freeze({last,sma,ema,rsi,atr,macd,adx,stochRsi,candlePattern,bullishPivot,supportResistance,weeklyExtension,analyseTimeframe,lateEntry,pullbackStochCriteria,aggressivePullbackCriteria,pullback1hConfirmationCriteria,VERSION,SOURCES,DEFAULTS,STRATEGIES,settings,closedCandles,closedOkxCandles,confirmedMacro,analyseSet,evaluateAnalyses,evaluate,compareSignals,consolidate,isFresh,rankingLabel,marketUniverse,fetchSeries,vehicle,scanMarket});
 });
+
