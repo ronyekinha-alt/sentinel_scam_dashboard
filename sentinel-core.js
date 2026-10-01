@@ -58,8 +58,8 @@ function analyseTimeframe(candles) {
 function lateEntry(timing, triggerCandles, triggerTimeframe = '1h') {
   // Filtro anti-perseguição: não entrar depois de uma arrancada já esticada.
   // A mesma regra é usada no backtest para que a comparação seja honesta.
-  const maxExtension = triggerTimeframe === '1h' ? 2.5 : triggerTimeframe === '2h' ? 3 : 4;
-  const maxRecentRise = triggerTimeframe === '1h' ? 6 : 8;
+  const maxExtension = 11;
+  const maxRecentRise = 11;
   const emaDistance = timing.ema9 ? (timing.close / timing.ema9 - 1) * 100 : 0;
   const baseCandles = triggerCandles.slice(-8, -1), base = baseCandles.length ? Math.min(...baseCandles.map(candle => candle.low)) : timing.close;
   const recentRise = base ? (timing.close / base - 1) * 100 : 0;
@@ -84,7 +84,7 @@ function pullback1hConfirmationCriteria(extension, day, confirmation, one) {
   const confirmed = confirmation.close >= confirmation.ema51 && confirmation.aligned && confirmation.rising && (confirmation.pivot.bullish || confirmation.pattern.bullish || confirmation.momentum);
   return { valid: macro && pullback1h && confirmed, pullback1h, confirmed };
 }
-const VERSION = '2026-10-01-dual-live-sources-binance-okx-kucoin-v1';
+const VERSION = '2026-10-01-dual-live-sources-binance-okx-kucoin-stretch11-v2';
 const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', okx: 'https://www.okx.com/api/v5', kucoin: 'https://api.kucoin.com' });
 const DEFAULTS = Object.freeze({ minScore: 90, minVolume: 1000000, assetLimit: 1000, strategy: 'both', maxSignals: 10 });
 const INTERVALS = ['1w', '1d', '4h', '2h', '1h'];
@@ -133,7 +133,9 @@ function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS,
   if (score < config.minScore) return null;
   const entry = timing.close, previousLow = Math.min(...triggerSeries.slice(-4,-1).map(c => c.low)), stop = previousLow - timing.atr * .12, risk = entry-stop, tp2 = entry+2*risk, tp3 = entry+3*risk;
   if (![entry,stop,risk,tp2,tp3].every(Number.isFinite) || risk <= 0 || risk/entry > .08 || (tp2-entry)/entry < .03 || (timing.levels.resistance && timing.levels.resistance-entry < 2*risk)) return null;
-  return { ...asset, source:asset.source||'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:timing.relativeVolume, context:'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H', trigger:`${timing.pattern.bullish ? timing.pattern.name : timing.pivot.label} · RSI ${timing.rsi.toFixed(1)} · volume ${timing.relativeVolume.toFixed(2)}x`, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, lateEntryAllowed:false, engineVersion:VERSION };
+  const stretchPct = timing.ema9 ? (entry / timing.ema9 - 1) * 100 : 0;
+  const stretchWarning = stretchPct > 0 ? `Entrada esticada em ${stretchPct.toFixed(1)}% vs EMA9` : 'Entrada sem esticamento vs EMA9';
+  return { ...asset, source:asset.source||'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:timing.relativeVolume, context:'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H', trigger:`${timing.pattern.bullish ? timing.pattern.name : timing.pivot.label} · RSI ${timing.rsi.toFixed(1)} · volume ${timing.relativeVolume.toFixed(2)}x · ${stretchWarning}`, entryStretchPct:stretchPct, entryWarning:stretchWarning, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, lateEntryAllowed:false, engineVersion:VERSION };
 }
 function evaluate(asset, series, options = DEFAULTS) {
   const config = settings(options), analyses = analyseSet(series);
