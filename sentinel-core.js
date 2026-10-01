@@ -190,8 +190,15 @@ async function marketUniverse(getJson, options = DEFAULTS) {
     for(const c of rows){const symbol=`${String(c.symbol).toUpperCase()}USDT`;if(symbols.get(String(c.symbol).toUpperCase())>1){if(pairs.has(symbol)||okxPairs.has(symbol))warnings.push(`${source}: símbolo ambíguo ${symbol}, ignorado nessa fonte`);continue;}const old=merged.get(symbol)||{symbol,name:c.name,rank:c.rank,rankingSources:[],rankings:{}};old.rank=Math.min(old.rank,c.rank);old.rankingSources.push(source);old.rankings[source]=c.rank;merged.set(symbol,old);}
   });
   const sources=Object.keys(rankings);
-  if(!sources.length)throw new Error(`Nenhum ranking por capitalização disponível; scanner interrompido. ${warnings.join(' | ')}`);
-  const mode=`market cap (${sources.join(' + ')})`, candidates=[...merged.values()];
+  let mode, candidates;
+  if(!sources.length){
+    // Contingência: os rankings por capitalização podem bloquear consultas públicas.
+    // Mantemos o scanner operacional ordenando os pares Binance por volume USDT 24h.
+    warnings.push('Rankings por capitalização indisponíveis; usando ranking fallback por volume 24h da Binance.');
+    const fallback=[...volumes.entries()].filter(([symbol,volume])=>pairs.has(symbol)&&!['BTCUSDT','ETHUSDT'].includes(symbol)&&Number(volume)>=config.minVolume).sort((a,b)=>b[1]-a[1]).slice(0,config.assetLimit);
+    candidates=fallback.map(([symbol,volume],index)=>({symbol,name:symbol.replace(/USDT$/,''),rank:index+1,rankingSources:['Binance volume 24h'],rankings:{'Binance volume 24h':index+1},volume,volume24h:volume}));
+    mode='volume 24h Binance (fallback)';
+  } else { mode=`market cap (${sources.join(' + ')})`; candidates=[...merged.values()]; }
   const seen=new Set();
   const assets=candidates.filter(c=>(pairs.has(c.symbol)||okxPairs.has(c.symbol)||kucoinPairs.has(c.symbol)) && !['BTCUSDT','ETHUSDT'].includes(c.symbol) && !seen.has(c.symbol) && (seen.add(c.symbol),true)).map(c=>{const binance=pairs.has(c.symbol),okx=okxPairs.has(c.symbol),exchangeSymbol=binance?c.symbol:(okx?okxPairs.get(c.symbol):kucoinPairs.get(c.symbol)),source=binance?'BINANCE':(okx?'OKX':'KUCOIN'),volume=binance?(volumes.get(c.symbol)||0):(okx?(okxVolumes.get(exchangeSymbol)||0):(kucoinVolumes.get(exchangeSymbol)||0));return {...c,source,exchangeSymbol,volume,volume24h:volume};}).filter(a=>a.volume >= config.minVolume).sort((a,b)=>a.rank-b.rank||a.symbol.localeCompare(b.symbol));
   return {assets,mode,warnings,rankings};
