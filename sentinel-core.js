@@ -84,8 +84,8 @@ function pullback1hConfirmationCriteria(extension, day, confirmation, one) {
   const confirmed = confirmation.close >= confirmation.ema51 && confirmation.aligned && confirmation.rising && (confirmation.pivot.bullish || confirmation.pattern.bullish || confirmation.momentum);
   return { valid: macro && pullback1h && confirmed, pullback1h, confirmed };
 }
-const VERSION = '2026-09-30-dual-ranking-okx-v2';
-const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', okx: 'https://www.okx.com/api/v5' });
+const VERSION = '2026-10-01-dual-live-sources-binance-okx-kucoin-v1';
+const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', okx: 'https://www.okx.com/api/v5', kucoin: 'https://api.kucoin.com' });
 const DEFAULTS = Object.freeze({ minScore: 90, minVolume: 1000000, assetLimit: 1000, strategy: 'both', maxSignals: 10 });
 const INTERVALS = ['1w', '1d', '4h', '2h', '1h'];
 const STRATEGIES = Object.freeze({ trend: 'Tendência + pivô', 'aggressive-pullback': 'Pullback 2H + confirmação 4H' });
@@ -115,7 +115,8 @@ function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS,
   if (!analyses || !Object.hasOwn(STRATEGIES,strategy) || !['1h','2h','4h','1d'].includes(triggerTimeframe)) return null;
   const { extension, day:d, four, two, one } = analyses;
   const timing = { '1h':one,'2h':two,'4h':four,'1d':d }[triggerTimeframe], triggerSeries = series[triggerTimeframe];
-  if (!triggerSeries?.length || !timing.pattern.bullish || !confirmedMacro(analyses)) return null;
+  const triggerBullish = timing.pattern.bullish || timing.pivot.bullish;
+  if (!triggerSeries?.length || !triggerBullish || !confirmedMacro(analyses)) return null;
   const trendValid = !extension.blocked && extension.weekly.close >= extension.weekly.ema22 && d.close >= d.ema51 && d.rsi >= 48 && four.close >= four.ema51 && two.close >= two.ema51 && timing.close >= timing.ema51 && timing.rsi >= 46 && (timing.pivot.bullish || timing.pattern.bullish) && timing.relativeVolume >= .9;
   const pullback = aggressivePullbackCriteria(extension,d,four,two,one);
   if (!(strategy === 'trend' ? trendValid : pullback.valid) || lateEntry(timing,triggerSeries,triggerTimeframe)) return null;
@@ -132,7 +133,7 @@ function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS,
   if (score < config.minScore) return null;
   const entry = timing.close, previousLow = Math.min(...triggerSeries.slice(-4,-1).map(c => c.low)), stop = previousLow - timing.atr * .12, risk = entry-stop, tp2 = entry+2*risk, tp3 = entry+3*risk;
   if (![entry,stop,risk,tp2,tp3].every(Number.isFinite) || risk <= 0 || risk/entry > .08 || (tp2-entry)/entry < .03 || (timing.levels.resistance && timing.levels.resistance-entry < 2*risk)) return null;
-  return { ...asset, source:asset.source||'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:timing.relativeVolume, context:'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H', trigger:`${timing.pattern.name} · RSI ${timing.rsi.toFixed(1)} · volume ${timing.relativeVolume.toFixed(2)}x`, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, lateEntryAllowed:false, engineVersion:VERSION };
+  return { ...asset, source:asset.source||'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:timing.relativeVolume, context:'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H', trigger:`${timing.pattern.bullish ? timing.pattern.name : timing.pivot.label} · RSI ${timing.rsi.toFixed(1)} · volume ${timing.relativeVolume.toFixed(2)}x`, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, lateEntryAllowed:false, engineVersion:VERSION };
 }
 function evaluate(asset, series, options = DEFAULTS) {
   const config = settings(options), analyses = analyseSet(series);
@@ -160,15 +161,16 @@ async function marketUniverse(getJson, options = DEFAULTS) {
   const pairs=new Set(exchange.symbols.filter(s=>s.status==='TRADING' && s.quoteAsset==='USDT' && s.isSpotTradingAllowed).map(s=>s.symbol));
   const volumes=new Map(tickers.map(t=>[t.symbol,Number(t.quoteVolume)||0]));
   const warnings=[], rankings={};
-  const okxPairs=new Map(), okxVolumes=new Map();
+  const okxPairs=new Map(), okxVolumes=new Map(), kucoinPairs=new Map(), kucoinVolumes=new Map();
   const okxJob=Promise.all([getJson(`${SOURCES.okx}/public/instruments?instType=SPOT`),getJson(`${SOURCES.okx}/market/tickers?instType=SPOT`)]).then(([instruments,quotes])=>{
     if(String(instruments.code)!=='0'||String(quotes.code)!=='0'||!Array.isArray(instruments.data)||!Array.isArray(quotes.data))throw new Error('Universo OKX inválido');
     for(const p of instruments.data)if(p.state==='live'&&p.quoteCcy==='USDT')okxPairs.set(`${p.baseCcy}USDT`,p.instId);
     for(const q of quotes.data)okxVolumes.set(q.instId,Number(q.volCcy24h)||0);
   }).catch(error=>warnings.push(`OKX: ${error.message}`));
+  const kucoinJob=Promise.all([getJson(`${SOURCES.kucoin}/api/v1/symbols`),getJson(`${SOURCES.kucoin}/api/v1/market/allTickers`)]).then(([symbols,tickers])=>{if(String(symbols.code)!=='200000'||String(tickers.code)!=='200000'||!Array.isArray(symbols.data)||!Array.isArray(tickers.data?.ticker))throw new Error('Universo KuCoin inválido');for(const p of symbols.data)if(p.enable&&p.quoteCurrency==='USDT')kucoinPairs.set(`${p.baseCurrency}USDT`,p.symbol);for(const q of tickers.data.ticker)kucoinVolumes.set(q.symbol,Number(q.volValue)||0);}).catch(error=>warnings.push(`KuCoin: ${error.message}`));
   const jobs=[['CoinGecko',async()=>{const rows=[];for(let page=1;page<=Math.ceil(config.assetLimit/250);page++){const coins=await getJson(`${SOURCES.ranking}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${page}&sparkline=false`);if(!Array.isArray(coins)||!coins.length)throw new Error('Ranking indisponível');rows.push(...coins);}return rows.map(c=>({...c,rank:Number(c.market_cap_rank)}));}],['CoinMarketCap',async()=>{const result=await getJson(`${SOURCES.cmc}/cryptocurrency/listings/latest?start=1&limit=${config.assetLimit}&convert=USD&sort=market_cap&sort_dir=desc`);if(!Array.isArray(result.data)||(result.status?.error_code != null && Number(result.status.error_code)!==0))throw new Error(result.status?.error_message||'Ranking inválido');return result.data.map(c=>({...c,rank:Number(c.cmc_rank)}));}]];
   const settled=await Promise.allSettled(jobs.map(([,load])=>load()));
-  await okxJob;
+  await Promise.all([okxJob,kucoinJob]);
   const merged=new Map();
   settled.forEach((result,index)=>{
     const source=jobs[index][0];
@@ -183,7 +185,7 @@ async function marketUniverse(getJson, options = DEFAULTS) {
   if(!sources.length)throw new Error(`Nenhum ranking por capitalização disponível; scanner interrompido. ${warnings.join(' | ')}`);
   const mode=`market cap (${sources.join(' + ')})`, candidates=[...merged.values()];
   const seen=new Set();
-  const assets=candidates.filter(c=>(pairs.has(c.symbol)||okxPairs.has(c.symbol)) && !['BTCUSDT','ETHUSDT'].includes(c.symbol) && !seen.has(c.symbol) && (seen.add(c.symbol),true)).map(c=>{const binance=pairs.has(c.symbol),exchangeSymbol=binance?c.symbol:okxPairs.get(c.symbol),volume=binance?(volumes.get(c.symbol)||0):(okxVolumes.get(exchangeSymbol)||0);return {...c,source:binance?'BINANCE':'OKX',exchangeSymbol,volume,volume24h:volume};}).filter(a=>a.volume >= config.minVolume).sort((a,b)=>a.rank-b.rank||a.symbol.localeCompare(b.symbol));
+  const assets=candidates.filter(c=>(pairs.has(c.symbol)||okxPairs.has(c.symbol)||kucoinPairs.has(c.symbol)) && !['BTCUSDT','ETHUSDT'].includes(c.symbol) && !seen.has(c.symbol) && (seen.add(c.symbol),true)).map(c=>{const binance=pairs.has(c.symbol),okx=okxPairs.has(c.symbol),exchangeSymbol=binance?c.symbol:(okx?okxPairs.get(c.symbol):kucoinPairs.get(c.symbol)),source=binance?'BINANCE':(okx?'OKX':'KUCOIN'),volume=binance?(volumes.get(c.symbol)||0):(okx?(okxVolumes.get(exchangeSymbol)||0):(kucoinVolumes.get(exchangeSymbol)||0));return {...c,source,exchangeSymbol,volume,volume24h:volume};}).filter(a=>a.volume >= config.minVolume).sort((a,b)=>a.rank-b.rank||a.symbol.localeCompare(b.symbol));
   return {assets,mode,warnings,rankings};
 }
 async function fetchSeries(getJson,symbol,asOf,source=SOURCES.spot) {
@@ -192,6 +194,8 @@ async function fetchSeries(getJson,symbol,asOf,source=SOURCES.spot) {
     const values=await Promise.all(INTERVALS.map(async interval=>{const result=await getJson(`${SOURCES.okx}/market/history-candles?instId=${encodeURIComponent(instId)}&bar=${bars[interval]}&limit=210&after=${asOf}`);if(String(result.code)!=='0'||!Array.isArray(result.data))throw new Error(result.msg||'Candles OKX inválidos');return closedOkxCandles(result.data,interval,asOf);}));
     return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
   }
+  const kucoinIntervals={'1w':'1week','1d':'1day','4h':'4hour','2h':'2hour','1h':'1hour'};
+  if(source===SOURCES.kucoin){const instId=symbol.includes('-')?symbol:symbol.replace(/USDT$/,'-USDT');const values=await Promise.all(INTERVALS.map(async interval=>{const duration={'1w':604800,'1d':86400,'4h':14400,'2h':7200,'1h':3600}[interval],end=Math.floor(asOf/1000),start=end-210*duration,result=await getJson(`${SOURCES.kucoin}/api/v1/market/candles?symbol=${encodeURIComponent(instId)}&type=${kucoinIntervals[interval]}&startAt=${start}&endAt=${end}`);if(String(result.code)!=='200000'||!Array.isArray(result.data))throw new Error(result.msg||'Candles KuCoin inválidos');const rows=result.data.map(r=>[Number(r[0])*1000,r[1],r[3],r[4],r[2],r[5],Number(r[0])*1000+duration*1000-1]);return closedCandles(rows,asOf);}));return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));}
   const values=await Promise.all(INTERVALS.map(interval=>getJson(`${source}/klines?symbol=${encodeURIComponent(symbol)}&interval=${interval}&limit=210&endTime=${asOf-1}`).then(raw=>closedCandles(raw,asOf))));
   return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
 }
@@ -217,7 +221,7 @@ async function scanMarket(getJson,options=DEFAULTS,onProgress=()=>{}) {
   const config=settings(options), clock=await getJson(`${SOURCES.spot}/time`), asOf=Number(clock.serverTime);
   if(!Number.isFinite(asOf))throw new Error('Horário Binance inválido.');
   const universe=await marketUniverse(getJson,config), signals=[], failures=[], warnings=[...universe.warnings];let next=0,done=0;
-  async function worker(){while(next<universe.assets.length){const asset=universe.assets[next++];try{const series=await fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,asOf,asset.source==='OKX'?SOURCES.okx:SOURCES.spot), signal=evaluate(asset,series,config);if(signal)signals.push(signal);}catch(error){failures.push({symbol:asset.symbol,source:asset.source,error:error.message});}onProgress(++done,universe.assets.length);}}
+  async function worker(){while(next<universe.assets.length){const asset=universe.assets[next++];try{const series=await fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,asOf,asset.source==='OKX'?SOURCES.okx:(asset.source==='KUCOIN'?SOURCES.kucoin:SOURCES.spot)), signal=evaluate(asset,series,config);if(signal)signals.push(signal);}catch(error){failures.push({symbol:asset.symbol,source:asset.source,error:error.message});}onProgress(++done,universe.assets.length);}}
   await Promise.all(Array.from({length:Math.min(4,universe.assets.length)},worker));
   if(universe.assets.length && failures.length===universe.assets.length)throw new Error(`Todas as ${failures.length} consultas de ativos falharam: ${failures[0].error}`);
   const qualified=consolidate(signals), selected=[];
