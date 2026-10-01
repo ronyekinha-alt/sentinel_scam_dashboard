@@ -56,7 +56,7 @@ function notifyNewSignals(signals) {
 const { last,sma,ema,rsi,atr,macd,adx,stochRsi,candlePattern,bullishPivot,supportResistance,weeklyExtension,analyseTimeframe,lateEntry } = SentinelCore;
 function readCandles(raw) { return SentinelCore.closedCandles(raw); }
 async function getJson(url) {
-  const publicSource = [API.cg, API.binance, API.futures, SentinelCore.SOURCES.cmc, SentinelCore.SOURCES.okx].some(base => url.startsWith(base));
+  const publicSource = [API.cg, API.binance, API.futures, SentinelCore.SOURCES.cmc, SentinelCore.SOURCES.okx, SentinelCore.SOURCES.kucoin].some(base => url.startsWith(base));
   const requestUrl = publicSource ? `/api/public?url=${encodeURIComponent(url)}` : url;
   const response = await fetch(requestUrl);
   if (!response.ok) { let detail = ''; try { detail = (await response.json()).error || ''; } catch {} throw new Error(detail || `Fonte respondeu ${response.status}`); }
@@ -70,7 +70,7 @@ const { pullbackStochCriteria, aggressivePullbackCriteria, pullback1hConfirmatio
 const SCANNER_TRIGGER_TIMEFRAMES = ['2h'];
 const TRIGGER_TIMEFRAME_LABELS = { '1h': '1H · antecipado', '2h': '2H · intermediário', '4h': '4H · confirmação' };
 const TRIGGER_TIMEFRAME_RANK = { '1h': 0, '2h': 1, '4h': 2, '1d': 3 };
-async function inspect(asset, selectedStrategy='trend', triggerTimeframe='2h') { const clock=await getJson(`${API.binance}/time`), series=await SentinelCore.fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,clock.serverTime,asset.source==='OKX'?SentinelCore.SOURCES.okx:SentinelCore.SOURCES.spot); return SentinelCore.evaluateAnalyses(asset,series,SentinelCore.analyseSet(series),selectedStrategy,{minScore:+$('minScore').value},triggerTimeframe); }
+async function inspect(asset, selectedStrategy='trend', triggerTimeframe='2h') { const clock=await getJson(`${API.binance}/time`), source=asset.source==='OKX'?SentinelCore.SOURCES.okx:(asset.source==='KUCOIN'?SentinelCore.SOURCES.kucoin:SentinelCore.SOURCES.spot), series=await SentinelCore.fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,clock.serverTime,source); return SentinelCore.evaluateAnalyses(asset,series,SentinelCore.analyseSet(series),selectedStrategy,{minScore:+$('minScore').value},triggerTimeframe); }
 async function chooseVehicle(signal) { return SentinelCore.vehicle(getJson,signal,Date.now()); }
 async function concurrentMap(items, limit, worker, onProgress) {
   const results = []; let next = 0;
@@ -194,7 +194,7 @@ function configureMexcHistoryAuto() { clearInterval(state.mexcHistoryTimer); if 
 function updateStrategyHelp() {
   const help = $('strategyHelp'); if (!help) return;
   const strategy = $('strategySelect').value;
-  help.textContent = strategy === 'both' ? 'Executa Tendência + pivô e Pullback 2H + confirmação 4H; fica apenas o sinal de maior score por ativo. Futuros limitados a 3×.' : strategy === 'trend' ? 'Critério mais amplo: tendência macro, pivôs e confirmação de fluxo. Futuros limitados a 3×.' : 'Critério operacional: Pullback no 2H com confirmação de tendência no 4H. Futuros limitados a 3×.';
+  help.textContent = strategy === 'both' ? 'Executa os três critérios e mantém somente o sinal de maior score por ativo. Futuros limitados a 3×.' : strategy === 'trend' ? 'Critério mais amplo: tendência macro, pivôs e confirmação de fluxo. Futuros limitados a 3×.' : strategy === 'flexible-pullback-2h' ? 'Pullback 2H com confirmação 4H e diário flexível: menor peso do momentum diário, sem bloqueio diário rígido. Futuros limitados a 3×.' : 'Critério operacional: Pullback no 2H com confirmação de tendência no 4H. Futuros limitados a 3×.';
 }
 function closeTrade(id, result) { const trade = state.trades.find(t => t.id === id); if (!trade) return; trade.result = result; trade.status = 'closed'; trade.closedAt = new Date().toISOString(); saveTrades(); }
 function renderStats() { const closed = state.trades.filter(t => t.result), wins = closed.filter(t => t.result !== 'loss'), losses = closed.filter(t => t.result === 'loss'), gains = wins.map(t => tradeReturn(t, t.result === 'tp3' ? t.tp3 : t.tp2)), downs = losses.map(t => tradeReturn(t, t.stop)); const avg = a => a.length ? a.reduce((x,y) => x+y,0)/a.length : 0; const cards = [['Setups atuais', state.signals.length], ['Entradas registradas', state.trades.length], ['Taxa de acerto', closed.length ? `${num(wins.length/closed.length*100,1)}%` : '—'], ['Gain médio', gains.length ? `+${num(avg(gains))}%` : '—'], ['Loss médio', downs.length ? `${num(avg(downs))}%` : '—']]; $('summaryCards').innerHTML = cards.map(([label,value]) => `<div class="stat"><div class="muted">${label}</div><div class="value">${value}</div></div>`).join(''); }
@@ -272,12 +272,12 @@ function renderBacktestAudit(results, capital) {
   if ($('backtestAuditBody')) $('backtestAuditBody').innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6" class="empty">Nenhuma combinação gerou trades fechados.</td></tr>';
 }
 const renderBacktestComparisonBase = renderBacktestComparison;
-renderBacktestComparison = (results, capital) => { renderBacktestComparisonBase(results, capital); renderBacktestAudit(results, capital); };
+renderBacktestComparison = (results, capital) => { renderBacktestComparisonBase(results, capital); document.querySelectorAll('#backtestComparisonBody tr').forEach(row => { if (row.children[0]?.textContent.startsWith('undefined')) row.children[0].textContent = 'Pullback 2H · diário flexível'; }); renderBacktestAudit(results, capital); document.querySelectorAll('#backtestAuditBody tr').forEach(row => { if (row.children[0]?.textContent.startsWith('undefined')) row.children[0].textContent = 'Pullback 2H · diário flexível'; }); };
 async function simulateBacktestAsset(symbol, start, end, timeframe, strategies) {
-  strategies = strategies.filter(strategy => ['trend', 'aggressive-pullback'].includes(strategy));
+  strategies = strategies.filter(strategy => ['trend', 'aggressive-pullback', 'flexible-pullback-2h', 'legacy-pullback-1h', 'refined-early-ema-rsi', 'refined-moderate-ema-rsi', 'refined-intermediate-ema-rsi', 'breakout-30-2h-close', 'breakout-30-2h-retest', 'breakout-30-2h-retest-fixed-3', 'breakout-30-2h-retest-fixed-4', 'breakout-30-2h-retest-fixed-7', 'breakout-60-2h-close', 'breakout-60-2h-retest', 'breakout-60-2h-retest-fixed-3', 'breakout-60-2h-retest-fixed-4', 'breakout-60-2h-retest-fixed-7', 'expansion-retest-2h'].includes(strategy));
   const dayMs = 86400000, days = Math.max(7, Math.ceil((end - start) / dayMs));
   const [week, day, h4, h2, h1] = await Promise.all([historicalCandles(symbol, '1w', start - 2600 * dayMs), historicalCandles(symbol, '1d', start - (days + 230) * dayMs), historicalCandles(symbol, '4h', start - (days + 60) * dayMs), historicalCandles(symbol, '2h', start - (days + 35) * dayMs), historicalCandles(symbol, '1h', start - (days + 25) * dayMs)]);
-  return SentinelBacktest.simulate({'1w':week,'1d':day,'4h':h4,'2h':h2,'1h':h1},symbol,start,end,timeframe,strategies,{minScore:+$('minScore').value});
+  return SentinelBacktest.simulate({'1w':week,'1d':day,'4h':h4,'2h':h2,'1h':h1},symbol,start,end,timeframe,strategies,{minScore:+$('minScore').value}).map(result => { if (result.strategy === 'flexible-pullback-2h') result.trades.forEach(trade => { trade.strategyName = 'Pullback 2H · diário flexível'; }); return result; });
 }
 function selectedBacktestFilters(name, allValues) {
   const selected = [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(input => input.value);
@@ -288,16 +288,16 @@ function syncBacktestFilterAll(group) {
   if (!all || !options.length) return;
   all.checked = options.every(input => input.checked);
 }
-function enforceOfficialBacktestSetups() {
-  const allowed = new Set(['trend', 'aggressive-pullback']);
-  document.querySelectorAll('#backtestStrategyFilters input[name="backtestStrategy"]').forEach(input => { if (!allowed.has(input.value)) input.closest('label')?.remove(); });
-  const all = document.querySelector('#backtestStrategyFilters [data-backtest-all]'); if (all) all.checked = true;
-}
 function configureBacktestFilters() {
   document.querySelectorAll('[data-backtest-all]').forEach(all => all.addEventListener('change', () => {
     const group = all.closest('.filter-group'); group.querySelectorAll('input[name]').forEach(input => { input.checked = all.checked; });
   }));
   document.querySelectorAll('.filter-group input[name]').forEach(input => input.addEventListener('change', () => syncBacktestFilterAll(input.closest('.filter-group'))));
+}
+function enforceOfficialBacktestSetups() {
+  const allowed = new Set(['trend', 'aggressive-pullback', 'flexible-pullback-2h']);
+  document.querySelectorAll('#backtestStrategyFilters input[name="backtestStrategy"]').forEach(input => { if (!allowed.has(input.value)) input.closest('label')?.remove(); });
+  const all = document.querySelector('#backtestStrategyFilters [data-backtest-all]'); if (all) all.checked = true;
 }
 async function runBacktest() {
   const symbols = $('backtestSymbol').value.split(/[\s,;]+/).map(value => value.trim().toUpperCase()).filter(Boolean).map(value => value.endsWith('USDT') ? value : `${value}USDT`).filter((value, index, list) => list.indexOf(value) === index), startInput = $('backtestStartDate').value, endInput = $('backtestEndDate').value, start = new Date(`${startInput}T00:00:00`).getTime(), end = new Date(`${endInput}T23:59:59`).getTime(), strategies = selectedBacktestFilters('backtestStrategy', ['trend', 'aggressive-pullback']), timeframes = selectedBacktestFilters('backtestTimeframe', ['1h', '2h', '4h']), capital = +$('backtestCapital').value;
@@ -310,3 +310,4 @@ async function runBacktest() {
 const settings = loadSettings(); const formatBacktestDate = date => { const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000); return local.toISOString().slice(0, 10); }; const backtestToday = new Date(), backtestStart = new Date(backtestToday); backtestStart.setDate(backtestStart.getDate() - 30); if ($('backtestStartDate') && !$('backtestStartDate').value) $('backtestStartDate').value = formatBacktestDate(backtestStart); if ($('backtestEndDate') && !$('backtestEndDate').value) $('backtestEndDate').value = formatBacktestDate(backtestToday); const allowedRefresh = ['5', '10', '20', '30', '60', '120', '180', '240']; $('autoRefresh').value = allowedRefresh.includes(String(settings.autoRefresh)) ? String(settings.autoRefresh) : '5'; $('browserAlerts').checked = Boolean(settings.browserAlerts);
 const savedMexc = loadMexcCredentials(); if (savedMexc.remember) { $('mexcApiKey').value = savedMexc.apiKey || ''; $('mexcSecret').value = savedMexc.secret || ''; $('mexcSpotSymbol').value = savedMexc.spotSymbol || 'BTCUSDT'; $('mexcRemember').checked = true; }
 $('scanButton').addEventListener('click', scan); $('entryForm').addEventListener('submit', recordTrade); $('refreshTracking').addEventListener('click', refreshTracking); $('backtestButton').addEventListener('click', runBacktest); $('mexcImportButton').addEventListener('click', importMexcTrades); $('mexcForgetButton').addEventListener('click', forgetMexcCredentials); $('mexcPositionsButton').addEventListener('click', refreshMexcPositions); $('mexcLiveAuto').addEventListener('change', configureMexcLive); $('mexcHistoryAuto').addEventListener('change', configureMexcHistoryAuto); $('mexcMinResult').addEventListener('input', renderMexcMetrics); $('strategySelect').addEventListener('change', updateStrategyHelp); if ($('refreshSignalHistory')) $('refreshSignalHistory').addEventListener('click', () => refreshSignalHistory().catch(() => { if ($('signalHistoryStatus')) $('signalHistoryStatus').textContent = 'Não foi possível atualizar os sinais agora.'; })); $('autoRefresh').addEventListener('change', configureAutoRefresh); $('browserAlerts').addEventListener('change', async () => { if ($('browserAlerts').checked && 'Notification' in window && Notification.permission !== 'granted') { const permission = await Notification.requestPermission(); if (permission !== 'granted') $('browserAlerts').checked = false; } saveSettings(); }); enforceOfficialBacktestSetups(); configureBacktestFilters(); configureAutoRefresh(); configureMexcLive(); configureMexcHistoryAuto(); updateStrategyHelp(); renderSignals(); renderSignalHistory(); renderTrades(); renderImportedTrades(); renderMexcMetrics(); renderMexcPositions(); renderStats();
+
