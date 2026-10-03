@@ -84,11 +84,11 @@ function pullback1hConfirmationCriteria(extension, day, confirmation, one) {
   const confirmed = confirmation.close >= confirmation.ema51 && confirmation.aligned && confirmation.rising && (confirmation.pivot.bullish || confirmation.pattern.bullish || confirmation.momentum);
   return { valid: macro && pullback1h && confirmed, pullback1h, confirmed };
 }
-const VERSION = '2026-10-01-dual-live-sources-binance-okx-kucoin-stretch11-local-v1';
-const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', okx: 'https://www.okx.com/api/v5', kucoin: 'https://api.kucoin.com' });
+const VERSION = '2026-10-03-multitimeframe-live-paprika-ema-cross-v1';
+const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', paprika: 'https://api.coinpaprika.com/v1', okx: 'https://www.okx.com/api/v5' });
 const DEFAULTS = Object.freeze({ minScore: 90, minVolume: 1000000, assetLimit: 1000, strategy: 'both', maxSignals: 10 });
 const INTERVALS = ['1w', '1d', '4h', '2h', '1h'];
-const STRATEGIES = Object.freeze({ trend: 'Tendência + pivô', 'aggressive-pullback': 'Pullback 2H + confirmação 4H', 'flexible-pullback-2h': 'Pullback 2H · diário flexível' });
+const STRATEGIES = Object.freeze({ trend: 'Tendência + pivô', 'aggressive-pullback': 'Pullback 2H + confirmação 4H', 'flexible-pullback-2h': 'Pullback 2H · diário flexível', 'ema-cross-retest-2h': 'Cruzamento EMA 9 + reteste 22/52 · 2H' });
 function settings(input = {}) {
   const result = { ...DEFAULTS, ...input };
   if (![90, 100].includes(Number(result.minScore))) throw new Error('Score mínimo deve ser 90 ou 100.');
@@ -110,24 +110,38 @@ function analyseSet(series) {
   if ([weekly,day,four,two,one].some(t => !t || ![t.close,t.ema22,t.ema51,t.rsi,t.atr].every(Number.isFinite))) return null;
   return { weekly, day, four, two, one, extension: weeklyExtension(series['1w']) };
 }
+function emaCrossRetest2hCriteria(series, analyses) {
+  const candles = series['2h'], timing = analyses.two, { day, four, extension } = analyses;
+  if (!Array.isArray(candles) || candles.length < 80) return { valid:false, reason:'Candles 2H insuficientes para cruzamento EMA' };
+  const closes = candles.map(candle => candle.close), e9 = ema(closes,9), e22 = ema(closes,22), e52 = ema(closes,51), i = closes.length - 1;
+  const crossedRecently = Array.from({length:Math.min(10,i-1)},(_,offset)=>i-offset).some(index=>e9[index]>e22[index]&&e9[index]>e52[index]&&(e9[index-1]<=e22[index-1]||e9[index-1]<=e52[index-1]));
+  const retest = candles.slice(-8,-1).some((candle,offset)=>{const index=i-7+offset;return candle.low<=e22[index]*1.018||candle.low<=e52[index]*1.025;});
+  const previousHigh = Math.max(...candles.slice(-7,-1).map(candle=>candle.high));
+  const closedBreakout = timing.close>previousHigh && candles.at(-1).close>candles.at(-1).open;
+  const structure = timing.close>timing.ema9&&timing.ema9>timing.ema22&&timing.ema22>timing.ema51;
+  const fourEma22=ema(series['4h'].map(candle=>candle.close),22), macro=!extension.blocked&&extension.weekly.close>=extension.weekly.ema22&&day.close>=day.ema80&&day.rsi>=42&&four.close>=four.ema51&&fourEma22.at(-1)>=fourEma22.at(-3)&&four.rsi>=45;
+  const recentRise=(timing.close/candles.at(-7).close-1)*100;
+  const valid=crossedRecently&&retest&&closedBreakout&&structure&&macro&&timing.relativeVolume>=1&&timing.rsi>=50&&timing.rsi<=72&&recentRise<=11;
+  return {valid,crossedRecently,retest,closedBreakout,structure,macro,recentRise,previousHigh};
+}
 function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS, triggerTimeframe = '2h') {
   const config = settings(options);
   const diagnostic = arguments[6];
   const reject = reason => { if (diagnostic && !diagnostic.reason) diagnostic.reason = reason; return null; };
   if (!analyses || !Object.hasOwn(STRATEGIES,strategy) || !['1h','2h','4h','1d'].includes(triggerTimeframe)) return reject('Dados de candles insuficientes ou configuração inválida');
   const { extension, day:d, four, two, one } = analyses;
-  const timing = { '1h':one,'2h':two,'4h':four,'1d':d }[triggerTimeframe], triggerSeries = series[triggerTimeframe];
+  const timing = { '1h':one,'2h':two,'4h':four,'1d':d }[triggerTimeframe], triggerSeries = series[triggerTimeframe], emaCross = strategy==='ema-cross-retest-2h' ? emaCrossRetest2hCriteria(series,analyses) : null;
   const triggerBullish = timing.pattern.bullish || timing.pivot.bullish;
   if (!triggerSeries?.length) return reject('Sem candles fechados no tempo do gatilho');
-  if (!triggerBullish) return reject('Sem padrão comprador ou pivô confirmado no gatilho');
+  if (!triggerBullish && !emaCross?.closedBreakout) return reject('Sem padrão comprador, pivô ou rompimento fechado no gatilho');
   const flexibleMacro = !extension.blocked && extension.weekly.close >= extension.weekly.ema22 && d.close >= d.ema80 && d.rsi >= 40 && four.aligned && four.rising && two.close >= two.ema51 && one.aligned && one.momentum;
-  if (strategy === 'flexible-pullback-2h' ? (!flexibleMacro || triggerTimeframe !== '2h') : !confirmedMacro(analyses)) return reject('Confirmação multi-tempo insuficiente');
+  if (strategy==='ema-cross-retest-2h' ? (triggerTimeframe!=='2h'||!emaCross.valid) : strategy === 'flexible-pullback-2h' ? (!flexibleMacro || triggerTimeframe !== '2h') : !confirmedMacro(analyses)) return reject(strategy==='ema-cross-retest-2h' ? 'Cruzamento, reteste, rompimento ou macro 2H não confirmado' : 'Confirmação multi-tempo insuficiente');
   const trendValid = !extension.blocked && extension.weekly.close >= extension.weekly.ema22 && d.close >= d.ema51 && d.rsi >= 48 && four.close >= four.ema51 && two.close >= two.ema51 && timing.close >= timing.ema51 && timing.rsi >= 46 && (timing.pivot.bullish || timing.pattern.bullish) && timing.relativeVolume >= .9;
   const pullback = aggressivePullbackCriteria(extension,d,four,two,one);
   const flexiblePullback = flexibleMacro && one.close >= one.ema51 && (one.recentLow <= one.ema9 * 1.02 || one.recentLow <= one.ema22 * 1.02) && (one.pivot.bullish || one.pattern.bullish) && two.close >= two.ema51 && (two.pivot.bullish || two.pattern.bullish || two.momentum) && (one.buyerDominance || one.relativeVolume >= .9);
-  if (!(strategy === 'trend' ? trendValid : strategy === 'aggressive-pullback' ? pullback.valid : flexiblePullback)) return reject('Condições específicas do setup não confirmadas');
-  if (lateEntry(timing,triggerSeries,triggerTimeframe)) return reject('Entrada esticada além do limite');
-  let score = strategy === 'trend' ? 58 : 60;
+  if (!(strategy==='ema-cross-retest-2h'||(strategy === 'trend' ? trendValid : strategy === 'aggressive-pullback' ? pullback.valid : flexiblePullback))) return reject('Condições específicas do setup não confirmadas');
+  if (strategy!=='ema-cross-retest-2h'&&lateEntry(timing,triggerSeries,triggerTimeframe)) return reject('Entrada esticada além do limite');
+  let score = strategy==='ema-cross-retest-2h' ? 90 : strategy === 'trend' ? 58 : 60;
   if (d.momentum) score += strategy === 'flexible-pullback-2h' ? 4 : 8;
   if (four.momentum) score += 10;
   if (two.momentum) score += 8;
@@ -144,14 +158,18 @@ function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS,
   if ((tp2-entry)/entry < .03) return reject('Alvo 2R abaixo do mínimo de 3%');
   if (timing.levels.resistance && timing.levels.resistance-entry < 2*risk) return reject('Resistência não deixa espaço mínimo de 2R');
   const stretchPct = timing.ema9 ? (entry / timing.ema9 - 1) * 100 : 0, stretchWarning = stretchPct > 0 ? `Entrada esticada em ${stretchPct.toFixed(1)}% vs EMA9` : 'Entrada sem esticamento vs EMA9';
-  return { ...asset, source:asset.source||'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:timing.relativeVolume, context:'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H', trigger:`${timing.pattern.bullish ? timing.pattern.name : timing.pivot.label} · RSI ${timing.rsi.toFixed(1)} · volume ${timing.relativeVolume.toFixed(2)}x · ${stretchWarning}`, entryStretchPct:stretchPct, entryWarning:stretchWarning, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, lateEntryAllowed:false, engineVersion:VERSION };
+  const triggerLabel=strategy==='ema-cross-retest-2h'?'EMA 9 cruzou 22/52 · reteste confirmado · rompimento fechado':(timing.pattern.bullish ? timing.pattern.name : timing.pivot.label);
+  return { ...asset, source:asset.source||'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:timing.relativeVolume, context:strategy==='ema-cross-retest-2h'?'Macro LONG: 1W · 1D · 4H, com cruzamento/reteste em 2H':'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H', trigger:`${triggerLabel} · RSI ${timing.rsi.toFixed(1)} · volume ${timing.relativeVolume.toFixed(2)}x · ${stretchWarning}`, entryStretchPct:stretchPct, entryWarning:stretchWarning, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, lateEntryAllowed:false, engineVersion:VERSION };
 }
 function evaluate(asset, series, options = DEFAULTS, diagnostics = null) {
   const config = settings(options), analyses = analyseSet(series);
   const volume=Number(asset.volume ?? asset.volume24h);
   if (!Number.isFinite(volume) || volume < config.minVolume) { if (diagnostics) diagnostics.push({strategy:'geral',reason:`Volume do par abaixo de US$ ${config.minVolume.toLocaleString('en-US')}`}); return null; }
   const strategies = config.strategy === 'both' ? Object.keys(STRATEGIES) : [config.strategy];
-  const attempts = strategies.map(strategy => { const trace = {strategy,reason:null}; const signal = evaluateAnalyses(asset,series,analyses,strategy,config,'2h',trace); if (diagnostics) diagnostics.push(trace); return signal; });
+  const attempts = strategies.flatMap(strategy => {
+    const timeframes=strategy==='flexible-pullback-2h'||strategy==='ema-cross-retest-2h'?['2h']:['1h','2h','4h'];
+    return timeframes.map(triggerTimeframe=>{const trace={strategy:`${strategy} · ${triggerTimeframe.toUpperCase()}`,reason:null};const signal=evaluateAnalyses(asset,series,analyses,strategy,config,triggerTimeframe,trace);if(diagnostics)diagnostics.push(trace);return signal;});
+  });
   return attempts.filter(Boolean).sort(compareSignals)[0] || null;
 }
 function compareSignals(a,b) { return b.score-a.score || (a.strategy === b.strategy ? 0 : a.strategy === 'trend' ? -1 : 1) || (a.rank||99999)-(b.rank||99999) || a.symbol.localeCompare(b.symbol); }
@@ -173,20 +191,19 @@ async function marketUniverse(getJson, options = DEFAULTS) {
   const pairs=new Set(exchange.symbols.filter(s=>s.status==='TRADING' && s.quoteAsset==='USDT' && s.isSpotTradingAllowed).map(s=>s.symbol));
   const volumes=new Map(tickers.map(t=>[t.symbol,Number(t.quoteVolume)||0]));
   const warnings=[], rankings={};
-  const okxPairs=new Map(), okxVolumes=new Map(), kucoinPairs=new Map(), kucoinVolumes=new Map();
+  const okxPairs=new Map(), okxVolumes=new Map();
   const okxJob=Promise.all([getJson(`${SOURCES.okx}/public/instruments?instType=SPOT`),getJson(`${SOURCES.okx}/market/tickers?instType=SPOT`)]).then(([instruments,quotes])=>{
     if(String(instruments.code)!=='0'||String(quotes.code)!=='0'||!Array.isArray(instruments.data)||!Array.isArray(quotes.data))throw new Error('Universo OKX inválido');
     for(const p of instruments.data)if(p.state==='live'&&p.quoteCcy==='USDT')okxPairs.set(`${p.baseCcy}USDT`,p.instId);
     for(const q of quotes.data)okxVolumes.set(q.instId,Number(q.volCcy24h)||0);
   }).catch(error=>warnings.push(`OKX: ${error.message}`));
-  const kucoinJob=Promise.all([getJson(`${SOURCES.kucoin}/api/v1/symbols`),getJson(`${SOURCES.kucoin}/api/v1/market/allTickers`)]).then(([symbols,tickers])=>{
-    if(String(symbols.code)!=='200000'||String(tickers.code)!=='200000'||!Array.isArray(symbols.data)||!Array.isArray(tickers.data?.ticker))throw new Error('Universo KuCoin inválido');
-    for(const p of symbols.data)if(p.enable&&p.quoteCurrency==='USDT')kucoinPairs.set(`${p.baseCurrency}USDT`,p.symbol);
-    for(const q of tickers.data.ticker)kucoinVolumes.set(q.symbol,Number(q.volValue)||0);
-  }).catch(error=>warnings.push(`KuCoin: ${error.message}`));
-  const jobs=[['CoinGecko',async()=>{const rows=[];for(let page=1;page<=Math.ceil(config.assetLimit/250);page++){const coins=await getJson(`${SOURCES.ranking}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${page}&sparkline=false`);if(!Array.isArray(coins)||!coins.length)throw new Error('Ranking indisponível');rows.push(...coins);}return rows.map(c=>({...c,rank:Number(c.market_cap_rank)}));}],['CoinMarketCap',async()=>{const result=await getJson(`${SOURCES.cmc}/cryptocurrency/listings/latest?start=1&limit=${config.assetLimit}&convert=USD&sort=market_cap&sort_dir=desc`);if(!Array.isArray(result.data)||(result.status?.error_code != null && Number(result.status.error_code)!==0))throw new Error(result.status?.error_message||'Ranking inválido');return result.data.map(c=>({...c,rank:Number(c.cmc_rank)}));}]];
-  const settled=await Promise.allSettled(jobs.map(([,load])=>load()));
-  await Promise.all([okxJob,kucoinJob]);
+  const primaryJobs=[['CoinGecko',async()=>{const rows=[];for(let page=1;page<=Math.ceil(config.assetLimit/250);page++){const coins=await getJson(`${SOURCES.ranking}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${page}&sparkline=false`);if(!Array.isArray(coins)||!coins.length)throw new Error('Ranking indisponível');rows.push(...coins);}return rows.map(c=>({...c,rank:Number(c.market_cap_rank)}));}],['CoinMarketCap',async()=>{const result=await getJson(`${SOURCES.cmc}/cryptocurrency/listings/latest?start=1&limit=${config.assetLimit}&convert=USD&sort=market_cap&sort_dir=desc`);if(!Array.isArray(result.data)||(result.status?.error_code != null && Number(result.status.error_code)!==0))throw new Error(result.status?.error_message||'Ranking inválido');return result.data.map(c=>({...c,rank:Number(c.cmc_rank)}));}]];
+  let jobs=primaryJobs, settled=await Promise.allSettled(primaryJobs.map(([,load])=>load()));
+  if(!settled.some(result=>result.status==='fulfilled')){
+    jobs=[['CoinPaprika',async()=>{const rows=await getJson(`${SOURCES.paprika}/tickers?quotes=USD`);if(!Array.isArray(rows)||!rows.length)throw new Error('Ranking indisponível');return rows.map(c=>({symbol:c.symbol,name:c.name,rank:Number(c.rank)})).filter(c=>Number.isInteger(c.rank)&&c.rank>0).sort((a,b)=>a.rank-b.rank).slice(0,config.assetLimit);}]];
+    settled=await Promise.allSettled(jobs.map(([,load])=>load()));
+  }
+  await okxJob;
   const merged=new Map();
   settled.forEach((result,index)=>{
     const source=jobs[index][0];
@@ -207,20 +224,15 @@ async function marketUniverse(getJson, options = DEFAULTS) {
     candidates=fallback.map(([symbol,volume],index)=>({symbol,name:symbol.replace(/USDT$/,''),rank:index+1,rankingSources:['Binance volume 24h'],rankings:{'Binance volume 24h':index+1},volume,volume24h:volume}));
     mode='volume 24h Binance (fallback)';
   } else { mode=`market cap (${sources.join(' + ')})`; candidates=[...merged.values()]; }
-  const candidateAudit=candidates.map(c=>{const binance=pairs.has(c.symbol),okx=okxPairs.has(c.symbol),kucoin=kucoinPairs.has(c.symbol),source=binance?'BINANCE':(okx?'OKX':(kucoin?'KUCOIN':null)),exchangeSymbol=binance?c.symbol:(okx?okxPairs.get(c.symbol):kucoin?kucoinPairs.get(c.symbol):null),volume=binance?(volumes.get(c.symbol)||0):(okx?(okxVolumes.get(exchangeSymbol)||0):(kucoin?(kucoinVolumes.get(exchangeSymbol)||0):0));return {symbol:c.symbol,name:c.name,rank:c.rank,source,volume,status:source&&volume>=config.minVolume?'eligible':'excluded',reason:!source?'Par USDT não encontrado nas fontes consultadas':`Volume ${volume.toLocaleString('en-US',{maximumFractionDigits:0})} abaixo do mínimo de US$ ${config.minVolume.toLocaleString('en-US')}`};});
+  const candidateAudit=candidates.map(c=>{const binance=pairs.has(c.symbol),okx=okxPairs.has(c.symbol),source=binance?'BINANCE':(okx?'OKX':null),exchangeSymbol=binance?c.symbol:(okx?okxPairs.get(c.symbol):null),volume=binance?(volumes.get(c.symbol)||0):(okx?(okxVolumes.get(exchangeSymbol)||0):0);return {symbol:c.symbol,name:c.name,rank:c.rank,source,volume,status:source&&volume>=config.minVolume?'eligible':'excluded',reason:!source?'Par USDT não encontrado na Binance ou OKX':`Volume ${volume.toLocaleString('en-US',{maximumFractionDigits:0})} abaixo do mínimo de US$ ${config.minVolume.toLocaleString('en-US')}`};});
   const seen=new Set();
-  const assets=candidates.filter(c=>(pairs.has(c.symbol)||okxPairs.has(c.symbol)||kucoinPairs.has(c.symbol)) && !['BTCUSDT','ETHUSDT'].includes(c.symbol) && !seen.has(c.symbol) && (seen.add(c.symbol),true)).map(c=>{const binance=pairs.has(c.symbol),okx=okxPairs.has(c.symbol),exchangeSymbol=binance?c.symbol:(okx?okxPairs.get(c.symbol):kucoinPairs.get(c.symbol)),source=binance?'BINANCE':(okx?'OKX':'KUCOIN'),volume=binance?(volumes.get(c.symbol)||0):(okx?(okxVolumes.get(exchangeSymbol)||0):(kucoinVolumes.get(exchangeSymbol)||0));return {...c,source,exchangeSymbol,volume,volume24h:volume};}).filter(a=>a.volume >= config.minVolume).sort((a,b)=>a.rank-b.rank||a.symbol.localeCompare(b.symbol));
+  const assets=candidates.filter(c=>(pairs.has(c.symbol)||okxPairs.has(c.symbol)) && !['BTCUSDT','ETHUSDT'].includes(c.symbol) && !seen.has(c.symbol) && (seen.add(c.symbol),true)).map(c=>{const binance=pairs.has(c.symbol),okx=okxPairs.has(c.symbol),exchangeSymbol=binance?c.symbol:okxPairs.get(c.symbol),source=binance?'BINANCE':'OKX',volume=binance?(volumes.get(c.symbol)||0):(okxVolumes.get(exchangeSymbol)||0);return {...c,source,exchangeSymbol,volume,volume24h:volume};}).filter(a=>a.volume >= config.minVolume).sort((a,b)=>a.rank-b.rank||a.symbol.localeCompare(b.symbol));
   return {assets,mode,warnings,rankings,requestedLimit:config.assetLimit,rankingCandidates:candidates.length,candidateAudit};
 }
 async function fetchSeries(getJson,symbol,asOf,source=SOURCES.spot) {
   if(source===SOURCES.okx){
     const bars={'1w':'1Wutc','1d':'1Dutc','4h':'4H','2h':'2H','1h':'1H'},instId=symbol.endsWith('-USDT')?symbol:symbol.replace(/USDT$/,'-USDT');
     const values=await Promise.all(INTERVALS.map(async interval=>{const result=await getJson(`${SOURCES.okx}/market/history-candles?instId=${encodeURIComponent(instId)}&bar=${bars[interval]}&limit=210&after=${asOf}`);if(String(result.code)!=='0'||!Array.isArray(result.data))throw new Error(result.msg||'Candles OKX inválidos');return closedOkxCandles(result.data,interval,asOf);}));
-    return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
-  }
-  if(source===SOURCES.kucoin){
-    const types={'1w':'1week','1d':'1day','4h':'4hour','2h':'2hour','1h':'1hour'},instId=symbol.includes('-')?symbol:symbol.replace(/USDT$/,'-USDT');
-    const values=await Promise.all(INTERVALS.map(async interval=>{const duration={'1w':604800,'1d':86400,'4h':14400,'2h':7200,'1h':3600}[interval],end=Math.floor(asOf/1000),start=end-210*duration,result=await getJson(`${SOURCES.kucoin}/api/v1/market/candles?symbol=${encodeURIComponent(instId)}&type=${types[interval]}&startAt=${start}&endAt=${end}`);if(String(result.code)!=='200000'||!Array.isArray(result.data))throw new Error(result.msg||'Candles KuCoin inválidos');const rows=result.data.map(r=>[Number(r[0])*1000,r[1],r[3],r[4],r[2],r[5],Number(r[0])*1000+duration*1000-1]);return closedCandles(rows,asOf);}));
     return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
   }
   const values=await Promise.all(INTERVALS.map(interval=>getJson(`${source}/klines?symbol=${encodeURIComponent(symbol)}&interval=${interval}&limit=210&endTime=${asOf-1}`).then(raw=>closedCandles(raw,asOf))));
@@ -248,7 +260,7 @@ async function scanMarket(getJson,options=DEFAULTS,onProgress=()=>{}) {
   const config=settings(options), clock=await getJson(`${SOURCES.spot}/time`), asOf=Number(clock.serverTime);
   if(!Number.isFinite(asOf))throw new Error('Horário Binance inválido.');
   const universe=await marketUniverse(getJson,config), signals=[], failures=[], diagnostics=universe.candidateAudit.filter(item=>item.status==='excluded').map(item=>({...item,reasons:[item.reason]})), warnings=[...universe.warnings];let next=0,done=0;
-  async function worker(){while(next<universe.assets.length){const asset=universe.assets[next++];const audit={symbol:asset.symbol,name:asset.name,rank:asset.rank,source:asset.source,volume:asset.volume,status:'rejected',reasons:[]};try{const source=asset.source==='OKX'?SOURCES.okx:(asset.source==='KUCOIN'?SOURCES.kucoin:SOURCES.spot),series=await fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,asOf,source), trace=[];const signal=evaluate(asset,series,config,trace);audit.reasons=trace.filter(item=>item.reason).map(item=>`${item.strategy}: ${item.reason}`);if(signal){signals.push(signal);audit.status='signal';audit.score=signal.score;audit.strategy=signal.strategyName;}else if(!audit.reasons.length)audit.reasons=['Não atingiu todos os filtros do setup'];}catch(error){failures.push({symbol:asset.symbol,source:asset.source,error:error.message});audit.status='error';audit.reasons=[`Falha de consulta: ${error.message}`];}diagnostics.push(audit);onProgress(++done,universe.assets.length);}}
+  async function worker(){while(next<universe.assets.length){const asset=universe.assets[next++];const audit={symbol:asset.symbol,name:asset.name,rank:asset.rank,source:asset.source,volume:asset.volume,status:'rejected',reasons:[]};try{const source=asset.source==='OKX'?SOURCES.okx:SOURCES.spot,series=await fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,asOf,source), trace=[], signal=evaluate(asset,series,config,trace);audit.reasons=trace.filter(item=>item.reason).map(item=>`${item.strategy}: ${item.reason}`);if(signal){signals.push(signal);audit.status='signal';audit.score=signal.score;audit.strategy=signal.strategyName;}else if(!audit.reasons.length)audit.reasons=['Não atingiu todos os filtros do setup'];}catch(error){failures.push({symbol:asset.symbol,source:asset.source,error:error.message});audit.status='error';audit.reasons=[`Falha de consulta: ${error.message}`];}diagnostics.push(audit);onProgress(++done,universe.assets.length);}}
   await Promise.all(Array.from({length:Math.min(4,universe.assets.length)},worker));
   if(universe.assets.length && failures.length===universe.assets.length)throw new Error(`Todas as ${failures.length} consultas de ativos falharam: ${failures[0].error}`);
   const qualified=consolidate(signals), selected=[];
