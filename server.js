@@ -29,7 +29,7 @@ const get = (url, headers = {}) => new Promise((resolve, reject) => {
 const signature = (secret, text) => crypto.createHmac('sha256', secret).update(text).digest('hex');
 const queryString = params => Object.entries(params).filter(([, value]) => value != null).sort(([a], [b]) => a.localeCompare(b)).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 const ninetyDaysAgo = () => String(Date.now() - 90 * 86400000);
-const publicMarketHosts = new Set(['api.coingecko.com', 'data-api.binance.vision', 'api.binance.com', 'fapi.binance.com', 'pro-api.coinmarketcap.com', 'www.okx.com']);
+const publicMarketHosts = new Set(['api.coingecko.com', 'data-api.binance.vision', 'api.binance.com', 'fapi.binance.com', 'pro-api.coinmarketcap.com', 'api.coinpaprika.com', 'www.okx.com']);
 const rankingCache = new Map();
 async function publicData(target) {
   if(target.hostname !== 'pro-api.coinmarketcap.com') return get(target.toString());
@@ -76,3 +76,4 @@ http.createServer((request, response) => {
   if (!file.startsWith(root)) { response.writeHead(403); return response.end('Acesso negado'); }
   fs.readFile(file, (error, data) => { if (error) { response.writeHead(404); return response.end('Arquivo não encontrado'); } response.writeHead(200, { 'Content-Type': types[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store, no-cache, must-revalidate' }); response.end(data); });
 }).listen(port, host, () => console.log(`Sentinel Trade disponível em http://${host}:${port}`));
+
