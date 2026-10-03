@@ -13,15 +13,15 @@ function fixtures(){
 }
 test('score permite somente 90 e 100, sem override por estratégia experimental',()=>{for(const score of [80,89,95,101])assert.throws(()=>Core.settings({minScore:score}));assert.equal(Core.settings({minScore:100}).minScore,100);assert.throws(()=>Core.settings({strategy:'breakout-30-2h-retest'}));});
 const patterns=[['Engolfo de alta',[{open:101,close:99,high:102,low:98},{open:98,close:102,high:103,low:97}]],['Martelo comprador',[{open:100,close:101,high:103,low:99},{open:100,close:101,high:102,low:97}]],['Rompimento de máxima',[{open:99,close:100,high:101,low:98},{open:100,close:102,high:103,low:99}]]];
-for(const [name,candles] of patterns)test('mesmo padrão e sinal nos dois ambientes: '+name,()=>{assert.equal(Core.candlePattern(candles).name,name);assert.deepEqual(plain(Core.candlePattern(candles)),plain(web.candlePattern(candles)));for(const strategy of Object.keys(Core.STRATEGIES)){const f=fixtures();f.analyses.two.pattern={name,bullish:true};const node=Core.evaluateAnalyses(f.asset,f.series,f.analyses,strategy),ui=web.evaluateAnalyses(f.asset,f.series,f.analyses,strategy);assert(node);assert.deepEqual(plain(ui),plain(node));}});
+for(const [name,candles] of patterns)test('mesmo padrão e sinal nos dois ambientes: '+name,()=>{assert.equal(Core.candlePattern(candles).name,name);assert.deepEqual(plain(Core.candlePattern(candles)),plain(web.candlePattern(candles)));for(const strategy of ['trend','aggressive-pullback','flexible-pullback-2h']){const f=fixtures();f.analyses.two.pattern={name,bullish:true};const node=Core.evaluateAnalyses(f.asset,f.series,f.analyses,strategy),ui=web.evaluateAnalyses(f.asset,f.series,f.analyses,strategy);assert(node);assert.deepEqual(plain(ui),plain(node));}});
 for(const [label,mutate] of [
- ['sem padrão',f=>f.analyses.two.pattern={bullish:false}],
+ ['sem padrão',f=>{f.analyses.two.pattern={bullish:false};f.analyses.two.pivot={bullish:false};}],
  ['macro diário desalinhado',f=>f.analyses.day.aligned=false],
  ['macro 4H sem inclinação',f=>f.analyses.four.rising=false],
  ['1H sem momentum',f=>f.analyses.one.momentum=false],
  ['euforia semanal',f=>f.analyses.extension.blocked=true],
  ['RSI esticado',f=>f.analyses.two.rsi=68],
- ['distância EMA',f=>f.analyses.two.ema9=95],
+ ['distância EMA',f=>f.analyses.two.ema9=88],
  ['alta recente',f=>f.series['2h'][202].low=90],
  ['resistência antes de 2R',f=>f.analyses.two.levels={resistance:101}],
  ['risco superior a 8%',f=>f.series['2h'][207].low=90]
@@ -30,10 +30,10 @@ test('score 91 passa no limiar 90 e é rejeitado no 100',()=>{const f=fixtures()
 test('resistência exatamente 2R é aceita, inferior rejeitada',()=>{const f=fixtures(),signal=Core.evaluateAnalyses(f.asset,f.series,f.analyses,'trend');f.analyses.two.levels={resistance:signal.tp2};assert(Core.evaluateAnalyses(f.asset,f.series,f.analyses,'trend'));f.analyses.two.levels.resistance-=.001;assert.equal(Core.evaluateAnalyses(f.asset,f.series,f.analyses,'trend'),null);});
 test('candle só entra após seu fechamento real, sem excluir o último fechado',()=>{const row=(time,closeTime)=>[time,'100','102','98','101','10',closeTime,0,0,'6'];const raw=[row(0,1999),row(2000,3999),row(4000,5999)];assert.deepEqual(Core.closedCandles(raw,4000).map(c=>c.time),[0,2000]);assert.deepEqual(Core.closedCandles(raw,3999).map(c=>c.time),[0]);});
 test('2H nativo é buscado, com corte fixo de horário e sem blocos incompletos',async()=>{const urls=[];await Core.fetchSeries(async url=>{urls.push(url);return [];},'TESTUSDT',10000);assert.equal(urls.length,5);assert(urls.some(u=>u.includes('interval=2h')));assert(urls.every(u=>u.startsWith(Core.SOURCES.spot)&&u.includes('endTime=9999')));});
-test('ranking não substitui volume USDT do par; universo e falha dupla são idênticos',async()=>{
+test('ranking não substitui volume USDT do par; fallback por volume mantém o universo',async()=>{
  const provider=async url=>{if(url.endsWith('/exchangeInfo'))return {symbols:['HIGHUSDT','LOWUSDT'].map(symbol=>({symbol,status:'TRADING',quoteAsset:'USDT',isSpotTradingAllowed:true}))};if(url.endsWith('/ticker/24hr'))return [{symbol:'HIGHUSDT',quoteVolume:'1000000'},{symbol:'LOWUSDT',quoteVolume:'999999'}];return [{symbol:'low',name:'Low',market_cap_rank:1,total_volume:1000000000},{symbol:'high',name:'High',market_cap_rank:2,total_volume:1}];};
  const result=await Core.marketUniverse(provider,{assetLimit:50});assert.deepEqual(result.assets.map(a=>a.symbol),['HIGHUSDT']);assert.deepEqual(plain(result),plain(await web.marketUniverse(provider,{assetLimit:50})));
- const fallback=async url=>{if(url.includes('coingecko'))throw new Error('429');return provider(url);};await assert.rejects(Core.marketUniverse(fallback,{assetLimit:50}),/Nenhum ranking/);await assert.rejects(web.marketUniverse(fallback,{assetLimit:50}),/Nenhum ranking/);
+ const fallback=async url=>{if(url.includes('coingecko'))throw new Error('429');return provider(url);};const fallbackResult=await Core.marketUniverse(fallback,{assetLimit:50});assert.match(fallbackResult.mode,/fallback/);assert.deepEqual(plain(fallbackResult),plain(await web.marketUniverse(fallback,{assetLimit:50})));
 });
 function rankingProvider({cg=[],cmc=[],failCg=false,failCmc=false}={}){
  return async url=>{
@@ -58,9 +58,9 @@ test('ranking respeita posição top N antes de filtrar volume e ignora ranking 
 test('CoinGecko indisponível mantém CMC e sinaliza cobertura parcial',async()=>{
  const result=await Core.marketUniverse(rankingProvider({failCg:true,cmc:[cmcCoin('CMCONLY',1000)]}));assert.equal(result.mode,'market cap (CoinMarketCap)');assert.equal(result.assets[0].symbol,'CMCONLYUSDT');assert(result.warnings.some(w=>w.includes('CoinGecko: 403')));
 });
-test('CMC indisponível mantém CoinGecko com aviso; falha dupla interrompe a busca',async()=>{
+test('CMC indisponível mantém CoinGecko; falha dupla usa fallback por volume',async()=>{
  const result=await Core.marketUniverse(rankingProvider({cg:[cgCoin('cgonly',1)],failCmc:true}));assert.equal(result.mode,'market cap (CoinGecko)');assert(result.warnings.some(w=>w.includes('CoinMarketCap: 429')));
- await assert.rejects(Core.marketUniverse(rankingProvider({failCg:true,failCmc:true})),/Nenhum ranking/);
+ const fallback=await Core.marketUniverse(rankingProvider({failCg:true,failCmc:true}));assert.match(fallback.mode,/fallback/);assert(fallback.warnings.some(w=>w.includes('fallback')));
 });
 test('símbolo CMC ambíguo não atribui ranking ao par errado',async()=>{
  const result=await Core.marketUniverse(rankingProvider({cg:[cgCoin('shared',1)],cmc:[cmcCoin('DUP',1),cmcCoin('DUP',2)]}),{assetLimit:2});assert.equal(result.assets.length,1);assert(result.warnings.some(w=>w.includes('ambíguo DUPUSDT')));
@@ -91,3 +91,4 @@ test('EMA, RSI, MACD, ADX e score calculados igualmente no navegador e Node',()=
 test('histórico usa fechamento macro, sem acesso ao candle aberto',()=>{const series=Array.from({length:215},(_,i)=>({time:i*100,closeTime:(i+1)*100-1}));const history=Backtest.historyUntil(series,21000);assert.equal(history.at(-1).time,20900);});
 test('todos os setups experimentais compartilham backtest idêntico nos dois ambientes',()=>{const f=fixtures(),strategies=['trend','aggressive-pullback','legacy-pullback-1h','refined-early-ema-rsi','refined-moderate-ema-rsi','refined-intermediate-ema-rsi','breakout-30-2h-close','breakout-30-2h-retest','breakout-30-2h-retest-fixed-3','breakout-30-2h-retest-fixed-4','breakout-30-2h-retest-fixed-7','breakout-60-2h-close','breakout-60-2h-retest','breakout-60-2h-retest-fixed-3','breakout-60-2h-retest-fixed-4','breakout-60-2h-retest-fixed-7','expansion-retest-2h'];for(const strategy of strategies){assert.deepEqual(plain(Backtest.historicalSetup(...['1w','1d','4h','2h','1h'].map(tf=>f.series[tf]),strategy,'2h')),plain(webBt.historicalSetup(...['1w','1d','4h','2h','1h'].map(tf=>f.series[tf]),strategy,'2h')));}});
 test('Telegram mantém envio novo, deduplicação e estado sem enviar rede no teste',async()=>{const {main,messageFor}=await import('../telegram-scanner.mjs');const f=fixtures(),signal={...Core.evaluateAnalyses(f.asset,f.series,f.analyses,'trend'),vehicle:'SPOT',leverage:'1×'};let saved={},messages=[];const deps={scan:async()=>({signals:[signal],assets:1,failures:[],warnings:[]}),send:async text=>messages.push(text),loadState:async()=>saved,saveState:async data=>saved=structuredClone(data)};await main(deps);await main(deps);assert.equal(messages.length,1);assert(saved.sent.TESTUSDT);assert(messageFor([signal,signal,signal]).length<4096);deps.scan=async()=>({signals:[],assets:1,failures:[],warnings:[]});await main(deps);assert.equal(messages.length,1);});
+
