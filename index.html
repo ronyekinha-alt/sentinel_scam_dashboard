@@ -204,53 +204,684 @@
     #mexcMetricsPrimary { grid-template-columns:repeat(2,minmax(135px,1fr)); }
   }
   </style><style id="value-tone-overrides">
-    .positive { color:#15803d !important; }
-    .negative { color:#b91c1c !important; }
-    .zero { color:#111827 !important; }
+    .positive { color:#166534 !important; background:#dcfce7 !important; font-weight:900 !important; border-radius:4px; padding:2px 4px; }
+    .negative { color:#991b1b !important; background:#fee2e2 !important; font-weight:900 !important; border-radius:4px; padding:2px 4px; }
+    .zero { color:#111827 !important; font-weight:800 !important; }
     .result-win { color:#15803d !important; }
     .result-loss { color:#b91c1c !important; }
+    #scannerAuditPanel { overflow:hidden; border:2px solid #93c5fd; background:#fff; }
+    #scannerAuditPanel > .section-heading { padding:20px 22px; background:linear-gradient(135deg,#0f172a,#172554 58%,#1d4ed8); color:#fff; border-bottom:3px solid #60a5fa; }
+    #scannerAuditPanel > .section-heading .eyebrow, #scannerAuditPanel > .section-heading h2 { color:#fff; text-shadow:none; }
+    #scannerAuditPanel > .section-heading label { display:flex; align-items:center; gap:10px; color:#dbeafe; }
+    #scannerAuditPanel > .section-heading input { min-width:210px; background:#fff; color:#172554; border:2px solid #bfdbfe; }
+    .audit-summary-grid { display:grid; grid-template-columns:repeat(6,minmax(120px,1fr)); gap:12px; padding:16px 18px; background:#eff6ff; border-bottom:1px solid #bfdbfe; }
+    .audit-metric { padding:12px 14px; background:#fff; border:1px solid #bfdbfe; border-top:4px solid #64748b; border-radius:10px; box-shadow:0 3px 10px #1e3a8a18; }
+    .audit-metric span { display:block; color:#475569; font-size:11px; font-weight:800; letter-spacing:.3px; }
+    .audit-metric strong { display:block; margin-top:4px; color:#172554; font-size:23px; line-height:1; }
+    .audit-metric.positive { border-top-color:#22c55e; background:#f0fdf4; }
+    .audit-metric.positive strong { color:#166534 !important; background:none !important; padding:0; }
+    .audit-metric.warn { border-top-color:#f59e0b; background:#fffbeb; }
+    .audit-metric.warn strong { color:#92400e !important; background:none !important; padding:0; }
+    .audit-metric.negative { border-top-color:#ef4444; background:#fef2f2; }
+    .audit-metric.negative strong { color:#991b1b !important; background:none !important; padding:0; }
+    .audit-summary-copy { margin:0; padding:12px 20px; color:#334155; font-size:13px; border-bottom:1px solid #cbd5e1; background:#fff; }
+    .audit-summary-copy strong { color:#172554; }
+    .audit-reasons-block { margin:16px 18px; border:1px solid #c7dbed; border-radius:12px; overflow:hidden; background:#fff; box-shadow:0 3px 10px #1e3a8a12; }
+    .audit-subheading { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 16px; background:#f8fafc; border-bottom:1px solid #cbd5e1; }
+    .audit-subheading h3 { margin:0; color:#172554; font-size:14px; }
+    .audit-subheading span { color:#64748b; font-size:12px; }
+    #scannerAuditPanel .audit-reasons-block .table-wrap { margin:0; }
+    #scannerAuditPanel .audit-reasons-block th { background:#1e293b; color:#fff; }
+    #scannerAuditPanel .audit-reasons-block td { color:#1e3a5f; }
+    .audit-result { margin:16px 18px 22px; padding:16px 18px; border:1px solid #cbd5e1; border-radius:12px; min-height:76px; box-shadow:0 3px 10px #1e3a8a12; }
+    .audit-result.positive { background:#ecfdf5 !important; border-color:#86efac; color:#14532d; }
+    .audit-result.negative { background:#fef2f2 !important; border-color:#fca5a5; color:#7f1d1d; }
+    .audit-result.warn { background:#fffbeb !important; border-color:#fcd34d; color:#78350f; }
+    .audit-result.muted { background:#f8fafc !important; color:#475569; }
+    .audit-result-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+    .audit-result-top h3 { margin:3px 0 0; color:#172554; font-size:18px; }
+    .audit-status-badge { display:inline-flex; align-items:center; padding:6px 10px; border-radius:999px; background:#e2e8f0; color:#334155; font-size:11px; font-weight:900; }
+    .audit-result.positive .audit-status-badge { background:#bbf7d0; color:#166534; }
+    .audit-result.negative .audit-status-badge { background:#fecaca; color:#991b1b; }
+    .audit-result.warn .audit-status-badge { background:#fde68a; color:#92400e; }
+    .audit-result-meta { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+    .audit-result-meta span { padding:5px 8px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; color:#334155; font-size:12px; }
+    .audit-reasons-list { display:grid; gap:6px; margin-top:10px; }
+    .audit-reason-item { display:flex; align-items:flex-start; gap:8px; padding:8px 10px; background:#fff; border:1px solid #dbeafe; border-radius:8px; color:#334155; font-size:13px; }
+    .audit-reason-index { flex:0 0 22px; display:inline-flex; justify-content:center; padding:2px 0; border-radius:999px; background:#dbeafe; color:#1d4ed8; font-size:11px; font-weight:900; }
+    .audit-loading { display:flex; align-items:center; gap:10px; font-size:14px; }
+    .audit-loading-dot { width:10px; height:10px; border-radius:50%; background:#f59e0b; box-shadow:0 0 0 5px #fef3c7; }
+    @media (max-width:1100px) { .audit-summary-grid { grid-template-columns:repeat(3,minmax(135px,1fr)); } }
+    @media (max-width:650px) { .audit-summary-grid { grid-template-columns:repeat(2,minmax(120px,1fr)); } .audit-result-top { flex-direction:column; } #scannerAuditPanel > .section-heading label { width:100%; flex-direction:column; align-items:stretch; } #scannerAuditPanel > .section-heading input { min-width:0; } }
+  </style>
+  <style id="futuristic-orbit-theme">
+    /* Sentinel Orbit: visual-only redesign. DOM, IDs and scanner behavior stay unchanged. */
+    :root {
+      --orbit-bg:#030711;
+      --orbit-surface:rgba(7,16,34,.82);
+      --orbit-surface-2:rgba(12,25,50,.76);
+      --orbit-line:rgba(72,121,190,.38);
+      --orbit-cyan:#49f6ff;
+      --orbit-green:#54ff9b;
+      --orbit-red:#ff426d;
+      --orbit-violet:#a875ff;
+      --orbit-amber:#ffd56a;
+    }
+    body {
+      background:
+        radial-gradient(circle at 50% 28%,rgba(22,91,170,.22),transparent 34%),
+        radial-gradient(circle at 9% 4%,rgba(29,237,255,.13),transparent 27%),
+        radial-gradient(circle at 92% 0%,rgba(177,55,255,.14),transparent 28%),
+        var(--orbit-bg) !important;
+      color:#eaf5ff !important;
+    }
+    body::before {
+      content:""; position:fixed; inset:0; pointer-events:none; opacity:.22; z-index:-1;
+      background-image:linear-gradient(rgba(95,150,230,.11) 1px,transparent 1px),linear-gradient(90deg,rgba(95,150,230,.11) 1px,transparent 1px);
+      background-size:44px 44px; mask-image:linear-gradient(to bottom,black,transparent 86%);
+    }
+    .topbar {
+      max-width:none; padding:24px clamp(18px,4vw,56px); min-height:108px;
+      border-bottom:1px solid rgba(72,164,255,.35) !important;
+      background:linear-gradient(180deg,rgba(4,12,28,.88),rgba(4,12,28,.55));
+      box-shadow:0 0 42px rgba(19,130,255,.14),inset 0 -1px rgba(88,242,255,.18);
+    }
+    .topbar h1 { font-size:32px; letter-spacing:-1px; text-shadow:0 0 22px rgba(73,246,255,.72); }
+    .topbar .eyebrow { color:var(--orbit-cyan); letter-spacing:2px; }
+    main { max-width:1540px; padding:28px clamp(14px,3vw,38px) 54px; }
+    .controls, .panel {
+      background:linear-gradient(145deg,rgba(7,17,38,.91),rgba(4,10,25,.84)) !important;
+      border:1px solid var(--orbit-line) !important; border-radius:22px !important;
+      box-shadow:0 0 0 1px rgba(102,190,255,.05),0 20px 55px rgba(0,0,0,.28),0 0 32px rgba(20,103,190,.12) !important;
+    }
+    .controls { padding:18px 20px; gap:14px; }
+    .controls label { color:#a6c4e6 !important; }
+    select,input,textarea { background:rgba(5,14,32,.9) !important; border:1px solid rgba(89,153,226,.52) !important; color:#edf8ff !important; border-radius:999px !important; }
+    .controls .check input { accent-color:var(--orbit-cyan); }
+    .primary { background:linear-gradient(135deg,#16e8dd,#5affaa) !important; color:#001f27 !important; border-radius:999px !important; box-shadow:0 0 20px rgba(45,255,223,.42) !important; }
+    .secondary { border-color:rgba(169,116,255,.7) !important; border-radius:999px !important; }
+    .pill { background:rgba(22,51,93,.74) !important; border:1px solid rgba(82,198,255,.35); }
+    .section-heading { padding:22px 24px; border-bottom:1px solid rgba(75,138,214,.34) !important; background:linear-gradient(90deg,rgba(8,26,56,.8),transparent); }
+    .section-heading h2 { letter-spacing:-.3px; text-shadow:0 0 14px rgba(73,246,255,.28); }
+    .section-heading .muted { color:#8eadd0 !important; }
+
+    /* Audit counters become a row of orbiting metric bubbles. */
+    #scannerAuditPanel { overflow:visible !important; background:linear-gradient(145deg,rgba(4,13,31,.96),rgba(8,20,45,.78)) !important; border-color:rgba(73,246,255,.42) !important; }
+    #scannerAuditPanel > .section-heading { border-radius:20px 20px 0 0; background:linear-gradient(90deg,rgba(10,35,72,.9),rgba(11,19,49,.8)) !important; border-bottom-color:rgba(73,246,255,.4) !important; }
+    .audit-summary-grid { grid-template-columns:repeat(6,minmax(125px,1fr)); gap:18px; padding:28px 24px 32px; background:radial-gradient(ellipse at center,rgba(38,107,191,.18),transparent 72%) !important; border-bottom:0 !important; position:relative; }
+    .audit-summary-grid::before { content:""; position:absolute; left:6%; right:6%; top:50%; height:1px; background:linear-gradient(90deg,transparent,rgba(71,209,255,.5),transparent); box-shadow:0 0 14px rgba(71,209,255,.65); }
+    .audit-metric { width:100%; aspect-ratio:1/1; min-height:122px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; position:relative; z-index:1; padding:18px 12px !important; background:radial-gradient(circle at 35% 28%,rgba(38,92,166,.7),rgba(5,16,37,.94) 68%) !important; border:1px solid rgba(90,165,239,.7) !important; border-top:1px solid rgba(90,165,239,.7) !important; border-radius:50% !important; box-shadow:0 0 0 7px rgba(45,121,220,.08),0 0 24px rgba(54,168,255,.32),inset 0 0 22px rgba(56,181,255,.19) !important; }
+    .audit-metric::after { content:""; position:absolute; inset:-8px; border:1px dashed rgba(100,208,255,.32); border-radius:50%; transform:rotate(-16deg); }
+    .audit-metric span { color:#b6d8f7 !important; font-size:10px; line-height:1.15; max-width:92px; text-transform:uppercase; letter-spacing:.7px; }
+    .audit-metric strong { margin-top:8px; font-size:29px !important; color:#f4fbff !important; text-shadow:0 0 15px rgba(73,246,255,.85); }
+    .audit-metric.positive { background:radial-gradient(circle at 35% 28%,rgba(19,167,119,.7),rgba(4,31,37,.95) 68%) !important; border-color:rgba(84,255,155,.92) !important; box-shadow:0 0 0 7px rgba(84,255,155,.08),0 0 25px rgba(84,255,155,.42),inset 0 0 22px rgba(84,255,155,.2) !important; }
+    .audit-metric.positive strong { color:#a5ffd0 !important; }
+    .audit-metric.warn { background:radial-gradient(circle at 35% 28%,rgba(168,114,25,.72),rgba(43,27,8,.95) 68%) !important; border-color:rgba(255,213,106,.92) !important; box-shadow:0 0 0 7px rgba(255,213,106,.08),0 0 25px rgba(255,213,106,.38),inset 0 0 22px rgba(255,213,106,.2) !important; }
+    .audit-metric.warn strong { color:#ffe9a9 !important; }
+    .audit-metric.negative { background:radial-gradient(circle at 35% 28%,rgba(170,30,83,.72),rgba(44,6,28,.95) 68%) !important; border-color:rgba(255,66,109,.9) !important; box-shadow:0 0 0 7px rgba(255,66,109,.08),0 0 25px rgba(255,66,109,.38),inset 0 0 22px rgba(255,66,109,.2) !important; }
+    .audit-metric.negative strong { color:#ffb0c5 !important; }
+    .audit-summary-copy { padding:14px 24px; background:rgba(8,25,51,.7) !important; border-color:rgba(73,145,221,.28) !important; color:#a6c4e6 !important; }
+
+    /* Opportunity area: orbital/glass rows instead of a flat admin grid. */
+    #signalsPanel { position:relative; overflow:hidden; }
+    #signalsPanel::before { content:""; position:absolute; width:540px; height:540px; right:8%; top:110px; border:1px solid rgba(86,159,255,.1); border-radius:50%; box-shadow:0 0 0 42px rgba(86,159,255,.025),0 0 0 86px rgba(86,159,255,.018); pointer-events:none; }
+    #signalsPanel .table-wrap { padding:10px 12px 18px; position:relative; }
+    #signalsPanel table { min-width:1120px; border-collapse:separate; border-spacing:0 9px; }
+    #signalsPanel thead th { background:transparent !important; color:#8eb9e4 !important; border:0; text-transform:uppercase; letter-spacing:1px; }
+    #signalsPanel tbody tr { background:linear-gradient(90deg,rgba(11,35,66,.9),rgba(6,17,37,.78)) !important; box-shadow:0 0 20px rgba(31,124,220,.12); }
+    #signalsPanel tbody td { border-top:1px solid rgba(83,160,237,.28); border-bottom:1px solid rgba(83,160,237,.28); color:#d8edff; }
+    #signalsPanel tbody td:first-child { border-left:1px solid rgba(83,160,237,.28); border-radius:17px 0 0 17px; }
+    #signalsPanel tbody td:last-child { border-right:1px solid rgba(83,160,237,.28); border-radius:0 17px 17px 0; }
+    #signalsPanel tbody tr:hover { transform:translateY(-2px); box-shadow:0 0 25px rgba(73,246,255,.25); }
+    #signalsPanel .score { display:inline-flex; align-items:center; justify-content:center; min-width:48px; height:48px; border:1px solid var(--orbit-cyan); border-radius:50%; color:#b7ffff !important; background:rgba(21,121,158,.26); box-shadow:0 0 16px rgba(73,246,255,.4); }
+    #signalsPanel .direction-badge.long { background:rgba(22,183,110,.2) !important; border:1px solid var(--orbit-green); color:#aaffcd !important; border-radius:999px !important; box-shadow:0 0 16px rgba(84,255,155,.36) !important; }
+    #signalsPanel .direction-badge.short { background:rgba(202,28,81,.2) !important; border:1px solid var(--orbit-red); color:#ffb0c5 !important; border-radius:999px !important; box-shadow:0 0 16px rgba(255,66,109,.36) !important; }
+    #signalsPanel .tag, #signalsPanel .exchange-badge, #signalsPanel .vehicle-badge, #signalsPanel .timeframe-badge { border-radius:999px !important; }
+    #signalsPanel button { border-radius:999px !important; }
+
+    .audit-reasons-block, .audit-result { background:rgba(7,20,42,.72) !important; border-color:rgba(77,144,220,.35) !important; box-shadow:0 0 20px rgba(22,108,196,.12) !important; }
+    .audit-subheading { background:rgba(12,35,69,.65) !important; border-color:rgba(77,144,220,.3) !important; }
+    .audit-subheading h3, .audit-result-top h3 { color:#dff4ff !important; }
+    footer { color:#6e95bd; }
+    @media (max-width:1100px) { .audit-summary-grid { grid-template-columns:repeat(3,minmax(130px,1fr)); } }
+    @media (max-width:650px) { .audit-summary-grid { grid-template-columns:repeat(2,minmax(125px,1fr)); gap:14px; padding:22px 15px 28px; } .audit-metric { min-height:128px; } }
+
+    /* Readability pass: preserve the neon concept without shrinking the actual product UI. */
+    body { font-size:15px !important; }
+    main { width:calc(100% - 32px); max-width:1800px !important; }
+    .topbar, footer { width:calc(100% - 32px); max-width:1800px !important; }
+    .controls label { font-size:13px !important; }
+    .controls select, .controls input { min-height:38px; padding:9px 14px !important; }
+    .audit-summary-grid { gap:22px; padding-top:34px; padding-bottom:38px; }
+    .audit-metric { min-height:156px; }
+    .audit-metric span { font-size:12px !important; max-width:112px; }
+    .audit-metric strong { font-size:36px !important; }
+    #scannerAuditPanel .audit-reasons-block th, #scannerAuditPanel .audit-reasons-block td { font-size:13px !important; }
+    #scannerAuditPanel .audit-result { font-size:14px; }
+    #signalsPanel th { font-size:12px !important; }
+    #signalsPanel td { font-size:14px !important; }
+    #signalsPanel .sub { font-size:12px !important; }
+
+    /* The remaining functional sections use the same dark glass language. */
+    #importedTradesPanel > .section-heading,
+    #importedTradesPanel .mexc-balance-heading,
+    #mexcLivePanel > .section-heading,
+    #mexcPanel > .section-heading,
+    #backtestPanel > .section-heading {
+      background:linear-gradient(90deg,rgba(8,38,72,.96),rgba(9,19,43,.9)) !important;
+      color:#e4f5ff !important; border-color:rgba(73,246,255,.36) !important;
+      box-shadow:inset 0 -1px rgba(73,246,255,.2) !important;
+    }
+    #importedTradesPanel > .section-heading *,
+    #importedTradesPanel .mexc-balance-heading *,
+    #mexcLivePanel > .section-heading *,
+    #mexcPanel > .section-heading *,
+    #backtestPanel > .section-heading * { color:#d8efff !important; text-shadow:0 0 10px rgba(73,246,255,.18) !important; }
+    #importedTradesPanel > .controls,
+    #mexcLivePanel > .controls,
+    #mexcPanel > .controls,
+    #backtestPanel > .controls { background:rgba(6,19,40,.82) !important; color:#d8efff !important; border-color:rgba(72,140,219,.36) !important; }
+    #importedTradesPanel > .controls .muted,
+    #mexcLivePanel > .controls .muted,
+    #mexcPanel > .controls .muted,
+    #backtestPanel > .controls .muted { color:#9dbbd9 !important; }
+    #importedTradesPanel .stats, #mexcLivePanel .stats, #backtestPanel .stats { gap:14px; }
+    #importedTradesPanel .stat, #mexcLivePanel .stat, #backtestPanel .stat { background:linear-gradient(145deg,rgba(10,35,68,.9),rgba(5,15,32,.95)) !important; border-color:rgba(83,160,237,.42) !important; color:#e5f5ff !important; box-shadow:0 0 17px rgba(38,133,225,.18) !important; }
+    #importedTradesPanel .stat .value, #mexcLivePanel .stat .value, #backtestPanel .stat .value { color:#aefbff !important; text-shadow:0 0 12px rgba(73,246,255,.65); }
+    #importedTradesPanel table, #mexcLivePanel table, #mexcPanel table, #backtestPanel table { border-collapse:separate; border-spacing:0 4px; }
+    #importedTradesPanel th, #mexcLivePanel th, #mexcPanel th, #backtestPanel th { background:rgba(16,42,77,.95) !important; color:#9fc6e9 !important; border-color:rgba(85,157,226,.3) !important; }
+    #importedTradesPanel td, #mexcLivePanel td, #mexcPanel td, #backtestPanel td { background:rgba(6,20,42,.86) !important; color:#d7ebff !important; border-color:rgba(69,130,205,.22) !important; }
+    #importedTradesPanel tr:nth-child(even) td, #mexcLivePanel tr:nth-child(even) td, #mexcPanel tr:nth-child(even) td, #backtestPanel tr:nth-child(even) td { background:rgba(10,30,58,.86) !important; }
+    #importedTradesPanel .result-win, #importedTradesPanel .positive, #mexcLivePanel .positive { background:rgba(25,166,104,.3) !important; color:#aaffcf !important; }
+    #importedTradesPanel .result-loss, #importedTradesPanel .negative, #mexcLivePanel .negative { background:rgba(194,38,78,.3) !important; color:#ffb4c8 !important; }
+    #scannerAuditPanel .audit-result.muted { background:rgba(7,24,49,.8) !important; color:#b8d3ee !important; }
+    .backtest-section-heading { border:1px solid rgba(82,158,232,.4); border-radius:999px !important; background:rgba(10,34,65,.88) !important; color:#d8f5ff !important; }
+    .backtest-section-heading span { color:#92b8d9 !important; }
+
+    /* Filtros acima dos resultados: auditoria e setups usam toda a largura. */
+    main { display:block; max-width:2200px !important; }
+    main > .controls { margin-bottom:20px; }
+    #scannerAuditPanel, #signalsPanel { width:100%; }
+    #scannerAuditPanel .audit-summary-grid { grid-template-columns:repeat(6,minmax(125px,1fr)); justify-items:center; }
+    #scannerAuditPanel .audit-summary-grid .audit-metric { max-width:220px; }
+    #scannerAuditMetrics .audit-metric:nth-child(5) {
+      background:radial-gradient(circle at 35% 28%,rgba(104,60,205,.76),rgba(24,9,62,.96) 68%) !important;
+      border-color:rgba(168,117,255,.96) !important;
+      box-shadow:0 0 0 7px rgba(168,117,255,.09),0 0 27px rgba(168,117,255,.48),inset 0 0 23px rgba(168,117,255,.22) !important;
+    }
+    #scannerAuditMetrics .audit-metric:nth-child(5) strong { color:#dfc8ff !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(6) {
+      background:radial-gradient(circle at 35% 28%,rgba(198,30,139,.76),rgba(53,7,43,.96) 68%) !important;
+      border-color:rgba(255,86,191,.96) !important;
+      box-shadow:0 0 0 7px rgba(255,86,191,.09),0 0 27px rgba(255,86,191,.48),inset 0 0 23px rgba(255,86,191,.22) !important;
+    }
+    #scannerAuditMetrics .audit-metric:nth-child(6) strong { color:#ffc2ea !important; }
+    #scannerAuditMetrics { overflow:hidden; }
+    #scannerAuditMetrics::after {
+      content:""; position:absolute; z-index:0; left:50%; top:50%; width:215px; height:215px; transform:translate(-50%,-50%);
+      border-radius:50%; pointer-events:none; opacity:.46;
+      background:radial-gradient(circle at 35% 28%,rgba(84,190,255,.54),rgba(18,80,155,.22) 48%,rgba(2,14,38,.05) 70%,transparent 72%);
+      border:1px solid rgba(73,198,255,.48); box-shadow:0 0 35px rgba(54,170,255,.35), inset 0 0 30px rgba(73,198,255,.3);
+    }
+    /* Final contrast pass: no dark text on dark glass. */
+    .panel, .panel p, .panel label, .panel span, .panel td, .panel th, .panel h2, .panel h3,
+    .controls, .controls p, .controls label, .controls span { color:#e7f6ff !important; }
+    .muted, .sub, .controls .muted, .controls .sub { color:#a9ccef !important; text-shadow:0 0 8px rgba(73,198,255,.18); }
+    .empty { color:#bceeff !important; text-shadow:0 0 10px rgba(73,246,255,.35); }
+    #scannerAuditPanel .audit-subheading span, #scannerAuditPanel .audit-result-meta span { color:#bceeff !important; }
+    #scannerAuditPanel .audit-reasons-block th,
+    #importedTradesPanel th, #mexcLivePanel th, #mexcPanel th, #backtestPanel th { color:#f1fbff !important; text-shadow:0 0 10px rgba(73,246,255,.4); }
+    #importedTradesPanel > .section-heading .eyebrow,
+    #importedTradesPanel > .section-heading h2,
+    #importedTradesPanel > .section-heading h3,
+    #importedTradesPanel > .section-heading .muted,
+    #importedTradesPanel .mexc-balance-heading .eyebrow,
+    #importedTradesPanel .mexc-balance-heading h3,
+    #importedTradesPanel .mexc-balance-heading .muted,
+    #mexcLivePanel > .section-heading .eyebrow,
+    #mexcLivePanel > .section-heading h2,
+    #mexcLivePanel > .section-heading .muted,
+    #mexcPanel > .section-heading .eyebrow,
+    #mexcPanel > .section-heading h2,
+    #mexcPanel > .section-heading .muted,
+    #backtestPanel > .section-heading .eyebrow,
+    #backtestPanel > .section-heading h2,
+    #backtestPanel > .section-heading .muted { color:#f0fbff !important; text-shadow:0 0 12px rgba(73,246,255,.55) !important; }
+    #importedTradesPanel > .section-heading .eyebrow,
+    #importedTradesPanel .mexc-balance-heading .eyebrow { color:#5affbb !important; }
+    #importedTradesPanel td, #mexcLivePanel td, #mexcPanel td, #backtestPanel td { color:#e5f6ff !important; }
+    #importedTradesPanel .result-win, #importedTradesPanel .positive, #mexcLivePanel .positive {
+      color:#baffd5 !important; background:rgba(0,206,130,.38) !important; box-shadow:inset 0 0 16px rgba(57,255,170,.2),0 0 10px rgba(57,255,170,.16); text-shadow:0 0 9px rgba(84,255,155,.8);
+    }
+    #importedTradesPanel .result-loss, #importedTradesPanel .negative, #mexcLivePanel .negative {
+      color:#ffc1d2 !important; background:rgba(224,30,92,.4) !important; box-shadow:inset 0 0 16px rgba(255,66,109,.22),0 0 10px rgba(255,66,109,.18); text-shadow:0 0 9px rgba(255,66,109,.85);
+    }
+    .backtest-section-heading strong, .backtest-section-heading span { color:#edfbff !important; }
+    button, select, input, textarea { text-shadow:0 0 7px rgba(215,248,255,.28); }
+    #backtestPanel > .section-heading .eyebrow,
+    #backtestPanel > .section-heading h2,
+    #backtestPanel > .section-heading .muted,
+    #backtestPanel .controls label,
+    #backtestPanel .controls label span,
+    #backtestPanel .controls strong,
+    #backtestPanel .filter-group legend,
+    #backtestPanel .filter-group legend span,
+    #backtestPanel .filter-option,
+    #backtestPanel .filter-option span,
+    #backtestPanel .controls .sub,
+    #backtestPanel .controls .muted,
+    #backtestPanel #backtestStatus { color:#e9f9ff !important; text-shadow:0 0 9px rgba(73,246,255,.42) !important; }
+    #backtestPanel .controls .sub,
+    #backtestPanel .controls .muted,
+    #backtestPanel #backtestStatus { color:#b6d8f3 !important; }
+    #backtestPanel .filter-group { border-color:rgba(153,207,255,.8) !important; background:rgba(8,26,52,.5) !important; }
+    #backtestPanel .filter-option input { accent-color:#48f5ff !important; }
+    #backtestPanel .capital-field strong { color:#79f6ff !important; }
+    #backtestPanel .backtest-date-field input { color:#8b3d19 !important; text-shadow:none; }
+    #backtestPanel .controls > .check { color:#effdff !important; }
+    /* Tables: force readable glass rows and remove legacy light zebra styling. */
+    #scannerAuditPanel .audit-reasons-block tbody tr td,
+    #scannerAuditPanel .audit-reasons-block tbody tr:nth-child(even) td,
+    #scannerAuditPanel .audit-reasons-block tbody tr:nth-child(odd) td {
+      background:rgba(7,25,51,.94) !important; color:#e9f8ff !important; border-color:rgba(79,157,235,.3) !important;
+    }
+    #scannerAuditPanel .audit-reasons-block tbody tr:nth-child(even) td { background:rgba(11,38,74,.94) !important; }
+    #scannerAuditPanel .audit-reasons-block tbody tr:hover td { background:rgba(19,83,135,.75) !important; color:#ffffff !important; }
+    #signalsPanel tbody tr td,
+    #signalsPanel tbody tr:nth-child(even) td,
+    #signalsPanel tbody tr:nth-child(odd) td {
+      background:linear-gradient(90deg,rgba(8,30,59,.97),rgba(5,18,39,.97)) !important;
+      color:#eaf9ff !important; border-color:rgba(83,160,237,.42) !important;
+    }
+    #signalsPanel tbody tr:nth-child(even) td { background:linear-gradient(90deg,rgba(12,45,83,.97),rgba(7,24,49,.97)) !important; }
+    #signalsPanel tbody tr td .asset,
+    #signalsPanel tbody tr td .muted,
+    #signalsPanel tbody tr td .sub,
+    #signalsPanel tbody tr td strong,
+    #signalsPanel tbody tr td span { color:#eaf9ff !important; text-shadow:0 0 8px rgba(73,246,255,.24); }
+    #signalsPanel tbody tr td .direction-badge.long { color:#baffd2 !important; }
+    #signalsPanel tbody tr td .direction-badge.short { color:#ffc1d1 !important; }
+    #signalsPanel tbody tr td .score { color:#c9ffff !important; }
+    #signalsPanel tbody tr td .best-badge { color:#1a1200 !important; text-shadow:none; }
+    #signalsPanel tbody tr td .exchange-badge.binance { color:#241700 !important; text-shadow:none; }
+    #signalsPanel tbody tr td .vehicle-badge, #signalsPanel tbody tr td .timeframe-badge { color:#061323 !important; text-shadow:none; }
+    .orbit-stage { position:relative; min-height:330px; overflow:hidden; background:radial-gradient(circle at 50% 50%,rgba(14,85,164,.25),rgba(3,13,31,.7) 52%,rgba(2,8,20,.88)); border-bottom:1px solid rgba(73,198,255,.32); }
+    .orbit-stage::before { content:""; position:absolute; inset:0; background-image:linear-gradient(rgba(73,180,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(73,180,255,.08) 1px,transparent 1px); background-size:28px 28px; mask-image:radial-gradient(circle at center,black,transparent 75%); }
+    .orbit-ring { position:absolute; left:45%; top:51%; border:1px solid rgba(73,198,255,.48); border-radius:50%; transform:translate(-50%,-50%) rotate(-13deg); box-shadow:0 0 18px rgba(73,198,255,.22); }
+    .orbit-ring-a { width:570px; height:185px; }.orbit-ring-b { width:440px; height:145px; transform:translate(-50%,-50%) rotate(21deg); border-color:rgba(170,117,255,.42); }
+    .orbit-globe { position:absolute; left:45%; top:51%; width:170px; height:170px; transform:translate(-50%,-50%); border-radius:50%; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; background:radial-gradient(circle at 34% 24%,rgba(94,190,255,.5),rgba(12,74,151,.5) 44%,rgba(4,22,57,.95) 72%); border:1px solid #45d8ff; box-shadow:0 0 0 8px rgba(48,151,255,.08),0 0 38px rgba(42,177,255,.56),inset 0 0 30px rgba(62,174,255,.35); z-index:2; }
+    .orbit-globe::after { content:""; position:absolute; inset:12px; border:1px dotted rgba(127,225,255,.75); border-radius:50%; }
+    .orbit-globe-label { color:#bbf2ff; font-size:13px; font-weight:900; letter-spacing:.8px; line-height:1.15; z-index:1; }.orbit-globe strong { color:#f5ffff; font-size:34px; line-height:1.05; text-shadow:0 0 16px #7af5ff; z-index:1; }.orbit-globe small { color:#72eaff; font-size:8px; letter-spacing:1.5px; z-index:1; }
+    .orbit-node { position:absolute; z-index:3; display:grid; grid-template-columns:30px auto; column-gap:7px; align-items:center; min-width:108px; color:#eaffff; text-shadow:0 0 10px rgba(73,246,255,.45); }.orbit-node span { grid-row:span 2; width:30px; height:30px; display:grid; place-items:center; border-radius:50%; color:#91ffff; border:1px solid #4affdb; box-shadow:0 0 16px rgba(84,255,155,.68),inset 0 0 12px rgba(84,255,155,.22); }.orbit-node b { font-size:12px; }.orbit-node strong { color:#65ffb3; font-size:20px; }.orbit-node-1{left:31%;top:19%}.orbit-node-2{left:17%;top:57%}.orbit-node-3{left:68%;top:18%}.orbit-node-4{left:72%;top:58%}.orbit-node-5{left:37%;top:78%}
+    .orbit-status { position:absolute; right:22px; top:50%; transform:translateY(-50%); min-width:190px; padding:17px 18px; border:1px solid rgba(168,117,255,.55); border-radius:18px; background:rgba(7,20,48,.78); box-shadow:0 0 22px rgba(168,117,255,.2); z-index:3; }.orbit-status h3 { margin:0 0 11px; color:#f3e6ff !important; font-size:12px; letter-spacing:1px; }.orbit-status p { margin:7px 0; color:#d8f7ff !important; font-size:11px; }.dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; }.dot.valid{background:#54ff9b;box-shadow:0 0 10px #54ff9b}.dot.watch{background:#ffd56a;box-shadow:0 0 10px #ffd56a}.dot.rejected{background:#ff426d;box-shadow:0 0 10px #ff426d}.dot.excluded{background:#a875ff;box-shadow:0 0 10px #a875ff}.dot.errors{background:#ff56bf;box-shadow:0 0 10px #ff56bf}
+    @media (max-width:900px) { .orbit-status{right:12px;min-width:160px}.orbit-node-1{left:24%}.orbit-node-2{left:8%}.orbit-node-3{left:62%}.orbit-node-4{left:68%}.orbit-node-5{left:30%} }
+    @media (max-width:650px) { .orbit-stage{min-height:420px}.orbit-status{top:auto;bottom:14px;right:14px;transform:none}.orbit-globe{left:47%;top:42%}.orbit-ring{left:47%;top:42%;}.orbit-node-1{left:10%;top:10%}.orbit-node-2{left:5%;top:55%}.orbit-node-3{left:58%;top:10%}.orbit-node-4{left:58%;top:55%}.orbit-node-5{left:28%;top:72%} }
+    /* Functional controls and finance values: clear layout, LED contrast, semantic colors. */
+    .section-heading > div:last-child { min-width:0; }
+    #importedTradesPanel > .section-heading:first-child > div:last-child,
+    #mexcLivePanel > .section-heading > div:last-child { display:grid; grid-template-columns:max-content max-content; align-items:center; justify-content:end; gap:10px 14px; }
+    #importedTradesPanel > .section-heading:first-child > div:last-child .check,
+    #mexcLivePanel > .section-heading > div:last-child .check { display:flex !important; grid-column:1; align-items:center; gap:9px; white-space:nowrap; color:#f4fbff !important; font-size:14px; }
+    #importedTradesPanel > .section-heading:first-child > div:last-child button,
+    #mexcLivePanel > .section-heading > div:last-child button { grid-column:2; grid-row:1; white-space:nowrap; min-height:44px; padding:11px 18px; color:#00252b !important; font-weight:900 !important; text-shadow:none !important; }
+    #importedTradesPanel > .section-heading:first-child > div:last-child > .muted { grid-column:1 / -1; grid-row:2; margin:0; text-align:right; color:#c5e7ff !important; font-size:13px; }
+    #mexcLivePanel > .section-heading > div:last-child { grid-template-rows:auto; }
+    #mexcWeekdayRefreshButton { color:#f8f2ff !important; background:linear-gradient(135deg,#743dcb,#a55cff) !important; border:1px solid #d3b4ff !important; box-shadow:0 0 18px rgba(165,92,255,.48) !important; text-shadow:0 0 8px rgba(255,255,255,.65) !important; }
+    .primary { color:#00252b !important; font-weight:900 !important; text-shadow:none !important; }
+    .secondary { color:#f2eaff !important; text-shadow:0 0 7px rgba(213,178,255,.5) !important; }
+    .check input[type="checkbox"], input[type="checkbox"] { appearance:auto !important; -webkit-appearance:checkbox !important; width:17px !important; height:17px !important; min-width:17px; min-height:17px; margin:0 2px 0 0 !important; padding:0 !important; border-radius:4px !important; accent-color:#42f4ff !important; opacity:1 !important; visibility:visible !important; flex:0 0 17px; box-shadow:0 0 9px rgba(66,244,255,.38); }
+    #importedTradesPanel .section-heading .check,
+    #mexcLivePanel .section-heading .check { display:flex !important; visibility:visible !important; opacity:1 !important; }
+    #importedTradesPanel .stats .mexc-metric-gain .value,
+    #importedTradesPanel .stats .positive,
+    #mexcLivePanel .stats .positive { color:#9cffbd !important; text-shadow:0 0 8px #00ff76,0 0 18px rgba(0,255,118,.8) !important; }
+    #importedTradesPanel .stats .mexc-metric-loss .value,
+    #importedTradesPanel .stats .negative,
+    #mexcLivePanel .stats .negative { color:#ff9db2 !important; text-shadow:0 0 8px #ff315f,0 0 18px rgba(255,49,95,.82) !important; }
+    #importedTradesPanel .stats .mexc-metric-neutral .value,
+    #importedTradesPanel .stats .zero,
+    #mexcLivePanel .stats .zero { color:#aef6ff !important; text-shadow:0 0 9px #35dcff,0 0 18px rgba(53,220,255,.65) !important; }
+    #importedTradesPanel .stats .mexc-metric-gain,
+    #importedTradesPanel .stats .mexc-metric-loss { border-top-width:4px !important; }
+    #importedTradesPanel .stats .mexc-metric-gain { border-top-color:#16ff91 !important; }
+    #importedTradesPanel .stats .mexc-metric-loss { border-top-color:#ff315f !important; }
+    #importedTradesPanel .stats .muted, #mexcLivePanel .stats .muted { color:#e4f5ff !important; text-shadow:0 0 7px rgba(100,209,255,.3); }
+    #importedTradesPanel #mexcWeekdayNote, #importedTradesPanel #mexcMetricsNote,
+    #mexcLivePanel #mexcLiveStatus, #mexcPanel #mexcStatus { color:#d8efff !important; text-shadow:0 0 8px rgba(73,198,255,.35); }
+    #importedTradesPanel > .section-heading:has(#mexcWeekdayNote) { display:grid; grid-template-columns:minmax(260px,auto) minmax(0,1fr); gap:16px 24px; align-items:center; }
+    #importedTradesPanel > .section-heading:has(#mexcWeekdayNote) > div:last-child { display:grid; grid-template-columns:max-content minmax(0,1fr); gap:10px 16px; align-items:start; }
+    #importedTradesPanel > .section-heading:has(#mexcWeekdayNote) #mexcWeekdayNote { grid-column:2; margin:0; line-height:1.5; }
+    #mexcPanel > .controls label { min-width:min(220px,100%); }
+    #mexcPanel > .controls input:not([type="checkbox"]) { max-width:100%; }
+    .controls select, .controls input:not([type="checkbox"]), .controls textarea { max-width:100%; min-width:0; }
+    @media (max-width:760px) {
+      #importedTradesPanel > .section-heading:first-child > div:last-child,
+      #mexcLivePanel > .section-heading > div:last-child { width:100%; grid-template-columns:minmax(0,1fr); justify-content:stretch; }
+      #importedTradesPanel > .section-heading:first-child > div:last-child .check,
+      #mexcLivePanel > .section-heading > div:last-child .check,
+      #importedTradesPanel > .section-heading:first-child > div:last-child button,
+      #mexcLivePanel > .section-heading > div:last-child button { grid-column:1; grid-row:auto; justify-self:start; }
+      #importedTradesPanel > .section-heading:first-child > div:last-child > .muted { text-align:left; }
+      #importedTradesPanel > .section-heading:has(#mexcWeekdayNote),
+      #importedTradesPanel > .section-heading:has(#mexcWeekdayNote) > div:last-child { grid-template-columns:1fr; }
+      #importedTradesPanel > .section-heading:has(#mexcWeekdayNote) #mexcWeekdayNote { grid-column:1; }
+    }
+    /* MEXC performance values: neon lettering only, with neutral card surfaces. */
+    #importedTradesPanel .stats .mexc-metric-gain .value,
+    #importedTradesPanel .stats .mexc-metric-gain .value.positive { color:#7dffad !important; background:transparent !important; padding:0 !important; border-radius:0 !important; box-shadow:none !important; text-shadow:0 0 5px #00ff77,0 0 13px rgba(0,255,119,.78) !important; }
+    #importedTradesPanel .stats .mexc-metric-loss .value,
+    #importedTradesPanel .stats .mexc-metric-loss .value.negative { color:#ff9bb3 !important; background:transparent !important; padding:0 !important; border-radius:0 !important; box-shadow:none !important; text-shadow:0 0 5px #ff3769,0 0 13px rgba(255,55,105,.8) !important; }
+    #importedTradesPanel .stats .value.zero,
+    #mexcLivePanel .stats .value.zero { color:#9cf5ff !important; background:transparent !important; padding:0 !important; box-shadow:none !important; text-shadow:0 0 6px #32dfff,0 0 13px rgba(50,223,255,.7) !important; }
+    #importedTradesPanel .stats .value.positive, #mexcLivePanel .stats .value.positive,
+    #importedTradesPanel .stats .value.negative, #mexcLivePanel .stats .value.negative { background:transparent !important; padding:0 !important; border-radius:0 !important; box-shadow:none !important; }
+    #mexcLivePanel .stats .value.positive { color:#7dffad !important; text-shadow:0 0 5px #00ff77,0 0 13px rgba(0,255,119,.78) !important; }
+    #mexcLivePanel .stats .value.negative { color:#ff9bb3 !important; text-shadow:0 0 5px #ff3769,0 0 13px rgba(255,55,105,.8) !important; }
+    #importedTradesPanel .mexc-results-pagination { display:flex; flex-wrap:wrap; align-items:center; gap:12px; background:linear-gradient(145deg,rgba(8,27,55,.96),rgba(4,15,33,.98)) !important; border:1px solid rgba(73,198,255,.5) !important; }
+    #importedTradesPanel .mexc-results-pagination label { display:flex; align-items:center; gap:10px; color:#e8faff !important; font-weight:700; white-space:nowrap; }
+    #importedTradesPanel .mexc-results-pagination select { color:#f4fdff !important; background:#0a1c38 !important; border:1px solid #59dfff !important; min-width:78px; }
+    #importedTradesPanel .mexc-results-pagination #mexcResultsPageText { color:#e3f7ff !important; text-shadow:0 0 8px rgba(73,198,255,.45); font-weight:700; }
+    #importedTradesPanel .mexc-results-pagination button.secondary { color:#f2eaff !important; background:rgba(95,47,164,.48) !important; border:1px solid #bd91ff !important; text-shadow:0 0 8px rgba(220,190,255,.7) !important; box-shadow:0 0 12px rgba(165,92,255,.26); }
+    #importedTradesPanel .mexc-results-pagination button:disabled { opacity:.48; cursor:not-allowed; }
+    #importedTradesPanel .mexc-results-pagination .muted { color:#e3f7ff !important; }
+    /* Weekday and history tables: keep the neon signal in the lettering only. */
+    #importedTradesPanel #mexcWeekdayBody td.positive,
+    #importedTradesPanel #mexcWeekdayBody td.negative,
+    #importedTradesPanel #mexcWeekdayBody td.zero,
+    #importedTradesPanel #mexcWeekdayBody td.result-win,
+    #importedTradesPanel #mexcWeekdayBody td.result-loss,
+    #importedTradesPanel #mexcBalanceHistoryBody td.positive,
+    #importedTradesPanel #mexcBalanceHistoryBody td.negative,
+    #importedTradesPanel #mexcBalanceHistoryBody td.zero,
+    #importedTradesPanel #mexcResultsBody td.positive,
+    #importedTradesPanel #mexcResultsBody td.negative,
+    #importedTradesPanel #mexcResultsBody td.zero,
+    #importedTradesPanel #mexcResultsBody td.result-win,
+    #importedTradesPanel #mexcResultsBody td.result-loss {
+      background:transparent !important; box-shadow:none !important; border-radius:0 !important; padding-left:14px !important; padding-right:14px !important;
+    }
+    #importedTradesPanel #mexcWeekdayBody td.positive,
+    #importedTradesPanel #mexcBalanceHistoryBody td.positive,
+    #importedTradesPanel #mexcResultsBody td.positive,
+    #importedTradesPanel #mexcWeekdayBody td.result-win,
+    #importedTradesPanel #mexcResultsBody td.result-win { color:#83ffb3 !important; font-size:14px; font-weight:900 !important; text-shadow:0 0 2px rgba(131,255,179,.72),0 0 5px rgba(0,255,119,.34) !important; }
+    #importedTradesPanel #mexcWeekdayBody td.negative,
+    #importedTradesPanel #mexcBalanceHistoryBody td.negative,
+    #importedTradesPanel #mexcResultsBody td.negative,
+    #importedTradesPanel #mexcWeekdayBody td.result-loss,
+    #importedTradesPanel #mexcResultsBody td.result-loss { color:#ff9bad !important; font-size:14px; font-weight:900 !important; text-shadow:0 0 2px rgba(255,155,173,.72),0 0 5px rgba(255,55,105,.34) !important; }
+    #importedTradesPanel #mexcWeekdayBody td.zero,
+    #importedTradesPanel #mexcBalanceHistoryBody td.zero,
+    #importedTradesPanel #mexcResultsBody td.zero { color:#9cf5ff !important; font-size:14px; font-weight:850 !important; text-shadow:0 0 2px rgba(156,245,255,.7),0 0 5px rgba(50,223,255,.32) !important; }
+    /* The orbit uses live counts only; sample tickers from the concept are intentionally absent. */
+    .orbit-status { right:7%; min-width:300px; padding:24px 28px; border-radius:22px; background:linear-gradient(145deg,rgba(7,22,52,.96),rgba(5,13,35,.98)); box-shadow:0 0 0 6px rgba(168,117,255,.06),0 0 35px rgba(168,117,255,.42),inset 0 0 24px rgba(73,198,255,.12); }
+    .orbit-status h3 { font-size:16px; letter-spacing:1.6px; text-shadow:0 0 12px rgba(220,190,255,.7); margin-bottom:17px; }
+    .orbit-status p { display:flex; align-items:center; gap:8px; margin:13px 0; font-size:14px; color:#f2fbff !important; text-shadow:0 0 8px rgba(73,198,255,.38); }
+    .orbit-status p span { color:#ffffff !important; font-size:16px; font-weight:900; text-shadow:0 0 10px rgba(73,246,255,.85); }
+    .orbit-status .dot { flex:0 0 11px; width:11px; height:11px; margin:0 3px 0 0; }
+    .orbit-globe { left:36%; width:190px; height:190px; }
+    #signalsPanel tbody td:nth-child(2) .tag.live { background:rgba(0,92,58,.62) !important; border:1px solid #54ff9b !important; color:#aaffcf !important; text-shadow:0 0 8px rgba(84,255,155,.85) !important; box-shadow:0 0 12px rgba(84,255,155,.24); }
+    #signalsPanel tbody td:nth-child(2) .tag.tp2 { background:rgba(12,53,82,.9) !important; border:1px solid #55e7ff !important; color:#c9fbff !important; text-shadow:0 0 8px rgba(85,231,255,.8) !important; }
+    #signalsPanel tbody td:nth-child(2) .timeframe-badge { color:#c9fbff !important; background:rgba(8,43,70,.95) !important; border:1px solid #55e7ff !important; text-shadow:0 0 8px rgba(85,231,255,.8) !important; box-shadow:0 0 12px rgba(85,231,255,.32) !important; }
+    #signalsPanel tbody td:nth-child(7) .tag.tp1,
+    #signalsPanel tbody td:nth-child(7) .tag.tp2 { display:inline-flex; align-items:center; justify-content:center; min-width:34px; min-height:24px; color:#d9fbff !important; background:rgba(9,44,76,.96) !important; border:1px solid #50ddff !important; text-shadow:0 0 8px rgba(80,221,255,.95) !important; box-shadow:0 0 12px rgba(80,221,255,.35) !important; }
+    @media (max-width:900px) { .orbit-status { right:3%; min-width:260px; } .orbit-globe { left:30%; } }
+    @media (max-width:650px) { .orbit-status { left:50%; right:auto; bottom:12px; top:auto; transform:translateX(-50%); min-width:min(300px,90%); padding:14px 18px; } .orbit-status p { margin:8px 0; font-size:12px; } .orbit-globe { left:50%; top:30%; width:150px; height:150px; } }
+    /* Neon luminoso para as esferas da auditoria, seguindo o mockup. */
+    #scannerAuditMetrics .audit-metric { filter:brightness(1.12); border-width:2px !important; box-shadow:0 0 0 8px rgba(86,190,255,.12),0 0 28px rgba(54,168,255,.58),0 0 58px rgba(54,168,255,.28),inset 0 0 28px rgba(56,181,255,.28) !important; }
+    #scannerAuditMetrics .audit-metric::after { inset:-11px; border:1px solid rgba(125,220,255,.62); box-shadow:0 0 14px rgba(73,198,255,.48),inset 0 0 12px rgba(73,198,255,.18); }
+    #scannerAuditMetrics .audit-metric span { color:#f1fbff !important; text-shadow:0 0 7px rgba(150,225,255,.82),0 0 15px rgba(73,198,255,.54) !important; }
+    #scannerAuditMetrics .audit-metric strong { color:#e9fbff !important; text-shadow:0 0 5px #fff,0 0 13px #48dfff,0 0 28px rgba(42,156,255,.96) !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(2) { border-color:#55ffad !important; background:radial-gradient(circle at 35% 28%,rgba(13,191,130,.82),rgba(2,35,39,.98) 72%) !important; box-shadow:0 0 0 8px rgba(65,255,162,.14),0 0 32px rgba(37,255,153,.76),0 0 62px rgba(37,255,153,.34),inset 0 0 30px rgba(65,255,162,.34) !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(2)::after { border-color:rgba(83,255,166,.78); box-shadow:0 0 18px rgba(37,255,153,.68),inset 0 0 13px rgba(37,255,153,.24); }
+    #scannerAuditMetrics .audit-metric:nth-child(2) strong { color:#9dffd0 !important; text-shadow:0 0 5px #fff,0 0 14px #42ff9e,0 0 30px #00dc82 !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(3) { border-color:#ffdb68 !important; background:radial-gradient(circle at 35% 28%,rgba(196,137,20,.86),rgba(43,28,5,.98) 72%) !important; box-shadow:0 0 0 8px rgba(255,211,83,.14),0 0 32px rgba(255,196,49,.7),0 0 62px rgba(255,196,49,.32),inset 0 0 30px rgba(255,211,83,.32) !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(3)::after { border-color:rgba(255,220,105,.8); box-shadow:0 0 18px rgba(255,196,49,.62); }
+    #scannerAuditMetrics .audit-metric:nth-child(3) strong { color:#fff0a6 !important; text-shadow:0 0 5px #fff,0 0 14px #ffdb68,0 0 30px #ffb900 !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(4) { border-color:#ff4f7c !important; background:radial-gradient(circle at 35% 28%,rgba(190,24,74,.84),rgba(45,5,28,.98) 72%) !important; box-shadow:0 0 0 8px rgba(255,55,105,.14),0 0 32px rgba(255,47,100,.76),0 0 62px rgba(255,47,100,.34),inset 0 0 30px rgba(255,55,105,.34) !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(4)::after { border-color:rgba(255,91,130,.82); box-shadow:0 0 18px rgba(255,47,100,.68); }
+    #scannerAuditMetrics .audit-metric:nth-child(4) strong { color:#ffb2c7 !important; text-shadow:0 0 5px #fff,0 0 14px #ff527b,0 0 30px #ff174f !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(5) { border-color:#bd87ff !important; background:radial-gradient(circle at 35% 28%,rgba(112,53,210,.86),rgba(24,8,53,.98) 72%) !important; box-shadow:0 0 0 8px rgba(168,106,255,.15),0 0 32px rgba(155,86,255,.78),0 0 62px rgba(155,86,255,.36),inset 0 0 30px rgba(168,106,255,.34) !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(5)::after { border-color:rgba(197,148,255,.82); box-shadow:0 0 18px rgba(155,86,255,.72); }
+    #scannerAuditMetrics .audit-metric:nth-child(5) strong { color:#e3caff !important; text-shadow:0 0 5px #fff,0 0 14px #bd87ff,0 0 30px #934cff !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(6) { border-color:#ff58c7 !important; background:radial-gradient(circle at 35% 28%,rgba(190,35,139,.86),rgba(48,5,42,.98) 72%) !important; box-shadow:0 0 0 8px rgba(255,74,196,.15),0 0 32px rgba(255,63,190,.78),0 0 62px rgba(255,63,190,.36),inset 0 0 30px rgba(255,74,196,.34) !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(6)::after { border-color:rgba(255,123,215,.82); box-shadow:0 0 18px rgba(255,63,190,.72); }
+    #scannerAuditMetrics .audit-metric:nth-child(6) strong { color:#ffc4ed !important; text-shadow:0 0 5px #fff,0 0 14px #ff66cb,0 0 30px #ff28ad !important; }
+    /* Resultados do backtest: texto luminoso, sem tarja colorida; cards-resumo permanecem ciano. */
+    #backtestPanel table td.positive, #backtestPanel table td.result-win { background:transparent !important; color:#7dffad !important; text-shadow:0 0 5px #00ff77,0 0 13px rgba(0,255,119,.82) !important; box-shadow:none !important; }
+    #backtestPanel table td.negative, #backtestPanel table td.result-loss { background:transparent !important; color:#ff9bb3 !important; text-shadow:0 0 5px #ff3769,0 0 13px rgba(255,55,105,.84) !important; box-shadow:none !important; }
+    #backtestComparisonBody td:nth-child(1):not(.positive):not(.negative):not(.result-win):not(.result-loss) { color:#b8e8ff !important; text-shadow:0 0 7px rgba(58,190,255,.66); }
+    #backtestComparisonBody td:nth-child(2):not(.positive):not(.negative):not(.result-win):not(.result-loss) { color:#8feaff !important; text-shadow:0 0 7px rgba(46,220,255,.62); }
+    #backtestComparisonBody td:nth-child(5):not(.positive):not(.negative):not(.result-win):not(.result-loss) { color:#ffe28b !important; text-shadow:0 0 7px rgba(255,194,54,.68); }
+    #backtestComparisonBody td:nth-child(6):not(.positive):not(.negative):not(.result-win):not(.result-loss) { color:#9dffd0 !important; text-shadow:0 0 7px rgba(37,255,153,.64); }
+    #backtestComparisonBody td:nth-child(7):not(.positive):not(.negative):not(.result-win):not(.result-loss) { color:#c9aaff !important; text-shadow:0 0 7px rgba(155,86,255,.7); }
+    #backtestComparisonBody td:nth-child(8):not(.positive):not(.negative):not(.result-win):not(.result-loss) { color:#8feaff !important; text-shadow:0 0 7px rgba(46,220,255,.62); }
+    #backtestComparisonBody td:nth-child(9):not(.positive):not(.negative):not(.result-win):not(.result-loss) { color:#9effdf !important; text-shadow:0 0 7px rgba(40,255,190,.62); }
+    #backtestComparisonBody td:nth-child(10):not(.positive):not(.negative):not(.result-win):not(.result-loss) { color:#b4c7ff !important; text-shadow:0 0 7px rgba(105,143,255,.66); }
+    #backtestComparisonBody td:nth-child(11):not(.positive):not(.negative):not(.result-win):not(.result-loss) { color:#d9b5ff !important; text-shadow:0 0 7px rgba(185,112,255,.66); }
+    #backtestComparisonBody td:nth-child(12):not(.positive):not(.negative):not(.result-win):not(.result-loss) { color:#ffc2eb !important; text-shadow:0 0 7px rgba(255,83,197,.62); }
+    #backtestComparisonBody td:nth-child(13):not(.positive):not(.negative):not(.result-win):not(.result-loss) { color:#ffe59b !important; text-shadow:0 0 7px rgba(255,204,75,.64); }
+    #backtestComparisonBody td:nth-child(14):not(.positive):not(.negative):not(.result-win):not(.result-loss) { color:#d7c2ff !important; text-shadow:0 0 7px rgba(171,126,255,.66); }
+    #backtestComparisonBody td:nth-child(15):not(.positive):not(.negative):not(.result-win):not(.result-loss) { color:#a8f3ff !important; text-shadow:0 0 7px rgba(65,220,255,.66); }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(1) { color:#b8e8ff !important; }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(2) { color:#8feaff !important; }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(3) { color:#7dffad !important; }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(4) { color:#ff9bb3 !important; }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(5) { color:#ffe28b !important; }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(6) { color:#9dffd0 !important; }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(7) { color:#c9aaff !important; }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(8) { color:#8feaff !important; }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(9) { color:#9effdf !important; }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(10) { color:#b4c7ff !important; }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(11) { color:#d9b5ff !important; }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(12) { color:#ffc2eb !important; }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(13) { color:#ffe59b !important; }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(14) { color:#d7c2ff !important; }
+    #backtestPanel .backtest-strategy-heading + .table-wrap th:nth-child(15) { color:#a8f3ff !important; }
+    #backtestPanel > .backtest-strategy-heading { flex-wrap:wrap; gap:10px 20px; padding:15px 20px !important; border:1px solid #50eaff !important; border-radius:18px !important; background:linear-gradient(110deg,rgba(7,31,65,.98),rgba(9,47,82,.95),rgba(16,24,66,.98)) !important; box-shadow:0 0 0 4px rgba(70,214,255,.09),0 0 24px rgba(42,198,255,.34),inset 0 0 22px rgba(42,198,255,.12) !important; }
+    #backtestPanel > .backtest-strategy-heading strong { color:#9ff8ff !important; font-size:14px; letter-spacing:.35px; text-shadow:0 0 6px #2feaff,0 0 15px rgba(47,234,255,.8) !important; }
+    #backtestPanel #backtestStrategyRecommendation { flex:1 1 520px; color:#fff0a6 !important; font-weight:850; line-height:1.55; text-shadow:0 0 6px rgba(255,213,88,.78),0 0 15px rgba(255,183,45,.48) !important; }
+    #signalsPanel tbody td:nth-child(2) .tag.tp1 { color:#f5ddff !important; background:linear-gradient(135deg,rgba(82,35,150,.98),rgba(43,18,91,.98)) !important; border:1px solid #d18bff !important; text-shadow:0 0 5px #fff,0 0 11px #bd72ff,0 0 18px rgba(174,83,255,.88) !important; box-shadow:0 0 8px rgba(174,83,255,.72),inset 0 0 8px rgba(199,143,255,.22) !important; }
+    .controls .scanner-strategy-filter { flex:1 1 290px; min-width:270px; max-width:390px; display:flex; flex-direction:column; align-items:stretch; gap:4px; margin:0; padding:10px 13px; border:1px solid rgba(115,192,255,.65); border-radius:10px; background:rgba(5,20,43,.72); }
+    .controls .scanner-strategy-filter legend { padding:0 5px; color:#aeeaff !important; font-size:12px; font-weight:800; }
+    .controls .scanner-strategy-filter legend span { color:#9dbbd9 !important; font-size:10px; font-weight:500; }
+    .controls .scanner-strategy-filter .filter-option { display:flex; grid-template-columns:none; align-items:center; gap:8px; padding:4px 2px; color:#e5f6ff !important; font-size:11px; cursor:pointer; }
+    .controls .scanner-strategy-filter .filter-option input { width:15px; height:15px; margin:0; accent-color:#35f4d2; }
+    .controls .scanner-strategy-filter .sub { padding:6px 0 0; color:#b6d8f3 !important; line-height:1.4; }
+    @media (max-width:700px) { .controls .scanner-strategy-filter { flex-basis:100%; max-width:none; min-width:0; } }
+    /* Tabela de comparação: preservar a paleta escura e reduzir o halo que borrava os números. */
+    #backtestPanel tbody td:not(.positive):not(.negative):not(.result-win):not(.result-loss) { text-shadow:0 0 2px rgba(100,190,235,.2) !important; }
+    #backtestPanel #backtestComparisonBody td:nth-child(n):not(.positive):not(.negative):not(.result-win):not(.result-loss) { text-shadow:0 0 2px rgba(100,190,235,.2) !important; }
+    #backtestPanel table td.positive, #backtestPanel table td.result-win { color:#83ffb3 !important; text-shadow:0 0 1px rgba(131,255,179,.7),0 0 4px rgba(0,255,119,.28) !important; }
+    #backtestPanel table td.negative, #backtestPanel table td.result-loss { color:#ff9bad !important; text-shadow:0 0 1px rgba(255,155,173,.72),0 0 4px rgba(255,55,105,.28) !important; }
+    #backtestPanel tbody tr.backtest-recommendation,
+    #backtestPanel tbody tr.backtest-recommendation td { background:rgba(8,24,47,.98) !important; color:#e7f5ff !important; }
+    #backtestPanel tbody tr.backtest-recommendation td.positive,
+    #backtestPanel tbody tr.backtest-recommendation td.result-win { color:#83ffb3 !important; }
+    #backtestPanel tbody tr.backtest-recommendation td.negative,
+    #backtestPanel tbody tr.backtest-recommendation td.result-loss { color:#ff9bad !important; }
+    #backtestPeriodsBody tr.backtest-recommendation td { border-top:1px solid rgba(75,205,245,.55) !important; border-bottom:1px solid rgba(75,205,245,.55) !important; }
+    #backtestComparisonBody tr.backtest-recommendation td.positive,
+    #backtestComparisonBody tr.backtest-recommendation td.result-win { color:#83ffb3 !important; }
+    #backtestComparisonBody tr.backtest-recommendation td.negative,
+    #backtestComparisonBody tr.backtest-recommendation td.result-loss { color:#ff9bad !important; }
+    #backtestComparisonBody tr.backtest-recommendation td:first-child { border-left:3px solid #39dff5; }
+    /* Cabeçalho acompanha a rolagem da lista de setups. */
+    #signalsPanel { overflow:visible !important; }
+    #signalsPanel .table-wrap { overflow:visible; }
+    #signalsPanel thead th {
+      position:sticky; top:0; z-index:5;
+      background:#102b4e !important; color:#f1faff !important;
+      border-top:1px solid #4bcaff; border-bottom:2px solid #4bcaff;
+      box-shadow:0 5px 12px rgba(0,0,0,.45); text-shadow:none !important;
+    }
+    #signalsPanel thead th:first-child { border-radius:10px 0 0 10px; }
+    #signalsPanel thead th:last-child { border-radius:0 10px 10px 0; }
+    @media (max-width:1200px) { #signalsPanel .table-wrap { max-height:70vh; overflow:auto; } }
+    /* Importação MEXC: rótulos claros e texto legível nos campos/botões. */
+    #mexcPanel > .controls label, #mexcPanel > .controls .check,
+    #mexcPanel > .controls .muted { color:#e7f6ff !important; text-shadow:none !important; }
+    #mexcPanel > .controls input:not([type="checkbox"]) {
+      background:#f8fbff !important; color:#102542 !important;
+      border:2px solid #80b9ed !important; box-shadow:none !important;
+    }
+    #mexcPanel > .controls input::placeholder { color:#536981 !important; opacity:1; }
+    #mexcPanel > .controls button.secondary {
+      background:#392461 !important; color:#ffffff !important;
+      border:2px solid #bb94ff !important; text-shadow:none !important;
+    }
+    /* Valores positivos e negativos continuam coloridos, mas sem efeito de névoa. */
+    #importedTradesPanel .mexc-metrics-performance .stat .value.positive,
+    #importedTradesPanel .mexc-metrics-performance .stat .value.negative,
+    #importedTradesPanel .mexc-metrics-performance .stat .value {
+      text-shadow:none !important; filter:none !important;
+    }
+    #importedTradesPanel .mexc-metrics-performance .mexc-metric-gain .value { color:#74ffac !important; }
+    #importedTradesPanel .mexc-metrics-performance .mexc-metric-loss .value { color:#ff8faa !important; }
+    #importedTradesPanel #mexcWeekdayBody td.positive, #importedTradesPanel #mexcWeekdayBody td.negative,
+    #importedTradesPanel #mexcWeekdayBody td.result-win, #importedTradesPanel #mexcWeekdayBody td.result-loss,
+    #importedTradesPanel #mexcBalanceHistoryBody td.positive, #importedTradesPanel #mexcBalanceHistoryBody td.negative,
+    #importedTradesPanel #mexcResultsBody td.positive, #importedTradesPanel #mexcResultsBody td.negative,
+    #importedTradesPanel #mexcResultsBody td.result-win, #importedTradesPanel #mexcResultsBody td.result-loss,
+    #importedTradesPanel #mexcResultsBody td.zero, #importedTradesPanel #mexcBalanceHistoryBody td.zero,
+    #importedTradesPanel #mexcWeekdayBody td.zero {
+      text-shadow:none !important; filter:none !important;
+    }
+    /* Scanner horizontal: escolha e ação ficam juntas, acima dos painéis. */
+    main > .controls {
+      display:grid !important;
+      grid-template-columns:repeat(4,minmax(135px,1fr)) minmax(190px,1.15fr) minmax(150px,auto);
+      grid-template-areas:"limit score volume refresh alerts action" "strategies strategies strategies strategies strategies strategies" "status status status status status status";
+      align-items:end; gap:14px 18px; min-height:0; padding:18px 22px;
+      border-radius:20px !important;
+    }
+    main > .controls::before { content:none !important; display:none !important; }
+    main > .controls .scanner-limit-filter { grid-area:limit; }
+    main > .controls .scanner-score-filter { grid-area:score; }
+    main > .controls .scanner-volume-filter { grid-area:volume; }
+    main > .controls .scanner-refresh-filter { grid-area:refresh; }
+    main > .controls .scanner-alert-filter { grid-area:alerts; align-self:center; }
+    main > .controls .scanner-scan-button { grid-area:action; align-self:center; min-height:42px; white-space:nowrap; }
+    main > .controls #scanStatus { grid-area:status; margin:0; padding:0; }
+    main > .controls label { min-width:0; }
+    main > .controls select { width:100%; }
+    main > .controls .scanner-strategy-filter {
+      grid-area:strategies; display:grid !important;
+      grid-template-columns:repeat(6,minmax(0,1fr)); gap:7px 12px;
+      min-width:0 !important; max-width:none !important; width:100%;
+      margin:0; padding:10px 14px 12px;
+    }
+    main > .controls .scanner-strategy-filter .filter-option {
+      width:auto; min-width:0; align-items:flex-start; line-height:1.35;
+      overflow-wrap:anywhere; padding:4px 3px;
+    }
+    main > .controls .scanner-strategy-filter .filter-option input,
+    main > .controls .scanner-alert-filter input {
+      width:16px !important; height:16px !important; min-height:0 !important;
+      padding:0 !important; flex:0 0 16px; margin:1px 0 0;
+    }
+    main > .controls #strategyHelp { grid-column:1/-1; line-height:1.35; }
+    @media (max-width:1300px) {
+      main > .controls {
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        grid-template-areas:"limit score volume" "refresh alerts action" "strategies strategies strategies" "status status status";
+      }
+      main > .controls .scanner-strategy-filter { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    }
+    @media (max-width:700px) {
+      main > .controls {
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        grid-template-areas:"limit score" "volume refresh" "strategies strategies" "alerts alerts" "action action" "status status";
+      }
+      main > .controls .scanner-strategy-filter { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width:480px) {
+      main > .controls { display:flex !important; flex-direction:column; align-items:stretch; }
+      main > .controls .scanner-strategy-filter { grid-template-columns:minmax(0,1fr); }
+    }
+    /* Todos os seis mostradores usam o mesmo fundo sólido, com aro e texto coloridos. */
+    #scannerAuditMetrics .audit-metric {
+      --ring:#70cfff; --ring-glow:rgba(70,175,255,.32);
+      background:#07101f !important; filter:none !important;
+      border:2px solid var(--ring) !important;
+      box-shadow:0 0 0 3px rgba(115,180,235,.08),0 0 12px var(--ring-glow) !important;
+    }
+    #scannerAuditMetrics .audit-metric:nth-child(2) { --ring:#62ffae; --ring-glow:rgba(58,255,151,.32); background:#07101f !important; box-shadow:0 0 0 3px rgba(115,180,235,.08),0 0 12px var(--ring-glow) !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(3) { --ring:#ffdc78; --ring-glow:rgba(255,201,67,.3); background:#07101f !important; box-shadow:0 0 0 3px rgba(115,180,235,.08),0 0 12px var(--ring-glow) !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(4) { --ring:#ff7997; --ring-glow:rgba(255,71,113,.32); background:#07101f !important; box-shadow:0 0 0 3px rgba(115,180,235,.08),0 0 12px var(--ring-glow) !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(5) { --ring:#cba0ff; --ring-glow:rgba(166,103,255,.32); background:#07101f !important; box-shadow:0 0 0 3px rgba(115,180,235,.08),0 0 12px var(--ring-glow) !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(6) { --ring:#ff86d5; --ring-glow:rgba(255,80,195,.32); background:#07101f !important; box-shadow:0 0 0 3px rgba(115,180,235,.08),0 0 12px var(--ring-glow) !important; }
+    #scannerAuditMetrics .audit-metric::after,
+    #scannerAuditMetrics .audit-metric:nth-child(n)::after {
+      inset:-6px; border:1px solid var(--ring) !important;
+      opacity:.46; background:none !important; box-shadow:none !important;
+    }
+    #scannerAuditMetrics .audit-metric:nth-child(n) span,
+    #scannerAuditMetrics .audit-metric:nth-child(n) strong {
+      color:var(--ring) !important; text-shadow:none !important; filter:none !important;
+    }
+    /* A tabela permanece bem compartimentada, mesmo com mais largura. */
+    #signalsPanel tbody td:not(:last-child) { border-right:2px solid rgba(83,160,237,.42) !important; }
+    #signalsPanel thead th:not(:last-child) { border-right:2px solid rgba(98,191,255,.4) !important; }
+    #signalsPanel tbody td { border-top:1px solid rgba(83,160,237,.5) !important; border-bottom:2px solid rgba(83,160,237,.5) !important; }
   </style></head>
 <body>
   <header class="topbar">
     <div><p class="eyebrow">ANÁLISE QUANTITATIVA · SPOT</p><h1>Sentinel Trade</h1></div>
-    <div class="header-actions"><span id="connection" class="pill neutral">Aguardando consulta</span><button id="scanButton" class="primary">Atualizar scanner</button></div>
+    <div class="header-actions"><span id="connection" class="pill neutral">Aguardando consulta</span></div>
   </header>
   <main>
     <section class="controls" aria-label="Filtros do scanner">
-      <label>Top por ranking ou volume 24h <select id="assetLimit"><option value="50">50</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="700">700</option><option value="1000" selected>1000</option><option value="1500">1500 (demorado)</option></select></label>
-      <label title="Score é uma pontuação de confluência técnica, não uma probabilidade matemática garantida.">Score mínimo <select id="minScore"><option value="90" selected>90</option><option value="100">100</option></select><span class="sub">90 ou 100 · mesmo score do Telegram</span></label>
-      <label>Estratégia do scanner <select id="strategySelect"><option value="both" selected>Todos os quatro critérios</option><option value="aggressive-pullback">Pullback 2H + confirmação 4H</option><option value="flexible-pullback-2h">Pullback 2H · diário flexível</option><option value="ema-cross-retest-2h">Cruzamento EMA 9 + reteste 22/52 · 2H</option><option value="trend">Tendência + pivô</option></select><span id="strategyHelp" class="sub">Executa os quatro critérios e mantém somente o sinal de maior score por ativo. Futuros limitados a 3×.</span></label>
-      <label>Volume mínimo 24h <select id="volumeLimit"><option value="1000000" selected>US$ 1 mi</option><option value="2000000">US$ 2 mi</option><option value="5000000">US$ 5 mi</option></select></label>
-      <label>Atualização automática <select id="autoRefresh"><option value="5" selected>A cada 5 min</option><option value="10">A cada 10 min</option><option value="20">A cada 20 min</option><option value="30">A cada 30 min</option><option value="60">A cada 1 hora</option><option value="120">A cada 2 horas</option><option value="180">A cada 3 horas</option><option value="240">A cada 4 horas</option></select></label>
-      <label class="check"><input id="browserAlerts" type="checkbox" /> Alertar novos setups neste navegador</label>
+      <label class="scanner-limit-filter">Top por ranking ou volume 24h <select id="assetLimit"><option value="50">50</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="700">700</option><option value="1000" selected>1000</option><option value="1500">1500 (demorado)</option></select></label>
+      <label class="scanner-score-filter" title="Score é uma pontuação de confluência técnica, não uma probabilidade matemática garantida.">Score mínimo <select id="minScore"><option value="85">85</option><option value="90">90</option><option value="100">100</option><option value="0" selected>Todos os Scores</option></select><span class="sub">85, 90, 100 ou todos · mesmo score do Telegram</span></label>
+      <fieldset class="filter-group scanner-strategy-filter" id="scannerStrategyFilters"><legend>Estratégia do scanner <span>selecione uma ou mais</span></legend><label class="filter-option filter-all"><input type="checkbox" data-backtest-all="scannerStrategy" checked /> Selecionar todos</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="trend" checked /> Tendência + pivô</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="aggressive-pullback" checked /> Pullback 2H + confirmação 4H</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="flexible-pullback-2h" checked /> Pullback 2H · diário flexível</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="ema-cross-retest-2h" checked /> Cruzamento EMA 9 + reteste 22/52 · 2H</label><span id="strategyHelp" class="sub">Executa os quatro critérios e mantém somente o sinal de maior score por ativo.</span></fieldset>
+      <label class="scanner-volume-filter">Volume mínimo 24h <select id="volumeLimit"><option value="1000000" selected>US$ 1 mi</option><option value="2000000">US$ 2 mi</option><option value="5000000">US$ 5 mi</option></select></label>
+      <label class="scanner-refresh-filter">Atualização automática <select id="autoRefresh"><option value="5" selected>A cada 5 min</option><option value="10">A cada 10 min</option><option value="20">A cada 20 min</option><option value="30">A cada 30 min</option><option value="60">A cada 1 hora</option><option value="120">A cada 2 horas</option><option value="180">A cada 3 horas</option><option value="240">A cada 4 horas</option></select></label>
+      <label class="check scanner-alert-filter"><input id="browserAlerts" type="checkbox" /> Alertar novos setups neste navegador</label>
+      <button id="scanButton" class="primary scanner-scan-button" type="button">Atualizar scanner</button>
       <p id="scanStatus" class="muted">Clique em “Atualizar scanner” para buscar o mercado.</p>
     </section>
     <section class="panel" id="scannerAuditPanel">
-      <div class="section-heading"><div><p class="eyebrow">TRANSPARÊNCIA DO SCANNER</p><h2>Consultar um ativo</h2></div><label>Buscar ativo <input id="diagnosticFilter" type="search" placeholder="Ex.: SKY ou SKYUSDT" /></label></div>
-      <p id="scannerAuditResult" class="muted">Digite um ativo para consultar o resultado da última leitura do scanner.</p>
+      <div class="section-heading"><div><p class="eyebrow">AUDITORIA TÉCNICA · ÚLTIMA LEITURA</p><h2>Por que cada ativo passou ou foi rejeitado?</h2></div><label>Buscar um ativo <input id="diagnosticFilter" type="search" placeholder="Ex.: SKY ou SKYUSDT" /></label></div>
+      <div class="audit-summary-grid" id="scannerAuditMetrics">
+        <div class="audit-metric"><span>Ativos auditados</span><strong id="auditMetricAnalyzed">—</strong></div>
+        <div class="audit-metric positive"><span>Sinais válidos</span><strong id="auditMetricSignals">—</strong></div>
+        <div class="audit-metric warn"><span>Em observação</span><strong id="auditMetricWatch">—</strong></div>
+        <div class="audit-metric negative"><span>Rejeitados</span><strong id="auditMetricRejected">—</strong></div>
+        <div class="audit-metric"><span>Fora do universo</span><strong id="auditMetricExcluded">—</strong></div>
+        <div class="audit-metric negative"><span>Falhas de consulta</span><strong id="auditMetricErrors">—</strong></div>
+      </div>
+      <div class="orbit-stage" aria-label="Visão orbital dos setups">
+        <div class="orbit-ring orbit-ring-a"></div><div class="orbit-ring orbit-ring-b"></div>
+        <div class="orbit-globe"><span class="orbit-globe-label">SETUPS<br>QUALIFICADOS</span><strong id="orbitSignalCount">—</strong><small>SINAIS VÁLIDOS</small></div>
+        <aside class="orbit-status"><h3>STATUS DOS SINAIS</h3><p><i class="dot valid"></i> Válido (<span id="orbitValidCount">—</span>)</p><p><i class="dot watch"></i> Em observação (<span id="orbitWatchCount">—</span>)</p><p><i class="dot rejected"></i> Rejeitado (<span id="orbitRejectedCount">—</span>)</p><p><i class="dot excluded"></i> Fora do universo (<span id="orbitExcludedCount">—</span>)</p><p><i class="dot errors"></i> Falha de consulta (<span id="orbitErrorCount">—</span>)</p></aside>
+      </div>
+      <p id="scannerAuditSummary" class="audit-summary-copy">A auditoria aparecerá após uma leitura do scanner.</p>
+      <div class="audit-reasons-block">
+        <div class="audit-subheading"><h3>Principais motivos de rejeição</h3><span>Ordenados por ocorrência nesta leitura</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Motivo de rejeição</th><th>Ocorrências</th><th>Participação nas rejeições</th></tr></thead><tbody id="scannerAuditReasonsBody"><tr><td colspan="3" class="empty">Execute o scanner para preencher a auditoria.</td></tr></tbody></table></div>
+      </div>
+      <div id="scannerAuditResult" class="audit-result muted">Digite um ativo para consultar o resultado da última leitura do scanner.</div>
     </section>
-    <section class="stats" id="summaryCards"></section>
     <section class="panel" id="signalsPanel">
-      <div class="section-heading"><div><p class="eyebrow">OPORTUNIDADES ATUAIS · TOP 10</p><h2>Setups qualificados</h2></div><p class="muted">Melhor critério por ativo · sem entrada esticada · futuros até 3×</p></div>
+      <div class="section-heading"><div><p class="eyebrow">OPORTUNIDADES ATUAIS · TOP 20</p><h2>Setups qualificados</h2></div><p class="muted">Melhor critério por ativo · sem entrada esticada · futuros até 3×</p></div>
       <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Score</th><th>Contexto macro</th><th>Validações</th><th>Entrada</th><th>Stop</th><th>TP 2R / 3R</th><th></th></tr></thead><tbody id="signalsBody"><tr><td colspan="8" class="empty">Nenhuma análise executada ainda.</td></tr></tbody></table></div>
     </section>
-    <section class="panel" id="realTradesPanel">
-      <div class="section-heading"><div><p class="eyebrow">TRADES REAIS · ACOMPANHAMENTO EM TEMPO REAL</p><h2>Entradas que você validou</h2></div><div><label class="check"><input id="tradeTrackingAuto" type="checkbox" checked /> Atualizar a cada 20 s</label><button id="refreshTracking" class="secondary">Atualizar trades</button></div></div>
-      <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Entrada</th><th>Stop / metas</th><th>Status</th><th>Resultado</th><th>Registro</th><th></th></tr></thead><tbody id="tradesBody"><tr><td colspan="7" class="empty">Valide uma entrada em um setup para começar o histórico.</td></tr></tbody></table></div>
-    </section>
     <section class="panel" id="importedTradesPanel">
-      <div class="section-heading"><div><p class="eyebrow">HISTÓRICO IMPORTADO · MEXC</p><h2>Operações lidas da corretora</h2></div><div><label class="check"><input id="mexcHistoryAuto" type="checkbox" /> Atualizar a cada 20 s</label><button id="mexcHistoryRefreshButton" class="primary" type="button">Atualizar posições</button><p class="muted">Consulta somente leitura; não compõe as métricas do diário.</p></div></div>
-      <div class="controls" id="mexcPerformanceFilters"><label>Resultado mínimo para performance (US$) <input id="mexcMinResult" type="number" min="0" step="0.01" value="1" /></label><p class="muted">Operações menores permanecem no histórico bruto, mas não entram nos cards de acerto, gain, loss ou resultado líquido.</p></div>
+      <div class="section-heading"><div><p class="eyebrow">HISTÓRICO IMPORTADO · MEXC</p><h2>Operações lidas da corretora</h2></div><div><label class="check"><input id="mexcHistoryAuto" type="checkbox" checked /> Atualizar a cada 20 s</label><button id="mexcHistoryRefreshButton" class="primary" type="button">Atualizar posições</button><p class="muted">Consulta somente leitura; não compõe as métricas do diário.</p></div></div>
       <section class="stats mexc-metrics-primary" id="mexcMetricsPrimary"><div class="empty">Importe as operações da MEXC para ver as métricas reais.</div></section>
       <section class="stats mexc-metrics-performance" id="mexcMetricsPerformance"></section>
       <p id="mexcMetricsNote" class="muted"></p>
+      <div class="section-heading"><div><p class="eyebrow">PADRÕES DAS OPERAÇÕES REAIS</p><h3>Qual dia da semana foi melhor para operar?</h3></div><div><button id="mexcWeekdayRefreshButton" class="secondary mini" type="button">Atualizar análise</button><p class="muted" id="mexcWeekdayNote">Usa todas as posições fechadas importadas da MEXC, no horário de Brasília.</p></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Dia</th><th>Trades</th><th>Wins</th><th>Losses</th><th>% acerto</th><th>PnL líquido</th></tr></thead><tbody id="mexcWeekdayBody"><tr><td colspan="6" class="empty">Importe ou atualize as posições para analisar os dias.</td></tr></tbody></table></div>
       <div class="section-heading mexc-balance-heading"><div><p class="eyebrow">HISTÓRICO DE SALDO</p><h3>Saldo MEXC por período</h3></div><p class="muted">Registra um snapshot quando o saldo é consultado; valores antigos não são inventados.</p></div>
       <div class="table-wrap"><table><thead><tr><th>Semana</th><th>Mês</th><th>Data do snapshot</th><th>Saldo (US$)</th><th>Saldo (R$)</th><th>Variação</th></tr></thead><tbody id="mexcBalanceHistoryBody"><tr><td colspan="6" class="empty">Atualize as posições para registrar o primeiro saldo.</td></tr></tbody></table></div>
       <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Total de trades</th><th>Wins</th><th>Losses</th><th>% acerto</th><th>Gains</th><th>Losses</th><th>PnL líquido</th></tr></thead><tbody id="mexcResultsBody"><tr><td colspan="8" class="empty">Nenhuma operação fechada importada ainda.</td></tr></tbody></table></div>
+      <div class="controls mexc-results-pagination" id="mexcResultsPagination" hidden><label>Ativos por página <select id="mexcResultsPageSize"><option value="10">10</option><option value="20">20</option><option value="30">30</option></select></label><button id="mexcResultsPrevious" class="secondary mini" type="button">← Anterior</button><span id="mexcResultsPageText" class="muted"></span><button id="mexcResultsNext" class="secondary mini" type="button">Próxima →</button></div>
       <div class="table-wrap" id="importedTradesDetail" hidden><table><thead><tr><th>Ativo</th><th>Tipo</th><th>Preço executado</th><th>Data</th><th>Detalhes</th></tr></thead><tbody id="importedTradesBody"><tr><td colspan="5" class="empty">Detalhamento oculto.</td></tr></tbody></table></div>
     </section>
     <section class="panel" id="mexcLivePanel">
-      <div class="section-heading"><div><p class="eyebrow">MEXC · POSIÇÕES REAIS EM ABERTO</p><h2>Acompanhamento ao vivo</h2></div><div><label class="check"><input id="mexcLiveAuto" type="checkbox" /> Atualizar a cada 30 s</label><button id="mexcPositionsButton" class="primary">Atualizar posições</button></div></div>
+      <div class="section-heading"><div><p class="eyebrow">MEXC · POSIÇÕES REAIS EM ABERTO</p><h2>Acompanhamento ao vivo</h2></div><div><label class="check"><input id="mexcLiveAuto" type="checkbox" checked /> Atualizar a cada 20 s</label><button id="mexcPositionsButton" class="primary">Atualizar posições</button></div></div>
       <p id="mexcLiveStatus" class="muted">Importe ou atualize as posições para acompanhar operações em aberto.</p>
       <section class="stats" id="mexcLiveMetrics"><div class="empty">Nenhuma posição consultada.</div></section>
       <div class="table-wrap"><table><thead><tr><th>Ativo / direção</th><th>Entrada → atual</th><th>Alavancagem / margem</th><th>PnL estimado</th><th>SL / TP</th><th>Liquidação</th><th>Status</th></tr></thead><tbody id="mexcPositionsBody"><tr><td colspan="7" class="empty">Nenhuma posição consultada.</td></tr></tbody></table></div>
@@ -270,15 +901,15 @@
     <section class="panel" id="backtestPanel">
       <div class="section-heading"><div><p class="eyebrow">SIMULAÇÃO HISTÓRICA</p><h2>Validação do setup</h2></div><p class="muted">Candles reais · sem taxas, slippage ou funding · alvo 2R</p></div>
       <div class="controls" aria-label="Configuração da simulação">
-        <label class="backtest-symbol-field">Pares (separe por vírgula) <input id="backtestSymbol" value="LINK, ONDO, NEAR, ASTR, VET, ETH, SOL, RAY" maxlength="500" /></label>
+        <label class="backtest-symbol-field">Pares (separe por vírgula) <input id="backtestSymbol" value="LINK, ONDO, GRT, RAY" maxlength="500" /></label>
         <label class="backtest-date-field">Data inicial <input id="backtestStartDate" type="date" required /></label><label class="backtest-date-field">Data final <input id="backtestEndDate" type="date" required /></label>
-        <fieldset class="filter-group" id="backtestStrategyFilters"><legend>Setup <span>selecione um ou mais</span></legend><label class="filter-option filter-all"><input type="checkbox" data-backtest-all="strategy" checked /> Selecionar todos</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="trend" checked /> Tendência + pivô</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="aggressive-pullback" checked /> Pullback 2H + confirmação 4H</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="flexible-pullback-2h" checked /> Pullback 2H · diário flexível</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="ema-cross-retest-2h" checked /> Cruzamento EMA 9 + reteste 22/52 · 2H</label><span class="sub">O backtest usa os quatro critérios ativos do scanner e candles somente da Binance. A regra de cruzamento opera apenas no gatilho 2H.</span></fieldset>
-        <fieldset class="filter-group" id="backtestTimeframeFilters"><legend>Tempo do gatilho <span>selecione um ou mais</span></legend><label class="filter-option filter-all"><input type="checkbox" data-backtest-all="timeframe" checked /> Comparar todos</label><label class="filter-option"><input type="checkbox" name="backtestTimeframe" value="1h" checked /> 1H · antecipado</label><label class="filter-option"><input type="checkbox" name="backtestTimeframe" value="2h" checked /> 2H · intermediário</label><label class="filter-option"><input type="checkbox" name="backtestTimeframe" value="4h" checked /> 4H · confirmação</label><span class="sub">O resumo compara apenas os tempos selecionados.</span></fieldset>
-        <label class="capital-field"><span>Capital inicial (R$)</span><strong>Valor aplicado no teste</strong><input id="backtestCapital" type="number" min="1" step="0.01" value="500" /></label>
+        <fieldset class="filter-group" id="backtestStrategyFilters"><legend>Setup <span>selecione um ou mais</span></legend><label class="filter-option filter-all"><input type="checkbox" data-backtest-all="strategy" checked /> Selecionar todos</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="trend" checked /> Tendência + pivô</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="aggressive-pullback" checked /> Pullback 2H + confirmação 4H</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="flexible-pullback-2h" checked /> Pullback 2H · diário flexível</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="ema-cross-retest-2h" checked /> Cruzamento EMA 9 + reteste 22/52 · 2H</label><span class="sub">O backtest usa candles fechados da Binance. Os quatro setups restaurados usam gatilhos fechados em 1H, 2H ou 4H.</span></fieldset>
+        <fieldset class="filter-group" id="backtestTimeframeFilters"><legend>Tempo do gatilho <span>selecione um ou mais</span></legend><label class="filter-option filter-all"><input type="checkbox" data-backtest-all="timeframe" checked /> Comparar todos</label><label class="filter-option"><input type="checkbox" name="backtestTimeframe" value="1h" checked /> 1H · antecipado</label><label class="filter-option"><input type="checkbox" name="backtestTimeframe" value="2h" checked /> 2H · intermediário</label><label class="filter-option"><input type="checkbox" name="backtestTimeframe" value="4h" checked /> 4H · confirmação</label><span class="sub">O resumo compara apenas os tempos selecionados. Sem setup de gatilho diário.</span></fieldset>
+        <label class="capital-field"><span>Capital inicial (R$)</span><strong>Valor aplicado no teste</strong><input id="backtestCapital" type="number" min="1" step="0.01" value="1300" /></label>
         
         <label class="check"><input id="backtestReinvest" type="checkbox" checked /> Destacar resultado com reinvestimento</label>
         <button id="backtestButton" class="primary">Simular setup</button>
-        <p id="backtestStatus" class="muted">A simulação usa candles fechados e distribui o capital em 10 operações para diluir o risco. Os cards mostram o saldo sem reinvestimento e com reinvestimento; cálculo sem taxas, slippage, funding ou liquidação real.</p>
+        <p id="backtestStatus" class="muted">A simulação usa candles fechados e distribui o capital igualmente entre os ativos selecionados. Os cards mostram o saldo sem reinvestimento e com reinvestimento; cálculo sem taxas, slippage, funding ou liquidação real.</p>
       </div>
       <section class="stats" id="backtestStats"><div class="empty">Escolha um par e execute a simulação.</div></section>
       <div class="backtest-section-heading backtest-strategy-heading"><strong>Comparação geral das estratégias</strong><span id="backtestStrategyRecommendation">A recomendação aparecerá após a simulação.</span></div>
@@ -289,14 +920,25 @@
       <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Trades</th><th>Wins</th><th>Losses</th><th>Taxa de acerto</th><th>Retorno composto 1×</th><th>Melhor alavancagem simulada</th></tr></thead><tbody id="backtestAssetsBody"><tr><td colspan="7" class="empty">Execute a simulação para comparar os ativos.</td></tr></tbody></table></div>
       <div class="backtest-section-heading backtest-period-heading"><strong>Melhores períodos para operar</strong><span id="backtestPeriodRecommendation">A recomendação aparecerá após a simulação.</span></div>
       <div class="table-wrap"><table><thead><tr><th>Período de entrada</th><th>Trades</th><th>Wins</th><th>Losses</th><th>Taxa de acerto</th><th>Retorno médio</th></tr></thead><tbody id="backtestPeriodsBody"><tr><td colspan="6" class="empty">A análise por mês e semana do mês aparecerá aqui.</td></tr></tbody></table></div>
+      <div class="backtest-section-heading backtest-period-heading"><strong>Melhores dias para entrar</strong><span id="backtestWeekdayRecommendation">A recomendação aparecerá após a simulação.</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Dia da entrada</th><th>Trades</th><th>Wins</th><th>Losses</th><th>Taxa de acerto</th><th>Retorno médio</th></tr></thead><tbody id="backtestWeekdayBody"><tr><td colspan="6" class="empty">A análise por dia da semana aparecerá após a simulação.</td></tr></tbody></table></div>
       <div class="table-wrap" id="backtestDetailTable" hidden><table><thead><tr><th>Estratégia</th><th>Entrada</th><th>Stop</th><th>Alvo 2R</th><th>Saída</th><th>Resultado</th></tr></thead><tbody id="backtestBody"><tr><td colspan="6" class="empty">Detalhamento oculto.</td></tr></tbody></table></div>
     </section>
   </main>
   <dialog id="entryDialog"><form method="dialog" id="entryForm"><div class="dialog-heading"><h2>Registrar entrada</h2><button value="cancel" class="icon-button" aria-label="Fechar">×</button></div><p id="entrySetup"></p><label>Preço executado <input id="executedPrice" type="number" step="any" required /></label><label>Valor aplicado (US$) <input id="tradeNotional" type="number" min="0" step="0.01" placeholder="Opcional, para calcular em R$" /></label><label>Data e hora <input id="entryTime" type="datetime-local" required /></label><label>Observação opcional <textarea id="tradeNote" rows="3" placeholder="Ex.: entrada parcial, motivo, contexto"></textarea></label><div class="dialog-actions"><button value="cancel" class="secondary">Cancelar</button><button id="saveTrade" value="default" class="primary">Confirmar entrada</button></div></form></dialog>
   <footer>Dados de mercado: CoinGecko, CoinMarketCap, CoinPaprika, Binance e OKX. Registros: somente neste navegador.</footer>
-  <script src="sentinel-core.js?v=20261003"></script>
-  <script src="sentinel-backtest.js?v=20261003"></script>
-  <script src="app.js?v=20261003"></script>
+<script src="sentinel-core.js?v=20261007g"></script>
+  <script src="sentinel-backtest.js?v=20261007b"></script>
+  <script src="app.js?v=20261007d"></script>
+  <script>
+    (() => {
+      const syncOrbit = () => {
+        const valid = document.getElementById('auditMetricSignals');
+        const mappings = [['auditMetricSignals','orbitSignalCount'],['auditMetricSignals','orbitValidCount'],['auditMetricWatch','orbitWatchCount'],['auditMetricRejected','orbitRejectedCount'],['auditMetricExcluded','orbitExcludedCount'],['auditMetricErrors','orbitErrorCount']];
+        mappings.forEach(([source,target]) => { const a=document.getElementById(source), b=document.getElementById(target); if(a&&b) b.textContent=(a.textContent||'—').trim(); });
+      };
+      document.addEventListener('DOMContentLoaded', () => { syncOrbit(); const root=document.getElementById('scannerAuditMetrics'); if(root) new MutationObserver(syncOrbit).observe(root,{subtree:true,childList:true,characterData:true}); });
+    })();
+  </script>
 </body>
 </html>
-

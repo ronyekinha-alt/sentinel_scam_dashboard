@@ -51,9 +51,9 @@ function weeklyExtension(candles) {
   return { weekly, rise12, rise26, distanceAtr, nearHigh, blocked };
 }
 function analyseTimeframe(candles) {
-  const closes = candles.map(c => c.close), volumes = candles.map(c => c.volume), sellVolumes = candles.map(c => c.takerBuyVolume == null ? (c.close < c.open ? c.volume : c.volume * .4) : c.volume - c.takerBuyVolume), e9 = ema(closes, 9), e22 = ema(closes, 22), e51 = ema(closes, 51), e80 = ema(closes, 80), rs = rsi(closes), mc = macd(closes), volumeAvg = sma(volumes, 20), sellAvg = sma(sellVolumes, 20), dx = adx(candles), stoch = stochRsi(closes);
+  const closes = candles.map(c => c.close), volumes = candles.map(c => c.volume), sellVolumes = candles.map(c => c.takerBuyVolume == null ? (c.close < c.open ? c.volume : c.volume * .4) : c.volume - c.takerBuyVolume), e8 = ema(closes, 8), e9 = ema(closes, 9), e22 = ema(closes, 22), e51 = ema(closes, 51), e80 = ema(closes, 80), rs = rsi(closes), mc = macd(closes), volumeAvg = sma(volumes, 20), sellAvg = sma(sellVolumes, 20), dx = adx(candles), stoch = stochRsi(closes);
   const i = closes.length - 1, aligned = closes[i] > e9[i] && e9[i] > e22[i] && e22[i] > e51[i] && e51[i] > e80[i], rising = e22[i] > e22[i - 3], momentum = rs[i] >= 50 && rs[i] <= 72 && mc.histogram[i] > 0, relativeVolume = volumes[i] / Math.max(volumeAvg[i] || volumes[i], .00001), strong = (dx[i] || 0) >= 18, stochCrossUp = stoch.k[i] > stoch.d[i] && (stoch.k[i - 1] <= stoch.d[i - 1] || stoch.k[i - 2] <= stoch.d[i - 2]) && Math.min(stoch.k[i - 1], stoch.d[i - 1], stoch.k[i - 2], stoch.d[i - 2]) < 25, stochRecovery = stoch.k[i] > stoch.d[i] && stoch.k[i] <= 50 && Math.min(stoch.k[i - 1], stoch.k[i - 2]) < 25, sellerDrying = sellVolumes[i] <= (sellAvg[i] || sellVolumes[i]) * .9, buyerDominance = candles[i].takerBuyVolume == null ? candles[i].close > candles[i].open && relativeVolume >= 1.05 : candles[i].takerBuyVolume / Math.max(volumes[i], Number.EPSILON) >= .51;
-  return { aligned, rising, momentum, relativeVolume, strong, rsi: rs[i], adx: dx[i] || 0, atr: last(atr(candles)), ema9: e9[i], ema22: e22[i], ema51: e51[i], ema80: e80[i], macdLine: mc.line[i], macdHistogram: mc.histogram[i], stochK: stoch.k[i], stochD: stoch.d[i], stochCrossUp, stochRecovery, sellerDrying, buyerDominance, lastLow: candles[i].low, recentLow: Math.min(...candles.slice(-10).map(c => c.low)), close: last(closes), pattern: candlePattern(candles), pivot: bullishPivot(candles), levels: supportResistance(candles, last(closes)) };
+  return { aligned, rising, momentum, relativeVolume, strong, rsi: rs[i], adx: dx[i] || 0, atr: last(atr(candles)), ema8: e8[i], ema9: e9[i], ema22: e22[i], ema51: e51[i], ema80: e80[i], macdLine: mc.line[i], macdHistogram: mc.histogram[i], stochK: stoch.k[i], stochD: stoch.d[i], stochCrossUp, stochRecovery, sellerDrying, buyerDominance, lastLow: candles[i].low, recentLow: Math.min(...candles.slice(-10).map(c => c.low)), close: last(closes), pattern: candlePattern(candles), pivot: bullishPivot(candles), levels: supportResistance(candles, last(closes)) };
 }
 function lateEntry(timing, triggerCandles, triggerTimeframe = '1h') {
   // Filtro anti-perseguição: não entrar depois de uma arrancada já esticada.
@@ -84,18 +84,23 @@ function pullback1hConfirmationCriteria(extension, day, confirmation, one) {
   const confirmed = confirmation.close >= confirmation.ema51 && confirmation.aligned && confirmation.rising && (confirmation.pivot.bullish || confirmation.pattern.bullish || confirmation.momentum);
   return { valid: macro && pullback1h && confirmed, pullback1h, confirmed };
 }
-const VERSION = '2026-10-03-multitimeframe-live-paprika-ema-cross-v1';
-const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', paprika: 'https://api.coinpaprika.com/v1', okx: 'https://www.okx.com/api/v5' });
-const DEFAULTS = Object.freeze({ minScore: 90, minVolume: 1000000, assetLimit: 1000, strategy: 'both', maxSignals: 10 });
+const VERSION = '2026-10-09-restored-2026-10-05-setups-live-safety-v1';
+const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', mexc: 'https://api.mexc.com/api/v3', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', paprika: 'https://api.coinpaprika.com/v1' });
+const DEFAULTS = Object.freeze({ minScore: 90, minVolume: 1000000, assetLimit: 1000, strategy: 'both', maxSignals: 20, enforceRiskPolicy: false, maxEntryDeviationPct: 2 });
 const INTERVALS = ['1w', '1d', '4h', '2h', '1h'];
+const STABLE_BASES = new Set(['USDT','USDC','USDE','USD1','DAI','FDUSD','TUSD','USDD','BUSD','PYUSD','USDP','FRAX','GUSD','EURC','EURS','USDY']);
+function isStableAsset(symbol) { return STABLE_BASES.has(String(symbol||'').replace(/USDT$/,'').toUpperCase()); }
 const STRATEGIES = Object.freeze({ trend: 'Tendência + pivô', 'aggressive-pullback': 'Pullback 2H + confirmação 4H', 'flexible-pullback-2h': 'Pullback 2H · diário flexível', 'ema-cross-retest-2h': 'Cruzamento EMA 9 + reteste 22/52 · 2H' });
 function settings(input = {}) {
   const result = { ...DEFAULTS, ...input };
-  if (![90, 100].includes(Number(result.minScore))) throw new Error('Score mínimo deve ser 90 ou 100.');
+  const selectedStrategies = Array.isArray(result.strategies) ? [...new Set(result.strategies)] : null;
+  if (![0, 85, 90, 100].includes(Number(result.minScore))) throw new Error('Score mínimo deve ser 85, 90, 100 ou todos os scores.');
   if (![1000000, 2000000, 5000000].includes(Number(result.minVolume))) throw new Error('Volume mínimo inválido.');
   if (!Number.isInteger(Number(result.assetLimit)) || result.assetLimit < 1 || result.assetLimit > 1500) throw new Error('Limite de ativos inválido.');
   if (!['both', ...Object.keys(STRATEGIES)].includes(result.strategy)) throw new Error('Setup ao vivo inválido.');
-  return { ...result, minScore: Number(result.minScore), minVolume: Number(result.minVolume), assetLimit: Number(result.assetLimit), maxSignals: 10 };
+  if (selectedStrategies && (!selectedStrategies.length || selectedStrategies.some(strategy => !Object.hasOwn(STRATEGIES, strategy)))) throw new Error('Selecione ao menos um setup válido.');
+  if (!Number.isFinite(Number(result.maxEntryDeviationPct)) || Number(result.maxEntryDeviationPct) < 0 || Number(result.maxEntryDeviationPct) > 5) throw new Error('Distância máxima da entrada inválida.');
+  return { ...result, strategies: selectedStrategies, minScore: Number(result.minScore), minVolume: Number(result.minVolume), assetLimit: Number(result.assetLimit), maxSignals: 20, enforceRiskPolicy: Boolean(result.enforceRiskPolicy), maxEntryDeviationPct: Number(result.maxEntryDeviationPct) };
 }
 function closedCandles(raw, asOf = Date.now()) {
   if (!Array.isArray(raw)) throw new Error('Resposta de candles inválida.');
@@ -154,26 +159,36 @@ function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS,
   if (score < config.minScore) return reject(`Score ${score}, abaixo do mínimo ${config.minScore}`);
   const entry = timing.close, previousLow = Math.min(...triggerSeries.slice(-4,-1).map(c => c.low)), stop = previousLow - timing.atr * .12, risk = entry-stop, tp2 = entry+2*risk, tp3 = entry+3*risk;
   if (![entry,stop,risk,tp2,tp3].every(Number.isFinite) || risk <= 0) return reject('Risco ou níveis de entrada inválidos');
-  if (risk/entry > .08) return reject(`Stop muito distante (${(risk/entry*100).toFixed(1)}%)`);
+  const tickerPrice = Number(asset.price ?? asset.lastPrice);
+  const latestPrice = Number.isFinite(tickerPrice) && tickerPrice > 0 ? tickerPrice : series?.['1h']?.at(-1)?.close ?? series?.['2h']?.at(-1)?.close ?? series?.['4h']?.at(-1)?.close;
+  if (Number.isFinite(latestPrice) && latestPrice <= stop) return reject(`Sinal vencido: preço atual ${latestPrice.toFixed(8)} já rompeu o stop ${stop.toFixed(8)}`);
+  if (Number.isFinite(latestPrice) && latestPrice >= tp2) return reject(`Sinal vencido: preço atual ${latestPrice.toFixed(8)} já atingiu o TP 2R ${tp2.toFixed(8)}`);
+  if (Number.isFinite(latestPrice)) { const progress = (latestPrice-entry)/Math.max(tp2-entry,Number.EPSILON); if (progress >= .5) return reject(`Entrada esticada: preço atual já percorreu ${(progress*100).toFixed(0)}% do caminho até o TP 2R`); }
+  if (Number.isFinite(latestPrice) && config.maxEntryDeviationPct > 0) { const deviation = Math.abs(latestPrice/entry-1)*100; if (deviation > config.maxEntryDeviationPct) return reject(`Entrada distante do preço atual (${deviation.toFixed(1)}% acima do limite de ${config.maxEntryDeviationPct.toFixed(1)}%)`); }
+  const riskPct=Math.abs(risk/entry), highRisk=riskPct>.04;
+  if (riskPct > .08) return reject(`Stop muito distante (${(riskPct*100).toFixed(1)}%)`);
   if ((tp2-entry)/entry < .03) return reject('Alvo 2R abaixo do mínimo de 3%');
   if (timing.levels.resistance && timing.levels.resistance-entry < 2*risk) return reject('Resistência não deixa espaço mínimo de 2R');
   const stretchPct = timing.ema9 ? (entry / timing.ema9 - 1) * 100 : 0, stretchWarning = stretchPct > 0 ? `Entrada esticada em ${stretchPct.toFixed(1)}% vs EMA9` : 'Entrada sem esticamento vs EMA9';
   const triggerLabel=strategy==='ema-cross-retest-2h'?'EMA 9 cruzou 22/52 · reteste confirmado · rompimento fechado':(timing.pattern.bullish ? timing.pattern.name : timing.pivot.label);
-  return { ...asset, source:asset.source||'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:timing.relativeVolume, context:strategy==='ema-cross-retest-2h'?'Macro LONG: 1W · 1D · 4H, com cruzamento/reteste em 2H':'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H', trigger:`${triggerLabel} · RSI ${timing.rsi.toFixed(1)} · volume ${timing.relativeVolume.toFixed(2)}x · ${stretchWarning}`, entryStretchPct:stretchPct, entryWarning:stretchWarning, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, lateEntryAllowed:false, engineVersion:VERSION };
+  return { ...asset, source:asset.source||'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], tier:score>=90?'VALIDATED':'WATCH', tierLabel:score>=90?'ENTRADA VALIDADA':'SETUP FORTE · AGUARDAR CONFIRMAÇÃO', triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:timing.relativeVolume, context:strategy==='ema-cross-retest-2h'?'Macro LONG: 1W · 1D · 4H, com cruzamento/reteste em 2H':'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H', trigger:`${triggerLabel} · RSI ${timing.rsi.toFixed(1)} · volume ${timing.relativeVolume.toFixed(2)}x · ${stretchWarning}`, entryStretchPct:stretchPct, entryWarning:highRisk?'Risco acima de 4%; somente SPOT, sem alavancagem':stretchWarning, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, lateEntryAllowed:false, riskPct, maxLeverage:config.enforceRiskPolicy?(highRisk?1:2):3, riskTier:config.enforceRiskPolicy?(highRisk?'HIGH_RISK_SPOT':'STANDARD_LEVERAGE_2X'):null, engineVersion:VERSION };
 }
 function evaluate(asset, series, options = DEFAULTS, diagnostics = null) {
   const config = settings(options), analyses = analyseSet(series);
   const volume=Number(asset.volume ?? asset.volume24h);
   if (!Number.isFinite(volume) || volume < config.minVolume) { if (diagnostics) diagnostics.push({strategy:'geral',reason:`Volume do par abaixo de US$ ${config.minVolume.toLocaleString('en-US')}`}); return null; }
-  const strategies = config.strategy === 'both' ? Object.keys(STRATEGIES) : [config.strategy];
+  const strategies = config.strategies || (config.strategy === 'both' ? Object.keys(STRATEGIES) : [config.strategy]);
   const attempts = strategies.flatMap(strategy => {
     const timeframes=strategy==='flexible-pullback-2h'||strategy==='ema-cross-retest-2h'?['2h']:['1h','2h','4h'];
     return timeframes.map(triggerTimeframe=>{const trace={strategy:`${strategy} · ${triggerTimeframe.toUpperCase()}`,reason:null};const signal=evaluateAnalyses(asset,series,analyses,strategy,config,triggerTimeframe,trace);if(diagnostics)diagnostics.push(trace);return signal;});
   });
   return attempts.filter(Boolean).sort(compareSignals)[0] || null;
 }
-function compareSignals(a,b) { return b.score-a.score || (a.strategy === b.strategy ? 0 : a.strategy === 'trend' ? -1 : 1) || (a.rank||99999)-(b.rank||99999) || a.symbol.localeCompare(b.symbol); }
-function consolidate(signals, limit = 10) { const seen=new Set(); return signals.slice().sort(compareSignals).filter(s=>{if(seen.has(s.symbol))return false; seen.add(s.symbol); return true;}).slice(0,limit); }
+function compareSignals(a,b) {
+  const priority={trend:0,'aggressive-pullback':1,'flexible-pullback-2h':2,'ema-cross-retest-2h':3};
+  return b.score-a.score || (priority[a.strategy]??99)-(priority[b.strategy]??99) || (a.rank||99999)-(b.rank||99999) || a.symbol.localeCompare(b.symbol);
+}
+function consolidate(signals, limit = 20) { const seen=new Set(); return signals.slice().sort(compareSignals).filter(s=>{if(seen.has(s.symbol))return false; seen.add(s.symbol); return true;}).slice(0,limit); }
 function isFresh(signal, previous, now = Date.now()) {
   if (!previous) return true;
   // A previously processed closed candle never becomes new merely through elapsed time.
@@ -181,6 +196,7 @@ function isFresh(signal, previous, now = Date.now()) {
   return now-Number(previous.at) > 12*3600000 || Math.abs(signal.entry-previous.entry)/Math.max(signal.entry,1e-12) >= .015;
 }
 function rankingLabel(asset) {
+  if (asset?.tokenized) return 'Tokenizado MEXC · Spot';
   const labels=['CoinGecko','CoinMarketCap'].filter(source=>Number.isInteger(asset.rankings?.[source])).map(source=>`${source} #${asset.rankings[source]}`);
   return labels.length ? labels.join(' · ') : 'Ranking por volume Binance; capitalização não confirmada';
 }
@@ -190,20 +206,21 @@ async function marketUniverse(getJson, options = DEFAULTS) {
   if (!Array.isArray(exchange.symbols) || !Array.isArray(tickers)) throw new Error('Universo Binance inválido.');
   const pairs=new Set(exchange.symbols.filter(s=>s.status==='TRADING' && s.quoteAsset==='USDT' && s.isSpotTradingAllowed).map(s=>s.symbol));
   const volumes=new Map(tickers.map(t=>[t.symbol,Number(t.quoteVolume)||0]));
+  const prices=new Map(tickers.map(t=>[t.symbol,Number(t.lastPrice)||0]));
   const warnings=[], rankings={};
-  const okxPairs=new Map(), okxVolumes=new Map();
-  const okxJob=Promise.all([getJson(`${SOURCES.okx}/public/instruments?instType=SPOT`),getJson(`${SOURCES.okx}/market/tickers?instType=SPOT`)]).then(([instruments,quotes])=>{
-    if(String(instruments.code)!=='0'||String(quotes.code)!=='0'||!Array.isArray(instruments.data)||!Array.isArray(quotes.data))throw new Error('Universo OKX inválido');
-    for(const p of instruments.data)if(p.state==='live'&&p.quoteCcy==='USDT')okxPairs.set(`${p.baseCcy}USDT`,p.instId);
-    for(const q of quotes.data)okxVolumes.set(q.instId,Number(q.volCcy24h)||0);
-  }).catch(error=>warnings.push(`OKX: ${error.message}`));
+  const mexcPairs=new Map(), mexcMetadata=new Map(), mexcVolumes=new Map(), mexcPrices=new Map();
+  const mexcJob=Promise.all([getJson(`${SOURCES.mexc}/exchangeInfo`),getJson(`${SOURCES.mexc}/ticker/24hr`)]).then(([info,quotes])=>{
+    if(!Array.isArray(info.symbols)||!Array.isArray(quotes))throw new Error('Universo MEXC inválido');
+    for(const p of info.symbols)if(p.status==='1'&&p.quoteAsset==='USDT'&&p.isSpotTradingAllowed!==false){mexcPairs.set(p.symbol,p.symbol);mexcMetadata.set(p.symbol,p);}
+    for(const q of quotes){mexcVolumes.set(q.symbol,Number(q.quoteVolume)||0);mexcPrices.set(q.symbol,Number(q.lastPrice)||0);}
+  }).catch(error=>warnings.push(`MEXC: ${error.message}`));
   const primaryJobs=[['CoinGecko',async()=>{const rows=[];for(let page=1;page<=Math.ceil(config.assetLimit/250);page++){const coins=await getJson(`${SOURCES.ranking}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${page}&sparkline=false`);if(!Array.isArray(coins)||!coins.length)throw new Error('Ranking indisponível');rows.push(...coins);}return rows.map(c=>({...c,rank:Number(c.market_cap_rank)}));}],['CoinMarketCap',async()=>{const result=await getJson(`${SOURCES.cmc}/cryptocurrency/listings/latest?start=1&limit=${config.assetLimit}&convert=USD&sort=market_cap&sort_dir=desc`);if(!Array.isArray(result.data)||(result.status?.error_code != null && Number(result.status.error_code)!==0))throw new Error(result.status?.error_message||'Ranking inválido');return result.data.map(c=>({...c,rank:Number(c.cmc_rank)}));}]];
   let jobs=primaryJobs, settled=await Promise.allSettled(primaryJobs.map(([,load])=>load()));
   if(!settled.some(result=>result.status==='fulfilled')){
     jobs=[['CoinPaprika',async()=>{const rows=await getJson(`${SOURCES.paprika}/tickers?quotes=USD`);if(!Array.isArray(rows)||!rows.length)throw new Error('Ranking indisponível');return rows.map(c=>({symbol:c.symbol,name:c.name,rank:Number(c.rank)})).filter(c=>Number.isInteger(c.rank)&&c.rank>0).sort((a,b)=>a.rank-b.rank).slice(0,config.assetLimit);}]];
     settled=await Promise.allSettled(jobs.map(([,load])=>load()));
   }
-  await okxJob;
+  await mexcJob;
   const merged=new Map();
   settled.forEach((result,index)=>{
     const source=jobs[index][0];
@@ -212,47 +229,47 @@ async function marketUniverse(getJson, options = DEFAULTS) {
     if(!rows.length){warnings.push(`${source}: ranking sem ativos válidos`);return;}
     rankings[source]=rows.length;
     const symbols=new Map();for(const c of rows){const symbol=String(c.symbol).toUpperCase();symbols.set(symbol,(symbols.get(symbol)||0)+1);}
-    for(const c of rows){const symbol=`${String(c.symbol).toUpperCase()}USDT`;if(symbols.get(String(c.symbol).toUpperCase())>1){if(pairs.has(symbol)||okxPairs.has(symbol))warnings.push(`${source}: símbolo ambíguo ${symbol}, ignorado nessa fonte`);continue;}const old=merged.get(symbol)||{symbol,name:c.name,rank:c.rank,rankingSources:[],rankings:{}};old.rank=Math.min(old.rank,c.rank);old.rankingSources.push(source);old.rankings[source]=c.rank;merged.set(symbol,old);}
+    for(const c of rows){const symbol=`${String(c.symbol).toUpperCase()}USDT`;if(symbols.get(String(c.symbol).toUpperCase())>1){if(pairs.has(symbol)||mexcPairs.has(symbol))warnings.push(`${source}: símbolo ambíguo ${symbol}, ignorado nessa fonte`);continue;}const old=merged.get(symbol)||{symbol,name:c.name,rank:c.rank,rankingSources:[],rankings:{}};old.rank=Math.min(old.rank,c.rank);old.rankingSources.push(source);old.rankings[source]=c.rank;merged.set(symbol,old);}
   });
+  const tradfiBases=new Set(['OIL','WTI','BRENT','GOLD','SILVER','NVDA','TSLA','AAPL','AMZN','META','COIN','MSTR','NFLX','MSFT','GOOGL','GOOG','MCD','HOOD','CRCL','MU','SOXL','SOXS','HAL','CORZ','SPY','QQQ','ITA','IWF','IWN','IWV','WFC']);
+  const tokenizedSymbols=[...mexcPairs.keys()].filter(symbol=>{
+    const base=String(symbol).replace(/USDT$/,'').toUpperCase(), metadata=mexcMetadata.get(symbol)||{}, descriptor=`${metadata.baseAsset||''} ${metadata.baseCoin||''} ${metadata.baseCoinName||''} ${metadata.quoteAsset||''}`.toUpperCase();
+    return base.endsWith('ON')||base.endsWith('X')||tradfiBases.has(base)||/TOKEN|STOCK|EQUITY|ETF|COMMODIT|GOLD|SILVER|OIL|ONDO|XSTOCK/.test(descriptor);
+  });
+  const tokenizedCandidates=tokenizedSymbols.filter(symbol=>(mexcVolumes.get(symbol)||0)>=config.minVolume).map((symbol,index)=>({symbol,name:`${mexcMetadata.get(symbol)?.baseAsset||symbol.replace(/USDT$/,'')} · Mercado tradicional tokenizado MEXC`,rank:config.assetLimit+index+1,rankingSources:['MEXC TradFi tokenizados'],rankings:{},source:'MEXC',exchangeSymbol:symbol,volume:mexcVolumes.get(symbol)||0,volume24h:mexcVolumes.get(symbol)||0,tokenized:true,assetClass:'TRADFI_TOKENIZED'}));
   const sources=Object.keys(rankings);
   let mode, candidates;
   if(!sources.length){
     // Contingência: os rankings por capitalização podem bloquear consultas públicas.
     // Mantemos o scanner operacional ordenando os pares Binance por volume USDT 24h.
     warnings.push('Rankings por capitalização indisponíveis; usando ranking fallback por volume 24h da Binance.');
-    const fallback=[...volumes.entries()].filter(([symbol,volume])=>pairs.has(symbol)&&!['BTCUSDT','ETHUSDT'].includes(symbol)&&Number(volume)>=config.minVolume).sort((a,b)=>b[1]-a[1]).slice(0,config.assetLimit);
+    const fallback=[...volumes.entries()].filter(([symbol,volume])=>pairs.has(symbol)&&!['BTCUSDT','ETHUSDT'].includes(symbol)&&!isStableAsset(symbol)&&Number(volume)>=config.minVolume).sort((a,b)=>b[1]-a[1]).slice(0,config.assetLimit);
     candidates=fallback.map(([symbol,volume],index)=>({symbol,name:symbol.replace(/USDT$/,''),rank:index+1,rankingSources:['Binance volume 24h'],rankings:{'Binance volume 24h':index+1},volume,volume24h:volume}));
     mode='volume 24h Binance (fallback)';
   } else { mode=`market cap (${sources.join(' + ')})`; candidates=[...merged.values()]; }
-  const candidateAudit=candidates.map(c=>{const binance=pairs.has(c.symbol),okx=okxPairs.has(c.symbol),source=binance?'BINANCE':(okx?'OKX':null),exchangeSymbol=binance?c.symbol:(okx?okxPairs.get(c.symbol):null),volume=binance?(volumes.get(c.symbol)||0):(okx?(okxVolumes.get(exchangeSymbol)||0):0);return {symbol:c.symbol,name:c.name,rank:c.rank,source,volume,status:source&&volume>=config.minVolume?'eligible':'excluded',reason:!source?'Par USDT não encontrado na Binance ou OKX':`Volume ${volume.toLocaleString('en-US',{maximumFractionDigits:0})} abaixo do mínimo de US$ ${config.minVolume.toLocaleString('en-US')}`};});
+  const candidateSymbols=new Set(candidates.map(c=>c.symbol));
+  candidates.push(...tokenizedCandidates.filter(c=>!candidateSymbols.has(c.symbol)));
+  const candidateAudit=candidates.map(c=>{const binance=pairs.has(c.symbol),mexc=mexcPairs.has(c.symbol),source=binance?'BINANCE':(mexc?'MEXC':null),exchangeSymbol=binance?c.symbol:(mexc?mexcPairs.get(c.symbol):null),volume=binance?(volumes.get(c.symbol)||0):(mexc?(mexcVolumes.get(exchangeSymbol)||0):0),stable=isStableAsset(c.symbol);return {symbol:c.symbol,name:c.name,rank:c.rank,source,volume,status:source&&volume>=config.minVolume&&!stable?'eligible':'excluded',reason:stable?'Stablecoin excluída do scanner':!source?'Par USDT não encontrado na Binance ou MEXC':`Volume ${volume.toLocaleString('en-US',{maximumFractionDigits:0})} abaixo do mínimo de US$ ${config.minVolume.toLocaleString('en-US')}`};});
   const seen=new Set();
-  const assets=candidates.filter(c=>(pairs.has(c.symbol)||okxPairs.has(c.symbol)) && !['BTCUSDT','ETHUSDT'].includes(c.symbol) && !seen.has(c.symbol) && (seen.add(c.symbol),true)).map(c=>{const binance=pairs.has(c.symbol),okx=okxPairs.has(c.symbol),exchangeSymbol=binance?c.symbol:okxPairs.get(c.symbol),source=binance?'BINANCE':'OKX',volume=binance?(volumes.get(c.symbol)||0):(okxVolumes.get(exchangeSymbol)||0);return {...c,source,exchangeSymbol,volume,volume24h:volume};}).filter(a=>a.volume >= config.minVolume).sort((a,b)=>a.rank-b.rank||a.symbol.localeCompare(b.symbol));
+  const assets=candidates.filter(c=>(pairs.has(c.symbol)||mexcPairs.has(c.symbol)) && !['BTCUSDT','ETHUSDT'].includes(c.symbol) && !isStableAsset(c.symbol) && !seen.has(c.symbol) && (seen.add(c.symbol),true)).map(c=>{const binance=pairs.has(c.symbol),mexc=mexcPairs.has(c.symbol),exchangeSymbol=binance?c.symbol:mexcPairs.get(c.symbol),source=binance?'BINANCE':'MEXC',volume=binance?(volumes.get(c.symbol)||0):(mexc?(mexcVolumes.get(exchangeSymbol)||0):0),price=binance?(prices.get(c.symbol)||0):(mexc?(mexcPrices.get(exchangeSymbol)||0):0);return {...c,source,exchangeSymbol,volume,volume24h:volume,price,lastPrice:price,tokenized:Boolean(c.tokenized),assetClass:c.assetClass||(c.tokenized?'TRADFI_TOKENIZED':'CRYPTO')};}).filter(a=>a.volume >= config.minVolume).sort((a,b)=>(a.tokenized-b.tokenized)||a.rank-b.rank||a.symbol.localeCompare(b.symbol));
   return {assets,mode,warnings,rankings,requestedLimit:config.assetLimit,rankingCandidates:candidates.length,candidateAudit};
 }
 async function fetchSeries(getJson,symbol,asOf,source=SOURCES.spot) {
-  if(source===SOURCES.okx){
-    const bars={'1w':'1Wutc','1d':'1Dutc','4h':'4H','2h':'2H','1h':'1H'},instId=symbol.endsWith('-USDT')?symbol:symbol.replace(/USDT$/,'-USDT');
-    const values=await Promise.all(INTERVALS.map(async interval=>{const result=await getJson(`${SOURCES.okx}/market/history-candles?instId=${encodeURIComponent(instId)}&bar=${bars[interval]}&limit=210&after=${asOf}`);if(String(result.code)!=='0'||!Array.isArray(result.data))throw new Error(result.msg||'Candles OKX inválidos');return closedOkxCandles(result.data,interval,asOf);}));
-    return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
-  }
+  if(source===SOURCES.mexc){const intervals={'1w':'1W','1d':'1D','4h':'4h','2h':'2h','1h':'1h'},values=await Promise.all(INTERVALS.map(async interval=>{const raw=await getJson(`${SOURCES.mexc}/klines?symbol=${encodeURIComponent(symbol)}&interval=${intervals[interval]}&limit=210&endTime=${asOf-1}`);return closedCandles(raw,asOf);}));return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));}
   const values=await Promise.all(INTERVALS.map(interval=>getJson(`${source}/klines?symbol=${encodeURIComponent(symbol)}&interval=${interval}&limit=210&endTime=${asOf-1}`).then(raw=>closedCandles(raw,asOf))));
   return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
 }
-function closedOkxCandles(raw,interval,asOf=Date.now()) {
-  const duration={'1w':7*86400000,'1d':86400000,'4h':4*3600000,'2h':2*3600000,'1h':3600000}[interval];
-  if(!duration||!Array.isArray(raw))throw new Error('Candles OKX inválidos');
-  // OKX returns newest first and does not expose taker-buy volume in this endpoint.
-  return closedCandles(raw.filter(row=>String(row[8])==='1').map(row=>[row[0],row[1],row[2],row[3],row[4],row[5],Number(row[0])+duration-1]),asOf);
-}
 async function vehicle(getJson,signal,asOf) {
   const spot={...signal,vehicle:'SPOT',leverage:'1×',vehicleReason:`Setup SPOT confirmado na ${signal.source||'BINANCE'}.`};
-  if(signal.source==='OKX')return spot;
+  if (signal.riskTier==='HIGH_RISK_SPOT') return {...spot,vehicleReason:'Risco entre 4% e 8%; somente SPOT, sem alavancagem.'};
+  if (signal.direction==='SHORT') return {...signal,vehicle:'FUTURES',leverage:'3× máx.',vehicleReason:'Direção SHORT: requer mercado de futuros; confirme margem e disponibilidade na corretora.'};
+  if(signal.source==='MEXC')return spot;
   try {
     const [series,premium]=await Promise.all([fetchSeries(getJson,signal.symbol,asOf,SOURCES.futures),getJson(`${SOURCES.futures}/premiumIndex?symbol=${signal.symbol}`)]);
     const analyses=analyseSet(series), funding=Number(premium.lastFundingRate);
     if(!analyses || analyses.extension.blocked || analyses.weekly.close < analyses.weekly.ema22 || !confirmedMacro(analyses)) return {...spot,vehicleReason:'Setup SPOT confirmado; futuros sem confirmação suficiente.'};
     const atrPct=analyses.one.atr/analyses.one.close*100;
-    if(signal.score>=90 && analyses.one.relativeVolume>=1.25 && atrPct<=3.5 && Number.isFinite(funding) && funding<=.0003) return {...signal,vehicle:'FUTURES',leverage:'3× máx.',funding,atrPct,vehicleReason:`Futuros confirmados; ATR ${atrPct.toFixed(1)}% e funding ${(funding*100).toFixed(3)}%.`};
+    if(signal.score>=90 && analyses.one.relativeVolume>=1.25 && atrPct<=3.5 && Number.isFinite(funding) && funding<=.0003) { const leverageCap=signal.riskTier?Math.min(2,signal.maxLeverage||2):(signal.maxLeverage||3); return {...signal,vehicle:'FUTURES',leverage:`${leverageCap}× máx.`,funding,atrPct,vehicleReason:`Futuros confirmados; alavancagem limitada a ${leverageCap}×, ATR ${atrPct.toFixed(1)}% e funding ${(funding*100).toFixed(3)}%.`}; }
     return {...spot,vehicleReason:'Setup SPOT confirmado; volatilidade, volume ou funding não qualificam futuros.'};
   }catch(error){return {...spot,vehicleReason:'Setup SPOT confirmado; consulta de futuros indisponível.',vehicleWarning:error.message};}
 }
@@ -260,14 +277,13 @@ async function scanMarket(getJson,options=DEFAULTS,onProgress=()=>{}) {
   const config=settings(options), clock=await getJson(`${SOURCES.spot}/time`), asOf=Number(clock.serverTime);
   if(!Number.isFinite(asOf))throw new Error('Horário Binance inválido.');
   const universe=await marketUniverse(getJson,config), signals=[], failures=[], diagnostics=universe.candidateAudit.filter(item=>item.status==='excluded').map(item=>({...item,reasons:[item.reason]})), warnings=[...universe.warnings];let next=0,done=0;
-  async function worker(){while(next<universe.assets.length){const asset=universe.assets[next++];const audit={symbol:asset.symbol,name:asset.name,rank:asset.rank,source:asset.source,volume:asset.volume,status:'rejected',reasons:[]};try{const source=asset.source==='OKX'?SOURCES.okx:SOURCES.spot,series=await fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,asOf,source), trace=[], signal=evaluate(asset,series,config,trace);audit.reasons=trace.filter(item=>item.reason).map(item=>`${item.strategy}: ${item.reason}`);if(signal){signals.push(signal);audit.status='signal';audit.score=signal.score;audit.strategy=signal.strategyName;}else if(!audit.reasons.length)audit.reasons=['Não atingiu todos os filtros do setup'];}catch(error){failures.push({symbol:asset.symbol,source:asset.source,error:error.message});audit.status='error';audit.reasons=[`Falha de consulta: ${error.message}`];}diagnostics.push(audit);onProgress(++done,universe.assets.length);}}
+  async function worker(){while(next<universe.assets.length){const asset=universe.assets[next++];const audit={symbol:asset.symbol,name:asset.name,rank:asset.rank,source:asset.source,volume:asset.volume,status:'rejected',reasons:[]};try{const source=asset.source==='MEXC'?SOURCES.mexc:SOURCES.spot,series=await fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,asOf,source), trace=[], signal=evaluate(asset,series,config,trace);audit.reasons=trace.filter(item=>item.reason).map(item=>`${item.strategy}: ${item.reason}`);if(signal){signals.push(signal);audit.status='signal';audit.score=signal.score;audit.strategy=signal.strategyName;}else if(!audit.reasons.length)audit.reasons=['Não atingiu todos os filtros do setup'];}catch(error){failures.push({symbol:asset.symbol,source:asset.source,error:error.message});audit.status='error';audit.reasons=[`Falha de consulta: ${error.message}`];}diagnostics.push(audit);onProgress(++done,universe.assets.length);}}
   await Promise.all(Array.from({length:Math.min(4,universe.assets.length)},worker));
   if(universe.assets.length && failures.length===universe.assets.length)throw new Error(`Todas as ${failures.length} consultas de ativos falharam: ${failures[0].error}`);
-  const qualified=consolidate(signals), selected=[];
+  const qualified=consolidate(signals,config.maxSignals), selected=[];
   for(const signal of qualified){const checked=await vehicle(getJson,signal,asOf);selected.push(checked);if(checked.vehicleWarning)warnings.push(`${signal.symbol}: ${checked.vehicleWarning}`);}
   return {signals:selected,assets:universe.assets.length,eligibleAssets:universe.assets.length,requestedLimit:universe.requestedLimit,rankingCandidates:universe.rankingCandidates,diagnostics,mode:universe.mode,failures,warnings,asOf,config,engineVersion:VERSION};
 }
 
-return Object.freeze({last,sma,ema,rsi,atr,macd,adx,stochRsi,candlePattern,bullishPivot,supportResistance,weeklyExtension,analyseTimeframe,lateEntry,pullbackStochCriteria,aggressivePullbackCriteria,pullback1hConfirmationCriteria,VERSION,SOURCES,DEFAULTS,STRATEGIES,settings,closedCandles,closedOkxCandles,confirmedMacro,analyseSet,evaluateAnalyses,evaluate,compareSignals,consolidate,isFresh,rankingLabel,marketUniverse,fetchSeries,vehicle,scanMarket});
+return Object.freeze({last,sma,ema,rsi,atr,macd,adx,stochRsi,candlePattern,bullishPivot,supportResistance,weeklyExtension,analyseTimeframe,lateEntry,pullbackStochCriteria,aggressivePullbackCriteria,pullback1hConfirmationCriteria,VERSION,SOURCES,DEFAULTS,STRATEGIES,settings,closedCandles,confirmedMacro,analyseSet,evaluateAnalyses,evaluate,compareSignals,consolidate,isFresh,rankingLabel,marketUniverse,fetchSeries,vehicle,scanMarket});
 });
-
