@@ -824,6 +824,27 @@
     #signalsPanel tbody td:not(:last-child) { border-right:2px solid rgba(83,160,237,.42) !important; }
     #signalsPanel thead th:not(:last-child) { border-right:2px solid rgba(98,191,255,.4) !important; }
     #signalsPanel tbody td { border-top:1px solid rgba(83,160,237,.5) !important; border-bottom:2px solid rgba(83,160,237,.5) !important; }
+
+    /* Leitura confortável: um degrau acima no painel, com números do backtest sem névoa. */
+    body { font-size:16px !important; }
+    button, select, input, textarea { font-size:15px !important; }
+    .controls label { font-size:14px !important; }
+    .controls .scanner-strategy-filter legend { font-size:13px !important; }
+    .controls .scanner-strategy-filter legend span { font-size:11px !important; }
+    .controls .scanner-strategy-filter .filter-option { font-size:12px !important; }
+    .controls .scanner-strategy-filter .sub,
+    #signalsPanel .sub { font-size:13px !important; }
+    #signalsPanel th { font-size:13px !important; }
+    #signalsPanel td { font-size:15px !important; line-height:1.4; }
+    #backtestPanel > .backtest-strategy-heading strong { font-size:15px !important; }
+    #backtestPanel #backtestStrategyRecommendation { font-size:15px !important; line-height:1.45; }
+    #backtestPanel table th { font-size:13px !important; line-height:1.28; text-shadow:none !important; }
+    #backtestPanel table td { font-size:15px !important; line-height:1.35; text-shadow:none !important; }
+    #backtestComparisonBody td:first-child { font-size:16px !important; }
+    #backtestPanel table td.positive,
+    #backtestPanel table td.result-win,
+    #backtestPanel table td.negative,
+    #backtestPanel table td.result-loss { text-shadow:none !important; }
   </style></head>
 <body>
   <header class="topbar">
