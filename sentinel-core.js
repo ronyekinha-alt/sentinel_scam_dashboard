@@ -84,13 +84,13 @@ function pullback1hConfirmationCriteria(extension, day, confirmation, one) {
   const confirmed = confirmation.close >= confirmation.ema51 && confirmation.aligned && confirmation.rising && (confirmation.pivot.bullish || confirmation.pattern.bullish || confirmation.momentum);
   return { valid: macro && pullback1h && confirmed, pullback1h, confirmed };
 }
-const VERSION = '2026-10-09-restored-2026-10-05-setups-live-safety-v1';
+const VERSION = '2026-10-10-early-1h-entry-validity-v1';
 const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', mexc: 'https://api.mexc.com/api/v3', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', paprika: 'https://api.coinpaprika.com/v1' });
-const DEFAULTS = Object.freeze({ minScore: 90, minVolume: 1000000, assetLimit: 1000, strategy: 'both', maxSignals: 20, enforceRiskPolicy: false, maxEntryDeviationPct: 2 });
+const DEFAULTS = Object.freeze({ minScore: 90, minVolume: 1000000, assetLimit: 1000, strategy: 'both', maxSignals: 20, enforceRiskPolicy: false, maxEntryDeviationPct: 2, minimumRewardRisk: 1.7 });
 const INTERVALS = ['1w', '1d', '4h', '2h', '1h'];
 const STABLE_BASES = new Set(['USDT','USDC','USDE','USD1','DAI','FDUSD','TUSD','USDD','BUSD','PYUSD','USDP','FRAX','GUSD','EURC','EURS','USDY']);
 function isStableAsset(symbol) { return STABLE_BASES.has(String(symbol||'').replace(/USDT$/,'').toUpperCase()); }
-const STRATEGIES = Object.freeze({ trend: 'Tendência + pivô', 'aggressive-pullback': 'Pullback 2H + confirmação 4H', 'flexible-pullback-2h': 'Pullback 2H · diário flexível', 'ema-cross-retest-2h': 'Cruzamento EMA 9 + reteste 22/52 · 2H' });
+const STRATEGIES = Object.freeze({ trend: 'Tendência + pivô', 'aggressive-pullback': 'Pullback 2H + confirmação 4H', 'flexible-pullback-2h': 'Pullback 2H · diário flexível', 'ema-cross-retest-2h': 'Cruzamento EMA 9 + reteste 22/52 · 2H', 'compression-expansion-1h': 'Compressão + expansão inicial · 1H' });
 function settings(input = {}) {
   const result = { ...DEFAULTS, ...input };
   const selectedStrategies = Array.isArray(result.strategies) ? [...new Set(result.strategies)] : null;
@@ -100,7 +100,8 @@ function settings(input = {}) {
   if (!['both', ...Object.keys(STRATEGIES)].includes(result.strategy)) throw new Error('Setup ao vivo inválido.');
   if (selectedStrategies && (!selectedStrategies.length || selectedStrategies.some(strategy => !Object.hasOwn(STRATEGIES, strategy)))) throw new Error('Selecione ao menos um setup válido.');
   if (!Number.isFinite(Number(result.maxEntryDeviationPct)) || Number(result.maxEntryDeviationPct) < 0 || Number(result.maxEntryDeviationPct) > 5) throw new Error('Distância máxima da entrada inválida.');
-  return { ...result, strategies: selectedStrategies, minScore: Number(result.minScore), minVolume: Number(result.minVolume), assetLimit: Number(result.assetLimit), maxSignals: 20, enforceRiskPolicy: Boolean(result.enforceRiskPolicy), maxEntryDeviationPct: Number(result.maxEntryDeviationPct) };
+  if (!Number.isFinite(Number(result.minimumRewardRisk)) || Number(result.minimumRewardRisk) < 1 || Number(result.minimumRewardRisk) > 2) throw new Error('Risco-retorno mínimo de entrada inválido.');
+  return { ...result, strategies: selectedStrategies, minScore: Number(result.minScore), minVolume: Number(result.minVolume), assetLimit: Number(result.assetLimit), maxSignals: 20, enforceRiskPolicy: Boolean(result.enforceRiskPolicy), maxEntryDeviationPct: Number(result.maxEntryDeviationPct), minimumRewardRisk: Number(result.minimumRewardRisk) };
 }
 function closedCandles(raw, asOf = Date.now()) {
   if (!Array.isArray(raw)) throw new Error('Resposta de candles inválida.');
@@ -129,6 +130,12 @@ function emaCrossRetest2hCriteria(series, analyses) {
   const valid=crossedRecently&&retest&&closedBreakout&&structure&&macro&&timing.relativeVolume>=1&&timing.rsi>=50&&timing.rsi<=72&&recentRise<=11;
   return {valid,crossedRecently,retest,closedBreakout,structure,macro,recentRise,previousHigh};
 }
+function compressionExpansion1hCriteria(series, analyses) {
+  const candles=series['1h'], timing=analyses.one, {day,four}=analyses;
+  if (!Array.isArray(candles) || candles.length < 80) return {valid:false};
+  const closes=candles.map(c=>c.close), e8=ema(closes,8), e22=ema(closes,22), rs=rsi(closes,14), rsAverage=sma(rs.map(v=>Number.isFinite(v)?v:0),14), i=closes.length-1, base=candles.slice(-19,-1), baseHigh=Math.max(...base.map(c=>c.high)), baseLow=Math.min(...base.map(c=>c.low)), baseRangePct=(baseHigh/baseLow-1)*100, averageVolume=candles.slice(-21,-1).reduce((sum,c)=>sum+Number(c.volume||0),0)/20, volumeRatio=Number(candles[i].volume||0)/Math.max(averageVolume,Number.EPSILON), candle=candles[i], breakoutPct=(timing.close/baseHigh-1)*100, closeLocation=(candle.close-candle.low)/Math.max(candle.high-candle.low,Number.EPSILON), rsiCross=[i,i-1].some(x=>x>0&&rs[x]>rsAverage[x]&&rs[x-1]<=rsAverage[x-1]), rsiHealthy=timing.rsi>=48&&timing.rsi<=68&&rsAverage[i]>=48&&rsAverage[i]<=68&&rs[i]>rs[i-1]&&rsAverage[i]>=rsAverage[i-1], priceStructure=timing.close>timing.ema8&&timing.close>timing.ema22&&e8[i]>e8[i-2], dailyContext=day.close>=day.ema80*.985&&day.rsi>=42&&four.close>=four.ema80*.98&&four.rsi>=42;
+  return {valid:baseRangePct<=12&&timing.close>baseHigh&&breakoutPct<=4.5&&candle.close>candle.open&&closeLocation>=.58&&volumeRatio>=1.5&&priceStructure&&rsiCross&&rsiHealthy&&dailyContext,baseLow,volumeRatio,rsiCross};
+}
 function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS, triggerTimeframe = '2h') {
   const config = settings(options);
   const diagnostic = arguments[6];
@@ -140,13 +147,13 @@ function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS,
   if (!triggerSeries?.length) return reject('Sem candles fechados no tempo do gatilho');
   if (!triggerBullish && !emaCross?.closedBreakout) return reject('Sem padrão comprador, pivô ou rompimento fechado no gatilho');
   const flexibleMacro = !extension.blocked && extension.weekly.close >= extension.weekly.ema22 && d.close >= d.ema80 && d.rsi >= 40 && four.aligned && four.rising && two.close >= two.ema51 && one.aligned && one.momentum;
-  if (strategy==='ema-cross-retest-2h' ? (triggerTimeframe!=='2h'||!emaCross.valid) : strategy === 'flexible-pullback-2h' ? (!flexibleMacro || triggerTimeframe !== '2h') : !confirmedMacro(analyses)) return reject(strategy==='ema-cross-retest-2h' ? 'Cruzamento, reteste, rompimento ou macro 2H não confirmado' : 'Confirmação multi-tempo insuficiente');
+  if (strategy==='ema-cross-retest-2h' ? (triggerTimeframe!=='2h'||!emaCross.valid) : strategy==='compression-expansion-1h' ? (triggerTimeframe!=='1h'||!early1h.valid) : strategy === 'flexible-pullback-2h' ? (!flexibleMacro || triggerTimeframe !== '2h') : !confirmedMacro(analyses)) return reject(strategy==='ema-cross-retest-2h' ? 'Cruzamento, reteste, rompimento ou macro 2H não confirmado' : 'Confirmação multi-tempo insuficiente');
   const trendValid = !extension.blocked && extension.weekly.close >= extension.weekly.ema22 && d.close >= d.ema51 && d.rsi >= 48 && four.close >= four.ema51 && two.close >= two.ema51 && timing.close >= timing.ema51 && timing.rsi >= 46 && (timing.pivot.bullish || timing.pattern.bullish) && timing.relativeVolume >= .9;
   const pullback = aggressivePullbackCriteria(extension,d,four,two,one);
   const flexiblePullback = flexibleMacro && one.close >= one.ema51 && (one.recentLow <= one.ema9 * 1.02 || one.recentLow <= one.ema22 * 1.02) && (one.pivot.bullish || one.pattern.bullish) && two.close >= two.ema51 && (two.pivot.bullish || two.pattern.bullish || two.momentum) && (one.buyerDominance || one.relativeVolume >= .9);
-  if (!(strategy==='ema-cross-retest-2h'||(strategy === 'trend' ? trendValid : strategy === 'aggressive-pullback' ? pullback.valid : flexiblePullback))) return reject('Condições específicas do setup não confirmadas');
-  if (strategy!=='ema-cross-retest-2h'&&lateEntry(timing,triggerSeries,triggerTimeframe)) return reject('Entrada esticada além do limite');
-  let score = strategy==='ema-cross-retest-2h' ? 90 : strategy === 'trend' ? 58 : 60;
+  if (!(strategy==='ema-cross-retest-2h'||strategy==='compression-expansion-1h'||(strategy === 'trend' ? trendValid : strategy === 'aggressive-pullback' ? pullback.valid : flexiblePullback))) return reject('Condições específicas do setup não confirmadas');
+  if (!['ema-cross-retest-2h','compression-expansion-1h'].includes(strategy)&&lateEntry(timing,triggerSeries,triggerTimeframe)) return reject('Entrada esticada além do limite');
+  let score = strategy==='ema-cross-retest-2h' ? 90 : strategy==='compression-expansion-1h'?85 : strategy === 'trend' ? 58 : 60;
   if (d.momentum) score += strategy === 'flexible-pullback-2h' ? 4 : 8;
   if (four.momentum) score += 10;
   if (two.momentum) score += 8;
@@ -154,24 +161,26 @@ function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS,
   if (timing.pivot.bullish && two.pivot.bullish) score += 8;
   if (timing.relativeVolume >= 1.25) score += 9;
   if (two.strong || timing.strong) score += 7;
+  if (strategy==='compression-expansion-1h'&&early1h.rsiCross) score += 5;
   if ((strategy === 'aggressive-pullback' || strategy === 'flexible-pullback-2h') && timing.pivot.bullish) score += 8;
   score = Math.min(score,100);
   if (score < config.minScore) return reject(`Score ${score}, abaixo do mínimo ${config.minScore}`);
-  const entry = timing.close, previousLow = Math.min(...triggerSeries.slice(-4,-1).map(c => c.low)), stop = previousLow - timing.atr * .12, risk = entry-stop, tp2 = entry+2*risk, tp3 = entry+3*risk;
+  const entry = timing.close, previousLow = Math.min(...triggerSeries.slice(-4,-1).map(c => c.low)), stop = (strategy==='compression-expansion-1h'?Math.max(early1h.baseLow,triggerSeries.at(-1).low):previousLow) - timing.atr * .12, risk = entry-stop, tp2 = entry+2*risk, tp3 = entry+3*risk;
   if (![entry,stop,risk,tp2,tp3].every(Number.isFinite) || risk <= 0) return reject('Risco ou níveis de entrada inválidos');
   const tickerPrice = Number(asset.price ?? asset.lastPrice);
   const latestPrice = Number.isFinite(tickerPrice) && tickerPrice > 0 ? tickerPrice : series?.['1h']?.at(-1)?.close ?? series?.['2h']?.at(-1)?.close ?? series?.['4h']?.at(-1)?.close;
   if (Number.isFinite(latestPrice) && latestPrice <= stop) return reject(`Sinal vencido: preço atual ${latestPrice.toFixed(8)} já rompeu o stop ${stop.toFixed(8)}`);
   if (Number.isFinite(latestPrice) && latestPrice >= tp2) return reject(`Sinal vencido: preço atual ${latestPrice.toFixed(8)} já atingiu o TP 2R ${tp2.toFixed(8)}`);
-  if (Number.isFinite(latestPrice)) { const progress = (latestPrice-entry)/Math.max(tp2-entry,Number.EPSILON); if (progress >= .5) return reject(`Entrada esticada: preço atual já percorreu ${(progress*100).toFixed(0)}% do caminho até o TP 2R`); }
+  const maxEntry=(tp2+config.minimumRewardRisk*stop)/(1+config.minimumRewardRisk);
+  if (Number.isFinite(latestPrice)) { const progress = (latestPrice-entry)/Math.max(tp2-entry,Number.EPSILON); if (progress >= .5) return reject(`Entrada esticada: preço atual já percorreu ${(progress*100).toFixed(0)}% do caminho até o TP 2R`); if (latestPrice>maxEntry) return reject('Entrada expirada: limite de preço para preservar risco-retorno'); }
   if (Number.isFinite(latestPrice) && config.maxEntryDeviationPct > 0) { const deviation = Math.abs(latestPrice/entry-1)*100; if (deviation > config.maxEntryDeviationPct) return reject(`Entrada distante do preço atual (${deviation.toFixed(1)}% acima do limite de ${config.maxEntryDeviationPct.toFixed(1)}%)`); }
   const riskPct=Math.abs(risk/entry), highRisk=riskPct>.04;
   if (riskPct > .08) return reject(`Stop muito distante (${(riskPct*100).toFixed(1)}%)`);
   if ((tp2-entry)/entry < .03) return reject('Alvo 2R abaixo do mínimo de 3%');
-  if (timing.levels.resistance && timing.levels.resistance-entry < 2*risk) return reject('Resistência não deixa espaço mínimo de 2R');
+  if (strategy!=='compression-expansion-1h' && timing.levels.resistance && timing.levels.resistance-entry < 2*risk) return reject('Resistência não deixa espaço mínimo de 2R');
   const stretchPct = timing.ema9 ? (entry / timing.ema9 - 1) * 100 : 0, stretchWarning = stretchPct > 0 ? `Entrada esticada em ${stretchPct.toFixed(1)}% vs EMA9` : 'Entrada sem esticamento vs EMA9';
-  const triggerLabel=strategy==='ema-cross-retest-2h'?'EMA 9 cruzou 22/52 · reteste confirmado · rompimento fechado':(timing.pattern.bullish ? timing.pattern.name : timing.pivot.label);
-  return { ...asset, source:asset.source||'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], tier:score>=90?'VALIDATED':'WATCH', tierLabel:score>=90?'ENTRADA VALIDADA':'SETUP FORTE · AGUARDAR CONFIRMAÇÃO', triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:timing.relativeVolume, context:strategy==='ema-cross-retest-2h'?'Macro LONG: 1W · 1D · 4H, com cruzamento/reteste em 2H':'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H', trigger:`${triggerLabel} · RSI ${timing.rsi.toFixed(1)} · volume ${timing.relativeVolume.toFixed(2)}x · ${stretchWarning}`, entryStretchPct:stretchPct, entryWarning:highRisk?'Risco acima de 4%; somente SPOT, sem alavancagem':stretchWarning, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, lateEntryAllowed:false, riskPct, maxLeverage:config.enforceRiskPolicy?(highRisk?1:2):3, riskTier:config.enforceRiskPolicy?(highRisk?'HIGH_RISK_SPOT':'STANDARD_LEVERAGE_2X'):null, engineVersion:VERSION };
+  const triggerLabel=strategy==='ema-cross-retest-2h'?'EMA 9 cruzou 22/52 · reteste confirmado · rompimento fechado':strategy==='compression-expansion-1h'?'Base comprimida · rompimento inicial com volume e RSI':(timing.pattern.bullish ? timing.pattern.name : timing.pivot.label);
+  return { ...asset, source:asset.source||'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], tier:score>=90?'VALIDATED':'WATCH', tierLabel:score>=90?'ENTRADA VALIDADA':'SETUP FORTE · AGUARDAR CONFIRMAÇÃO', triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, maxEntry, minimumRewardRisk:config.minimumRewardRisk, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:strategy==='compression-expansion-1h'?early1h.volumeRatio:timing.relativeVolume, context:strategy==='compression-expansion-1h'?'Antecipação 1H: base comprimida, expansão com volume e RSI; diário/4H sem viés baixista':strategy==='ema-cross-retest-2h'?'Macro LONG: 1W · 1D · 4H, com cruzamento/reteste em 2H':'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H', trigger:`${triggerLabel} · RSI ${timing.rsi.toFixed(1)} · volume ${timing.relativeVolume.toFixed(2)}x · ${stretchWarning}`, entryStretchPct:stretchPct, entryWarning:highRisk?'Risco acima de 4%; somente SPOT, sem alavancagem':stretchWarning, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, lateEntryAllowed:false, riskPct, maxLeverage:config.enforceRiskPolicy?(highRisk?1:2):3, riskTier:config.enforceRiskPolicy?(highRisk?'HIGH_RISK_SPOT':'STANDARD_LEVERAGE_2X'):null, engineVersion:VERSION };
 }
 function evaluate(asset, series, options = DEFAULTS, diagnostics = null) {
   const config = settings(options), analyses = analyseSet(series);
@@ -179,7 +188,7 @@ function evaluate(asset, series, options = DEFAULTS, diagnostics = null) {
   if (!Number.isFinite(volume) || volume < config.minVolume) { if (diagnostics) diagnostics.push({strategy:'geral',reason:`Volume do par abaixo de US$ ${config.minVolume.toLocaleString('en-US')}`}); return null; }
   const strategies = config.strategies || (config.strategy === 'both' ? Object.keys(STRATEGIES) : [config.strategy]);
   const attempts = strategies.flatMap(strategy => {
-    const timeframes=strategy==='flexible-pullback-2h'||strategy==='ema-cross-retest-2h'?['2h']:['1h','2h','4h'];
+    const timeframes=strategy==='compression-expansion-1h'?['1h']:strategy==='flexible-pullback-2h'||strategy==='ema-cross-retest-2h'?['2h']:['1h','2h','4h'];
     return timeframes.map(triggerTimeframe=>{const trace={strategy:`${strategy} · ${triggerTimeframe.toUpperCase()}`,reason:null};const signal=evaluateAnalyses(asset,series,analyses,strategy,config,triggerTimeframe,trace);if(diagnostics)diagnostics.push(trace);return signal;});
   });
   return attempts.filter(Boolean).sort(compareSignals)[0] || null;
@@ -285,5 +294,5 @@ async function scanMarket(getJson,options=DEFAULTS,onProgress=()=>{}) {
   return {signals:selected,assets:universe.assets.length,eligibleAssets:universe.assets.length,requestedLimit:universe.requestedLimit,rankingCandidates:universe.rankingCandidates,diagnostics,mode:universe.mode,failures,warnings,asOf,config,engineVersion:VERSION};
 }
 
-return Object.freeze({last,sma,ema,rsi,atr,macd,adx,stochRsi,candlePattern,bullishPivot,supportResistance,weeklyExtension,analyseTimeframe,lateEntry,pullbackStochCriteria,aggressivePullbackCriteria,pullback1hConfirmationCriteria,VERSION,SOURCES,DEFAULTS,STRATEGIES,settings,closedCandles,confirmedMacro,analyseSet,evaluateAnalyses,evaluate,compareSignals,consolidate,isFresh,rankingLabel,marketUniverse,fetchSeries,vehicle,scanMarket});
+return Object.freeze({last,sma,ema,rsi,atr,macd,adx,stochRsi,candlePattern,bullishPivot,supportResistance,weeklyExtension,analyseTimeframe,lateEntry,pullbackStochCriteria,aggressivePullbackCriteria,pullback1hConfirmationCriteria,compressionExpansion1hCriteria,VERSION,SOURCES,DEFAULTS,STRATEGIES,settings,closedCandles,confirmedMacro,analyseSet,evaluateAnalyses,evaluate,compareSignals,consolidate,isFresh,rankingLabel,marketUniverse,fetchSeries,vehicle,scanMarket});
 });
