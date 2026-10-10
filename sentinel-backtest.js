@@ -82,7 +82,7 @@ function breakout30EmaCriteria(candles, timing, mode = 'close', lookback = 30) {
   return { valid: valid && alignment && rsiOk, rangeHigh, alignment, volumeOk, rsiOk, breakoutSize };
 }
 function historicalSetup(week, day, h4, h2, h1, strategy, triggerTimeframe = '1h', emaCandles = h1, options = {}) {
-  if (['trend','aggressive-pullback','flexible-pullback-2h','ema-cross-retest-2h'].includes(strategy)) {
+  if (['trend','aggressive-pullback','flexible-pullback-2h','ema-cross-retest-2h','compression-expansion-1h'].includes(strategy)) {
     const series={'1w':week,'1d':day,'4h':h4,'2h':h2,'1h':h1};
     const signal=SentinelCore.evaluateAnalyses({symbol:'BACKTEST',volume:1000000},series,SentinelCore.analyseSet(series),strategy,{minScore:options.minScore||90},triggerTimeframe);
     return signal ? {entry:signal.entry,stop:signal.stop,target:signal.tp2,score:signal.score} : null;
