@@ -972,14 +972,14 @@
     <section class="panel" id="rsiFinderPanel">
       <div class="section-heading"><div><p class="eyebrow">BUSCADOR DE SOBREVENDIDOS</p><h2>RSI ≤ 30 nos ativos selecionados</h2></div><p class="muted">Leitura informativa com candles fechados; não cria sinal nem ordem.</p></div>
       <div class="controls" aria-label="Buscador de RSI"><label>RSI máximo <input id="rsiFinderThreshold" type="number" min="1" max="50" step="1" value="30" /></label><label>Universo <select id="rsiFinderLimit"><option value="100">Top 100</option><option value="200">Top 200</option><option value="400">Top 400</option><option value="700" selected>Top 700</option><option value="all">Todos os elegíveis</option></select></label><button id="rsiFinderButton" class="primary" type="button">Varrer top 700</button><p id="rsiFinderStatus" class="muted">Escolha o universo. “Todos” considera todos os ativos de cripto elegíveis dentro do top 700. A ordem prioriza Diário, 8H, 4H, 2H e 1H.</p></div>
-      <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Diário</th><th>8H</th><th>4H</th><th>2H</th><th>1H</th><th>Maior tempo em sobrevenda</th><th>Volume 24h</th></tr></thead><tbody id="rsiFinderBody"><tr><td colspan="8" class="empty">Escolha o universo e clique em “Varrer” para procurar RSI em sobrevenda.</td></tr></tbody></table></div>
+      <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Capitalização</th><th>Diário</th><th>8H</th><th>4H</th><th>2H</th><th>1H</th><th>Maior tempo em sobrevenda</th><th>Volume 24h</th><th>Leitura técnica</th><th>Pressão média</th></tr></thead><tbody id="rsiFinderBody"><tr><td colspan="11" class="empty">Escolha o universo e clique em “Varrer” para procurar RSI em sobrevenda.</td></tr></tbody></table></div>
     </section>
   </main>
   <dialog id="entryDialog"><form method="dialog" id="entryForm"><div class="dialog-heading"><h2>Registrar entrada</h2><button value="cancel" class="icon-button" aria-label="Fechar">×</button></div><p id="entrySetup"></p><label>Preço executado <input id="executedPrice" type="number" step="any" required /></label><label>Valor aplicado (US$) <input id="tradeNotional" type="number" min="0" step="0.01" placeholder="Opcional, para calcular em R$" /></label><label>Data e hora <input id="entryTime" type="datetime-local" required /></label><label>Observação opcional <textarea id="tradeNote" rows="3" placeholder="Ex.: entrada parcial, motivo, contexto"></textarea></label><div class="dialog-actions"><button value="cancel" class="secondary">Cancelar</button><button id="saveTrade" value="default" class="primary">Confirmar entrada</button></div></form></dialog>
   <footer>Dados de mercado: CoinGecko, CoinMarketCap, CoinPaprika, Binance e OKX. Registros: somente neste navegador.</footer>
-<script src="sentinel-core.js?v=20261012-rsi700"></script>
+<script src="sentinel-core.js?v=20261012-rsi-context"></script>
   <script src="sentinel-backtest.js?v=20261007b"></script>
-<script src="app.js?v=20261012-rsi-options"></script>
+<script src="app.js?v=20261012-rsi-context"></script>
   <script>
     (() => {
       const syncOrbit = () => {
