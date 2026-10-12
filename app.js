@@ -293,25 +293,25 @@ const RSI_FINDER_TIMEFRAMES = [{ key: '1d', label: 'Diário' }, { key: '8h', lab
 function latestRsi(candleSeries) { const values = rsi(candleSeries.map(candle => candle.close), 14); const value = values.at(-1); return Number.isFinite(value) ? value : null; }
 function rsiFinderCell(value, threshold) { return value == null ? '—' : `<span class="${value <= threshold ? 'negative' : ''}">${num(value, 1)}${value <= threshold ? ' ✓' : ''}</span>`; }
 async function scanOversoldRsi() {
-  const threshold = Number($('rsiFinderThreshold').value), button = $('rsiFinderButton'), status = $('rsiFinderStatus'), body = $('rsiFinderBody');
+  const threshold = Number($('rsiFinderThreshold').value), selectedLimit = $('rsiFinderLimit')?.value || '700', requestedLimit = selectedLimit === 'all' ? 700 : Number(selectedLimit), requestedLabel = selectedLimit === 'all' ? 'todos os elegíveis do top 700' : `top ${requestedLimit}`, button = $('rsiFinderButton'), status = $('rsiFinderStatus'), body = $('rsiFinderBody');
   if (!Number.isFinite(threshold) || threshold < 1 || threshold > 50) { status.textContent = 'Informe um RSI entre 1 e 50.'; return; }
   button.disabled = true; button.textContent = 'Preparando leitura…'; body.innerHTML = '<tr><td colspan="8" class="empty">Consultando ranking e candles fechados…</td></tr>';
   try {
-    const config = SentinelCore.settings({ assetLimit: 700, minVolume: 0, minScore: 0, strategy: 'both' });
+    const config = SentinelCore.settings({ assetLimit: requestedLimit, minVolume: 0, minScore: 0, strategy: 'both' });
     const universeResult = await SentinelCore.marketUniverse(getJson, config);
-    const assets = universeResult.assets.filter(asset => !asset.tokenized && asset.assetClass !== 'TRADFI_TOKENIZED').slice(0, 700);
+    const assets = universeResult.assets.filter(asset => !asset.tokenized && asset.assetClass !== 'TRADFI_TOKENIZED').slice(0, requestedLimit);
     const matches = await concurrentMap(assets, 4, async asset => {
       const [daily, hourly] = await Promise.all([candles(asset, '1d'), candles(asset, '1h')]);
       const series = { '1d': daily, '8h': resampleCandles(hourly, 8), '4h': resampleCandles(hourly, 4), '2h': resampleCandles(hourly, 2), '1h': hourly };
       const values = Object.fromEntries(RSI_FINDER_TIMEFRAMES.map(({ key }) => [key, latestRsi(series[key]) ]));
       const first = RSI_FINDER_TIMEFRAMES.findIndex(({ key }) => values[key] != null && values[key] <= threshold);
       return first < 0 ? null : { asset, values, first };
-    }, (done, total) => { status.textContent = `Lendo RSI em candles fechados: ${done}/${total} ativos elegíveis do top 700…`; });
+    }, (done, total) => { status.textContent = `Lendo RSI em candles fechados: ${done}/${total} ativos elegíveis de ${requestedLabel}…`; });
     matches.sort((a, b) => (a.first - b.first) || ((a.values[RSI_FINDER_TIMEFRAMES[a.first].key] || 101) - (b.values[RSI_FINDER_TIMEFRAMES[b.first].key] || 101)) || ((b.asset.volume24h || b.asset.volume || 0) - (a.asset.volume24h || a.asset.volume || 0)));
     body.innerHTML = matches.length ? matches.map(({ asset, values, first }) => `<tr><td><strong>${escapeHtml(asset.symbol.replace(/USDT$/, ''))}</strong><div class="sub">#${asset.rank || '—'} · ${escapeHtml(asset.source || '—')}</div></td>${RSI_FINDER_TIMEFRAMES.map(({ key }) => `<td>${rsiFinderCell(values[key], threshold)}</td>`).join('')}<td><strong>${RSI_FINDER_TIMEFRAMES[first].label}</strong></td><td>${money(asset.volume24h || asset.volume || 0)}</td></tr>`).join('') : '<tr><td colspan="8" class="empty">Nenhum ativo elegível ficou com RSI dentro do limite nesta leitura.</td></tr>';
-    status.textContent = `${matches.length} ativo(s) com RSI ≤ ${num(threshold, 0)}. Ordem: Diário → 8H → 4H → 2H → 1H; dentro do grupo, RSI mais baixo primeiro. Universo: ${assets.length} ativos de cripto elegíveis do top 700.`;
+    status.textContent = `${matches.length} ativo(s) com RSI ≤ ${num(threshold, 0)}. Ordem: Diário → 8H → 4H → 2H → 1H; dentro do grupo, RSI mais baixo primeiro. Universo: ${assets.length} ativos de cripto elegíveis de ${requestedLabel}.`;
   } catch (error) { body.innerHTML = '<tr><td colspan="8" class="empty">Não foi possível concluir a leitura agora.</td></tr>'; status.textContent = `Não foi possível concluir o Buscador: ${error.message}`; }
-  finally { button.disabled = false; button.textContent = 'Varrer top 700'; }
+  finally { button.disabled = false; button.textContent = selectedLimit === 'all' ? 'Varrer todos' : `Varrer top ${requestedLimit}`; }
 }
 const { backtestPortfolio } = SentinelBacktest;
 function renderBacktest(trades, startingCapital, slots = 10) {
