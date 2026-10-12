@@ -248,7 +248,7 @@ async function marketUniverse(getJson, options = DEFAULTS) {
     if(!rows.length){warnings.push(`${source}: ranking sem ativos válidos`);return;}
     rankings[source]=rows.length;
     const symbols=new Map();for(const c of rows){const symbol=String(c.symbol).toUpperCase();symbols.set(symbol,(symbols.get(symbol)||0)+1);}
-    for(const c of rows){const symbol=`${String(c.symbol).toUpperCase()}USDT`;if(symbols.get(String(c.symbol).toUpperCase())>1){if(pairs.has(symbol)||mexcPairs.has(symbol))warnings.push(`${source}: símbolo ambíguo ${symbol}, ignorado nessa fonte`);continue;}const old=merged.get(symbol)||{symbol,name:c.name,rank:c.rank,rankingSources:[],rankings:{}};old.rank=Math.min(old.rank,c.rank);old.rankingSources.push(source);old.rankings[source]=c.rank;merged.set(symbol,old);}
+    for(const c of rows){const symbol=`${String(c.symbol).toUpperCase()}USDT`;if(symbols.get(String(c.symbol).toUpperCase())>1){if(pairs.has(symbol)||mexcPairs.has(symbol))warnings.push(`${source}: símbolo ambíguo ${symbol}, ignorado nessa fonte`);continue;}const old=merged.get(symbol)||{symbol,name:c.name,rank:c.rank,rankingSources:[],rankings:{}};const marketCap=Number(c.market_cap||c.quote?.USD?.market_cap||0);old.rank=Math.min(old.rank,c.rank);old.marketCap=Math.max(Number(old.marketCap)||0,Number.isFinite(marketCap)?marketCap:0);old.rankingSources.push(source);old.rankings[source]=c.rank;merged.set(symbol,old);}
   });
   const tradfiBases=new Set(['OIL','WTI','BRENT','GOLD','SILVER','NVDA','TSLA','AAPL','AMZN','META','COIN','MSTR','NFLX','MSFT','GOOGL','GOOG','MCD','HOOD','CRCL','MU','SOXL','SOXS','HAL','CORZ','SPY','QQQ','ITA','IWF','IWN','IWV','WFC']);
   const tokenizedSymbols=[...mexcPairs.keys()].filter(symbol=>{
