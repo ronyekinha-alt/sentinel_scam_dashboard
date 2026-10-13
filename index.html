@@ -858,7 +858,7 @@
     #rsiFinderPanel .primary { background:#102a43 !important; color:#fff !important; box-shadow:none !important; }
     #rsiFinderPanel .table-wrap { padding:0 16px 16px !important; background:#fff !important; }
     #rsiFinderPanel table { border-collapse:separate !important; border-spacing:0 8px !important; min-width:940px; background:#fff !important; }
-    #rsiFinderPanel thead th { background:#173f67 !important; color:#fff !important; border:0 !important; font-size:13px !important; letter-spacing:.25px !important; text-transform:none !important; text-shadow:none !important; }
+    #rsiFinderPanel thead th { position:sticky; top:0; z-index:12; background:#173f67 !important; color:#fff !important; border:0 !important; font-size:13px !important; letter-spacing:.25px !important; text-transform:none !important; text-shadow:none !important; box-shadow:0 3px 8px rgba(16,42,67,.32); }
     #rsiFinderPanel thead th:first-child { border-radius:4px 0 0 4px; }
     #rsiFinderPanel thead th:last-child { border-radius:0 4px 4px 0; }
     #rsiFinderPanel tbody tr, #rsiFinderPanel tbody tr:nth-child(even), #rsiFinderPanel tbody tr:nth-child(odd) { background:#fff !important; box-shadow:0 1px 3px rgba(16,42,67,.12) !important; }
@@ -868,6 +868,7 @@
     #rsiFinderPanel tbody tr:hover td { background:#edf6ff !important; color:#0b2545 !important; }
     #rsiFinderPanel .sub { color:#486581 !important; font-weight:600; }
     #rsiFinderPanel .negative { display:inline-block; padding:3px 7px; border:1px solid #e7a3ad; border-radius:4px; background:#ffe7ea !important; color:#8d1225 !important; font-weight:800; text-shadow:none !important; }
+    #rsiFinderPanel tbody td span:not(.negative) { color:#102a43 !important; font-weight:700 !important; text-shadow:none !important; }
     #rsiFinderPanel tbody td.finder-pressure { color:#101820 !important; font-weight:800; }
     #rsiFinderPanel tbody td.finder-pressure.positive { background:#d9f7df !important; border-color:#91d5a2 !important; }
     #rsiFinderPanel tbody td.finder-pressure.negative { background:#ffe1e1 !important; border-color:#f0a3a3 !important; }
