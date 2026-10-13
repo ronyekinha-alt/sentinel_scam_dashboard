@@ -239,6 +239,9 @@ function compareSignals(a,b) {
 function consolidate(signals, limit = 20) { const seen=new Set(); return signals.slice().sort(compareSignals).filter(s=>{if(seen.has(s.symbol))return false; seen.add(s.symbol); return true;}).slice(0,limit); }
 function isFresh(signal, previous, now = Date.now()) {
   if (!previous) return true;
+  // Um setup novo para o mesmo ativo deve ser comunicado: o histórico não pode
+  // ocultar a recuperação RSI/EMA só porque outra estratégia já alertou a vela.
+  if (previous.strategy && signal.strategy && previous.strategy !== signal.strategy) return true;
   // A previously processed closed candle never becomes new merely through elapsed time.
   if (previous.candleTime && Number(previous.candleTime) === Number(signal.candleTime)) return false;
   return now-Number(previous.at) > 12*3600000 || Math.abs(signal.entry-previous.entry)/Math.max(signal.entry,1e-12) >= .015;
