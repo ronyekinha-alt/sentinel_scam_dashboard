@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 26281)
-Total output lines: 1004
-
 <!doctype html>
 <html lang="pt-BR">
   <head>
@@ -569,7 +566,76 @@ Total output lines: 1004
       #importedTradesPanel > .section-heading:has(#mexcWeekdayNote) > div:last-child { grid-template-columns:1fr; }
       #importedTradesPanel > .section-heading:has(#mexcWeekdayNote) #mexcWeekdayNote { grid-column:1; }
     }
-    /…2281 tokens truncated…(circle at 35% 28%,rgba(196,137,20,.86),rgba(43,28,5,.98) 72%) !important; box-shadow:0 0 0 8px rgba(255,211,83,.14),0 0 32px rgba(255,196,49,.7),0 0 62px rgba(255,196,49,.32),inset 0 0 30px rgba(255,211,83,.32) !important; }
+    /* MEXC performance values: neon lettering only, with neutral card surfaces. */
+    #importedTradesPanel .stats .mexc-metric-gain .value,
+    #importedTradesPanel .stats .mexc-metric-gain .value.positive { color:#7dffad !important; background:transparent !important; padding:0 !important; border-radius:0 !important; box-shadow:none !important; text-shadow:0 0 5px #00ff77,0 0 13px rgba(0,255,119,.78) !important; }
+    #importedTradesPanel .stats .mexc-metric-loss .value,
+    #importedTradesPanel .stats .mexc-metric-loss .value.negative { color:#ff9bb3 !important; background:transparent !important; padding:0 !important; border-radius:0 !important; box-shadow:none !important; text-shadow:0 0 5px #ff3769,0 0 13px rgba(255,55,105,.8) !important; }
+    #importedTradesPanel .stats .value.zero,
+    #mexcLivePanel .stats .value.zero { color:#9cf5ff !important; background:transparent !important; padding:0 !important; box-shadow:none !important; text-shadow:0 0 6px #32dfff,0 0 13px rgba(50,223,255,.7) !important; }
+    #importedTradesPanel .stats .value.positive, #mexcLivePanel .stats .value.positive,
+    #importedTradesPanel .stats .value.negative, #mexcLivePanel .stats .value.negative { background:transparent !important; padding:0 !important; border-radius:0 !important; box-shadow:none !important; }
+    #mexcLivePanel .stats .value.positive { color:#7dffad !important; text-shadow:0 0 5px #00ff77,0 0 13px rgba(0,255,119,.78) !important; }
+    #mexcLivePanel .stats .value.negative { color:#ff9bb3 !important; text-shadow:0 0 5px #ff3769,0 0 13px rgba(255,55,105,.8) !important; }
+    #importedTradesPanel .mexc-results-pagination { display:flex; flex-wrap:wrap; align-items:center; gap:12px; background:linear-gradient(145deg,rgba(8,27,55,.96),rgba(4,15,33,.98)) !important; border:1px solid rgba(73,198,255,.5) !important; }
+    #importedTradesPanel .mexc-results-pagination label { display:flex; align-items:center; gap:10px; color:#e8faff !important; font-weight:700; white-space:nowrap; }
+    #importedTradesPanel .mexc-results-pagination select { color:#f4fdff !important; background:#0a1c38 !important; border:1px solid #59dfff !important; min-width:78px; }
+    #importedTradesPanel .mexc-results-pagination #mexcResultsPageText { color:#e3f7ff !important; text-shadow:0 0 8px rgba(73,198,255,.45); font-weight:700; }
+    #importedTradesPanel .mexc-results-pagination button.secondary { color:#f2eaff !important; background:rgba(95,47,164,.48) !important; border:1px solid #bd91ff !important; text-shadow:0 0 8px rgba(220,190,255,.7) !important; box-shadow:0 0 12px rgba(165,92,255,.26); }
+    #importedTradesPanel .mexc-results-pagination button:disabled { opacity:.48; cursor:not-allowed; }
+    #importedTradesPanel .mexc-results-pagination .muted { color:#e3f7ff !important; }
+    /* Weekday and history tables: keep the neon signal in the lettering only. */
+    #importedTradesPanel #mexcWeekdayBody td.positive,
+    #importedTradesPanel #mexcWeekdayBody td.negative,
+    #importedTradesPanel #mexcWeekdayBody td.zero,
+    #importedTradesPanel #mexcWeekdayBody td.result-win,
+    #importedTradesPanel #mexcWeekdayBody td.result-loss,
+    #importedTradesPanel #mexcBalanceHistoryBody td.positive,
+    #importedTradesPanel #mexcBalanceHistoryBody td.negative,
+    #importedTradesPanel #mexcBalanceHistoryBody td.zero,
+    #importedTradesPanel #mexcResultsBody td.positive,
+    #importedTradesPanel #mexcResultsBody td.negative,
+    #importedTradesPanel #mexcResultsBody td.zero,
+    #importedTradesPanel #mexcResultsBody td.result-win,
+    #importedTradesPanel #mexcResultsBody td.result-loss {
+      background:transparent !important; box-shadow:none !important; border-radius:0 !important; padding-left:14px !important; padding-right:14px !important;
+    }
+    #importedTradesPanel #mexcWeekdayBody td.positive,
+    #importedTradesPanel #mexcBalanceHistoryBody td.positive,
+    #importedTradesPanel #mexcResultsBody td.positive,
+    #importedTradesPanel #mexcWeekdayBody td.result-win,
+    #importedTradesPanel #mexcResultsBody td.result-win { color:#83ffb3 !important; font-size:14px; font-weight:900 !important; text-shadow:0 0 2px rgba(131,255,179,.72),0 0 5px rgba(0,255,119,.34) !important; }
+    #importedTradesPanel #mexcWeekdayBody td.negative,
+    #importedTradesPanel #mexcBalanceHistoryBody td.negative,
+    #importedTradesPanel #mexcResultsBody td.negative,
+    #importedTradesPanel #mexcWeekdayBody td.result-loss,
+    #importedTradesPanel #mexcResultsBody td.result-loss { color:#ff9bad !important; font-size:14px; font-weight:900 !important; text-shadow:0 0 2px rgba(255,155,173,.72),0 0 5px rgba(255,55,105,.34) !important; }
+    #importedTradesPanel #mexcWeekdayBody td.zero,
+    #importedTradesPanel #mexcBalanceHistoryBody td.zero,
+    #importedTradesPanel #mexcResultsBody td.zero { color:#9cf5ff !important; font-size:14px; font-weight:850 !important; text-shadow:0 0 2px rgba(156,245,255,.7),0 0 5px rgba(50,223,255,.32) !important; }
+    /* The orbit uses live counts only; sample tickers from the concept are intentionally absent. */
+    .orbit-status { right:7%; min-width:300px; padding:24px 28px; border-radius:22px; background:linear-gradient(145deg,rgba(7,22,52,.96),rgba(5,13,35,.98)); box-shadow:0 0 0 6px rgba(168,117,255,.06),0 0 35px rgba(168,117,255,.42),inset 0 0 24px rgba(73,198,255,.12); }
+    .orbit-status h3 { font-size:16px; letter-spacing:1.6px; text-shadow:0 0 12px rgba(220,190,255,.7); margin-bottom:17px; }
+    .orbit-status p { display:flex; align-items:center; gap:8px; margin:13px 0; font-size:14px; color:#f2fbff !important; text-shadow:0 0 8px rgba(73,198,255,.38); }
+    .orbit-status p span { color:#ffffff !important; font-size:16px; font-weight:900; text-shadow:0 0 10px rgba(73,246,255,.85); }
+    .orbit-status .dot { flex:0 0 11px; width:11px; height:11px; margin:0 3px 0 0; }
+    .orbit-globe { left:36%; width:190px; height:190px; }
+    #signalsPanel tbody td:nth-child(2) .tag.live { background:rgba(0,92,58,.62) !important; border:1px solid #54ff9b !important; color:#aaffcf !important; text-shadow:0 0 8px rgba(84,255,155,.85) !important; box-shadow:0 0 12px rgba(84,255,155,.24); }
+    #signalsPanel tbody td:nth-child(2) .tag.tp2 { background:rgba(12,53,82,.9) !important; border:1px solid #55e7ff !important; color:#c9fbff !important; text-shadow:0 0 8px rgba(85,231,255,.8) !important; }
+    #signalsPanel tbody td:nth-child(2) .timeframe-badge { color:#c9fbff !important; background:rgba(8,43,70,.95) !important; border:1px solid #55e7ff !important; text-shadow:0 0 8px rgba(85,231,255,.8) !important; box-shadow:0 0 12px rgba(85,231,255,.32) !important; }
+    #signalsPanel tbody td:nth-child(7) .tag.tp1,
+    #signalsPanel tbody td:nth-child(7) .tag.tp2 { display:inline-flex; align-items:center; justify-content:center; min-width:34px; min-height:24px; color:#d9fbff !important; background:rgba(9,44,76,.96) !important; border:1px solid #50ddff !important; text-shadow:0 0 8px rgba(80,221,255,.95) !important; box-shadow:0 0 12px rgba(80,221,255,.35) !important; }
+    @media (max-width:900px) { .orbit-status { right:3%; min-width:260px; } .orbit-globe { left:30%; } }
+    @media (max-width:650px) { .orbit-status { left:50%; right:auto; bottom:12px; top:auto; transform:translateX(-50%); min-width:min(300px,90%); padding:14px 18px; } .orbit-status p { margin:8px 0; font-size:12px; } .orbit-globe { left:50%; top:30%; width:150px; height:150px; } }
+    /* Neon luminoso para as esferas da auditoria, seguindo o mockup. */
+    #scannerAuditMetrics .audit-metric { filter:brightness(1.12); border-width:2px !important; box-shadow:0 0 0 8px rgba(86,190,255,.12),0 0 28px rgba(54,168,255,.58),0 0 58px rgba(54,168,255,.28),inset 0 0 28px rgba(56,181,255,.28) !important; }
+    #scannerAuditMetrics .audit-metric::after { inset:-11px; border:1px solid rgba(125,220,255,.62); box-shadow:0 0 14px rgba(73,198,255,.48),inset 0 0 12px rgba(73,198,255,.18); }
+    #scannerAuditMetrics .audit-metric span { color:#f1fbff !important; text-shadow:0 0 7px rgba(150,225,255,.82),0 0 15px rgba(73,198,255,.54) !important; }
+    #scannerAuditMetrics .audit-metric strong { color:#e9fbff !important; text-shadow:0 0 5px #fff,0 0 13px #48dfff,0 0 28px rgba(42,156,255,.96) !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(2) { border-color:#55ffad !important; background:radial-gradient(circle at 35% 28%,rgba(13,191,130,.82),rgba(2,35,39,.98) 72%) !important; box-shadow:0 0 0 8px rgba(65,255,162,.14),0 0 32px rgba(37,255,153,.76),0 0 62px rgba(37,255,153,.34),inset 0 0 30px rgba(65,255,162,.34) !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(2)::after { border-color:rgba(83,255,166,.78); box-shadow:0 0 18px rgba(37,255,153,.68),inset 0 0 13px rgba(37,255,153,.24); }
+    #scannerAuditMetrics .audit-metric:nth-child(2) strong { color:#9dffd0 !important; text-shadow:0 0 5px #fff,0 0 14px #42ff9e,0 0 30px #00dc82 !important; }
+    #scannerAuditMetrics .audit-metric:nth-child(3) { border-color:#ffdb68 !important; background:radial-gradient(circle at 35% 28%,rgba(196,137,20,.86),rgba(43,28,5,.98) 72%) !important; box-shadow:0 0 0 8px rgba(255,211,83,.14),0 0 32px rgba(255,196,49,.7),0 0 62px rgba(255,196,49,.32),inset 0 0 30px rgba(255,211,83,.32) !important; }
     #scannerAuditMetrics .audit-metric:nth-child(3)::after { border-color:rgba(255,220,105,.8); box-shadow:0 0 18px rgba(255,196,49,.62); }
     #scannerAuditMetrics .audit-metric:nth-child(3) strong { color:#fff0a6 !important; text-shadow:0 0 5px #fff,0 0 14px #ffdb68,0 0 30px #ffb900 !important; }
     #scannerAuditMetrics .audit-metric:nth-child(4) { border-color:#ff4f7c !important; background:radial-gradient(circle at 35% 28%,rgba(190,24,74,.84),rgba(45,5,28,.98) 72%) !important; box-shadow:0 0 0 8px rgba(255,55,105,.14),0 0 32px rgba(255,47,100,.76),0 0 62px rgba(255,47,100,.34),inset 0 0 30px rgba(255,55,105,.34) !important; }
@@ -825,7 +891,7 @@ Total output lines: 1004
     <section class="controls" aria-label="Filtros do scanner">
       <label class="scanner-limit-filter">Top por ranking ou volume 24h <select id="assetLimit"><option value="50">50</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="700" selected>700</option></select></label>
       <label class="scanner-score-filter" title="Score é uma pontuação de confluência técnica, não uma probabilidade matemática garantida.">Score mínimo <select id="minScore"><option value="85">85</option><option value="90">90</option><option value="100">100</option><option value="0" selected>Todos os Scores</option></select><span class="sub">85, 90, 100 ou todos · mesmo score do Telegram</span></label>
-      <fieldset class="filter-group scanner-strategy-filter" id="scannerStrategyFilters"><legend>Estratégia do scanner <span>selecione uma ou mais</span></legend><label class="filter-option filter-all"><input type="checkbox" data-backtest-all="scannerStrategy" checked /> Selecionar todos</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="trend" checked /> Tendência + pivô</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="aggressive-pullback" checked /> Pullback 2H + confirmação 4H</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="flexible-pullback-2h" checked /> Pullback 2H · diário flexível</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="ema-cross-retest-2h" checked /> Cruzamento EMA 9 + reteste 22/52 · 2H</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="compression-expansion-1h" checked /> Compressão + expansão inicial · 1H</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="rsi-ema-recovery" checked /> Experimental · recuperação RSI + EMA 8/22/80</label><span id="strategyHelp" class="sub">Executa os seis critérios e mantém primeiro os sinais validados; o experimental exige confirmação manual no gráfico.</span></fieldset>
+      <fieldset class="filter-group scanner-strategy-filter" id="scannerStrategyFilters"><legend>Estratégia do scanner <span>selecione uma ou mais</span></legend><label class="filter-option filter-all"><input type="checkbox" data-backtest-all="scannerStrategy" checked /> Selecionar todos</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="trend" checked /> Tendência + pivô</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="aggressive-pullback" checked /> Pullback 2H + confirmação 4H</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="flexible-pullback-2h" checked /> Pullback 2H · diário flexível</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="ema-cross-retest-2h" checked /> Cruzamento EMA 9 + reteste 22/52 · 2H</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="compression-expansion-1h" checked /> Compressão + expansão inicial · 1H</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="rsi-ema-recovery" checked /> Experimental · recuperação RSI + EMA 8/22/80</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="bearish-breakdown" checked /> SHORT · tendência baixista + rompimento</label><span id="strategyHelp" class="sub">Executa os sete critérios e mantém primeiro os sinais validados; os experimentais exigem confirmação manual no gráfico.</span></fieldset>
       <label class="scanner-volume-filter">Volume mínimo 24h <select id="volumeLimit"><option value="1000000" selected>US$ 1 mi</option><option value="2000000">US$ 2 mi</option><option value="5000000">US$ 5 mi</option></select></label>
       <label class="scanner-refresh-filter">Atualização automática <select id="autoRefresh"><option value="5" selected>A cada 5 min</option><option value="10">A cada 10 min</option><option value="20">A cada 20 min</option><option value="30">A cada 30 min</option><option value="60">A cada 1 hora</option><option value="120">A cada 2 horas</option><option value="180">A cada 3 horas</option><option value="240">A cada 4 horas</option></select></label>
       <label class="check scanner-alert-filter"><input id="browserAlerts" type="checkbox" /> Alertar novos setups neste navegador</label>
@@ -894,7 +960,7 @@ Total output lines: 1004
       <div class="controls" aria-label="Configuração da simulação">
         <label class="backtest-symbol-field">Pares (separe por vírgula) <input id="backtestSymbol" value="LINK, ONDO, GRT, RAY" maxlength="500" /></label>
         <label class="backtest-date-field">Data inicial <input id="backtestStartDate" type="date" required /></label><label class="backtest-date-field">Data final <input id="backtestEndDate" type="date" required /></label>
-        <fieldset class="filter-group" id="backtestStrategyFilters"><legend>Setup <span>selecione um ou mais</span></legend><label class="filter-option filter-all"><input type="checkbox" data-backtest-all="strategy" checked /> Selecionar todos</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="trend" checked /> Tendência + pivô</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="aggressive-pullback" checked /> Pullback 2H + confirmação 4H</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="flexible-pullback-2h" checked /> Pullback 2H · diário flexível</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="ema-cross-retest-2h" checked /> Cruzamento EMA 9 + reteste 22/52 · 2H</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="compression-expansion-1h" checked /> Compressão + expansão inicial · 1H</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="rsi-ema-recovery" checked /> Experimental · recuperação RSI + EMA 8/22/80</label><span class="sub">O experimental espera RSI ≤ 30 e, após 7–8 dias, o cruzamento da EMA 8 acima de 22 e 80 nos tempos 1H, 2H, 4H ou 8H.</span></fieldset>
+        <fieldset class="filter-group" id="backtestStrategyFilters"><legend>Setup <span>selecione um ou mais</span></legend><label class="filter-option filter-all"><input type="checkbox" data-backtest-all="strategy" checked /> Selecionar todos</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="trend" checked /> Tendência + pivô</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="aggressive-pullback" checked /> Pullback 2H + confirmação 4H</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="flexible-pullback-2h" checked /> Pullback 2H · diário flexível</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="ema-cross-retest-2h" checked /> Cruzamento EMA 9 + reteste 22/52 · 2H</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="compression-expansion-1h" checked /> Compressão + expansão inicial · 1H</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="rsi-ema-recovery" checked /> Experimental · recuperação RSI + EMA 8/22/80</label><label class="filter-option"><input type="checkbox" name="backtestStrategy" value="bearish-breakdown" checked /> SHORT · tendência baixista + rompimento</label><span class="sub">O experimental espera RSI ≤ 30; o SHORT exige tendência baixista, rompimento fechado, volume e espaço de 2R.</span></fieldset>
         <fieldset class="filter-group" id="backtestTimeframeFilters"><legend>Tempo do gatilho <span>selecione um ou mais</span></legend><label class="filter-option filter-all"><input type="checkbox" data-backtest-all="timeframe" checked /> Comparar todos</label><label class="filter-option"><input type="checkbox" name="backtestTimeframe" value="1h" checked /> 1H · antecipado</label><label class="filter-option"><input type="checkbox" name="backtestTimeframe" value="2h" checked /> 2H · intermediário</label><label class="filter-option"><input type="checkbox" name="backtestTimeframe" value="4h" checked /> 4H · confirmação</label><span class="sub">O resumo compara apenas os tempos selecionados. Sem setup de gatilho diário.</span></fieldset>
         <label class="capital-field"><span>Capital inicial (R$)</span><strong>Valor aplicado no teste</strong><input id="backtestCapital" type="number" min="1" step="0.01" value="1300" /></label>
         
@@ -923,9 +989,9 @@ Total output lines: 1004
   </main>
   <dialog id="entryDialog"><form method="dialog" id="entryForm"><div class="dialog-heading"><h2>Registrar entrada</h2><button value="cancel" class="icon-button" aria-label="Fechar">×</button></div><p id="entrySetup"></p><label>Preço executado <input id="executedPrice" type="number" step="any" required /></label><label>Valor aplicado (US$) <input id="tradeNotional" type="number" min="0" step="0.01" placeholder="Opcional, para calcular em R$" /></label><label>Data e hora <input id="entryTime" type="datetime-local" required /></label><label>Observação opcional <textarea id="tradeNote" rows="3" placeholder="Ex.: entrada parcial, motivo, contexto"></textarea></label><div class="dialog-actions"><button value="cancel" class="secondary">Cancelar</button><button id="saveTrade" value="default" class="primary">Confirmar entrada</button></div></form></dialog>
   <footer>Dados de mercado: CoinGecko, CoinMarketCap, CoinPaprika, Binance e OKX. Registros: somente neste navegador.</footer>
-<script src="sentinel-core.js?v=20261013-rsi-context-2"></script>
-  <script src="sentinel-backtest.js?v=20261007b"></script>
-<script src="app.js?v=20261013-rsi-context-2"></script>
+<script src="sentinel-core.js?v=20261014-short-watchlist-1"></script>
+  <script src="sentinel-backtest.js?v=20261014-short-watchlist-1"></script>
+<script src="app.js?v=20261014-short-watchlist-1"></script>
   <script>
     (() => {
       const syncOrbit = () => {
