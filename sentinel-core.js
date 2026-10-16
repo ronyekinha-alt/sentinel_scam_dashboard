@@ -90,7 +90,9 @@ const DEFAULTS = Object.freeze({ minScore: 90, minVolume: 1000000, assetLimit: 7
 const INTERVALS = ['1w', '1d', '4h', '2h', '1h'];
 const STABLE_BASES = new Set(['USDT','USDC','USDE','USD1','DAI','FDUSD','TUSD','USDD','BUSD','PYUSD','USDP','FRAX','GUSD','EURC','EURS','USDY']);
 function isStableAsset(symbol) { return STABLE_BASES.has(String(symbol||'').replace(/USDT$/,'').toUpperCase()); }
-const TRADFI_BASES = new Set(['OIL','WTI','BRENT','GOLD','SILVER','NVDA','TSLA','TSLAB','AAPL','AMZN','META','COIN','MSTR','NFLX','MSFT','GOOGL','GOOG','MCD','HOOD','CRCL','MU','SOXL','SOXLB','SOXS','KORUB','HAL','CORZ','SPY','QQQ','ITA','IWF','IWN','IWV','WFC']);
+// Símbolos exclusivos das versões tokenizadas. Tickers genéricos (como META ou COIN)
+// não entram aqui, pois também podem representar projetos cripto legítimos.
+const TRADFI_BASES = new Set(['KORUB','SOXLB','TSLAB']);
 function isTradfiTokenized(asset = {}) { const base=String(asset.symbol||'').replace(/USDT$/,'').toUpperCase(), descriptor=`${asset.name||''} ${asset.baseAsset||''} ${asset.baseCoin||''} ${asset.baseCoinName||''} ${asset.assetClass||''}`.toUpperCase(); return Boolean(asset.tokenized)||asset.assetClass==='TRADFI_TOKENIZED'||TRADFI_BASES.has(base)||/\b(BSTOCKS?|XSTOCKS?|TOKENIZED\s*(STOCK|EQUITY|ETF|ASSET)?|TRADFI|STOCK|EQUITY|ETF|COMMODIT(Y|IES)|INDEX\s*FUND|LEVERAGED\s+(BULL|BEAR))\b/.test(descriptor); }
 const STRATEGIES = Object.freeze({ trend: 'Tendência + pivô', 'aggressive-pullback': 'Pullback 2H + confirmação 4H', 'flexible-pullback-2h': 'Pullback 2H · diário flexível', 'ema-cross-retest-2h': 'Cruzamento EMA 9 + reteste 22/52 · 2H', 'compression-expansion-1h': '1H antecipado · Compressão + expansão', 'rsi-ema-recovery': 'Experimental · Recuperação RSI + EMA 8/22/80', 'bearish-breakdown': 'SHORT · Tendência baixista + rompimento' });
 function settings(input = {}) {
