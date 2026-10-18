@@ -67,7 +67,7 @@ async function getJson(url) {
 }
 async function universe(maxAssets=700) { const result=await SentinelCore.marketUniverse(getJson,{assetLimit:Math.min(700,maxAssets),minVolume:+$('volumeLimit').value}); state.universeMode=result.mode; return result.assets; }
 function resampleCandles(candles, hours) { const buckets = new Map(); for (const c of candles) { const time = Math.floor(c.time / (hours * 3600000)) * hours * 3600000, old = buckets.get(time); buckets.set(time, old ? { ...old, high: Math.max(old.high, c.high), low: Math.min(old.low, c.low), close: c.close, volume: old.volume + c.volume, takerBuyVolume: old.takerBuyVolume == null || c.takerBuyVolume == null ? null : old.takerBuyVolume + c.takerBuyVolume } : { ...c, time }); } return [...buckets.values()]; }
-async function candles(asset, interval) { if (asset.source !== 'MEXC') return readCandles(await getJson(`${API.binance}/klines?symbol=${asset.symbol}&interval=${interval}&limit=210`)); const mexcInterval = interval === '1w' ? '1W' : interval === '2h' ? '1h' : interval, raw = await getJson(`${API.mexc}/klines?symbol=${asset.symbol}&interval=${mexcInterval}&limit=${interval === '2h' ? 500 : 210}`), parsed = readCandles(raw); return interval === '2h' ? resampleCandles(parsed, 2).slice(-210) : parsed; }
+async function candles(asset, interval) { const series=await SentinelCore.fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,Date.now(),SentinelCore.sourceForAsset(asset)); return series[interval]||[]; }
 async function futuresCandles(symbol, interval) { return readCandles(await getJson(`${API.futures}/klines?symbol=${symbol}&interval=${interval}&limit=210`)); }
 const { pullbackStochCriteria, aggressivePullbackCriteria, pullback1hConfirmationCriteria } = SentinelCore;
 const SCANNER_TRIGGER_TIMEFRAMES = ['1h','2h','4h'];
@@ -306,9 +306,10 @@ async function scanOversoldRsi() {
     const config = SentinelCore.settings({ assetLimit: requestedLimit, minVolume: 0, minScore: 0, strategy: 'both' });
     const universeResult = await SentinelCore.marketUniverse(getJson, config);
     const assets = universeResult.assets.filter(asset => !asset.tokenized && asset.assetClass !== 'TRADFI_TOKENIZED').slice(0, requestedLimit);
+    const clock=await getJson(`${SentinelCore.SOURCES.spot}/time`), asOf=Number(clock.serverTime)||Date.now();
     const matches = await concurrentMap(assets, 4, async asset => {
-      const [daily, hourly] = await Promise.all([candles(asset, '1d'), candles(asset, '1h')]);
-      const series = { '1d': daily, '8h': resampleCandles(hourly, 8), '4h': resampleCandles(hourly, 4), '2h': resampleCandles(hourly, 2), '1h': hourly };
+      const source=SentinelCore.sourceForAsset(asset), native=await SentinelCore.fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,asOf,source), daily=native['1d'], hourly=native['1h'];
+      const series = { '1d': daily, '8h': resampleCandles(hourly, 8), '4h': native['4h'], '2h': native['2h'], '1h': hourly };
       const values = Object.fromEntries(RSI_FINDER_TIMEFRAMES.map(({ key }) => [key, latestRsi(series[key]) ]));
       const first = RSI_FINDER_TIMEFRAMES.findIndex(({ key }) => values[key] != null && values[key] <= threshold), firstKey = RSI_FINDER_SORT_TIMEFRAMES.find(key => values[key] != null && values[key] <= threshold);
       return first < 0 ? null : { asset, values, first, firstKey: firstKey || '1d', context:finderContext(daily,hourly,values) };
