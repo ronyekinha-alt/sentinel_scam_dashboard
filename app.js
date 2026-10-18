@@ -92,7 +92,7 @@ async function scan() {
     const active=new Set(state.trades.filter(t=>!t.imported&&!t.result).map(t=>t.symbol));
     const hidden=result.signals.filter(s=>active.has(s.symbol)).length;
     state.signals=result.signals.filter(s=>!active.has(s.symbol));
-    state.diagnostics=result.diagnostics || [];
+    state.diagnostics=result.diagnostics || []; state.marketRegime=result.marketRegime || null;
     notifyNewSignals(state.signals); renderSignals();
     renderScannerAuditSummary();
     renderScannerAudit();
@@ -124,7 +124,8 @@ function renderScannerAuditSummary() {
   const signals=diagnostics.filter(item=>item.status==='signal'), validated=signals.filter(item=>Number(item.score)>=90).length, watch=signals.filter(item=>Number(item.score)>=85&&Number(item.score)<90).length, rejected=count('rejected'), excluded=count('excluded'), errors=count('error'), rejectedBase=Math.max(1,rejected+excluded);
   setMetrics([diagnostics.length,validated,watch,rejected,excluded,errors]);
   const reasons=new Map(); diagnostics.filter(item=>item.status!=='signal').forEach(item=>(item.reasons||[]).forEach(reason=>{const key=String(reason||'').trim(); if(key) reasons.set(key,(reasons.get(key)||0)+1);}));
-  summary.innerHTML=`${signals.length} sinal(is) encontrado(s), sendo ${validated} entrada(s) validada(s) e ${watch} em observação. Scores 85–89 permanecem em acompanhamento e não são apresentados como entrada imediata.`;
+  const regime=state.marketRegime?.label ? `<br><strong>${escapeHtml(state.marketRegime.label)}</strong>` : '';
+  summary.innerHTML=`${signals.length} sinal(is) encontrado(s), sendo ${validated} entrada(s) validada(s) e ${watch} em observação. Scores 85–89 permanecem em acompanhamento e não são apresentados como entrada imediata.${regime}`;
   const rows=[...reasons.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12);
   body.innerHTML=rows.length?rows.map(([reason,total])=>`<tr><td>${escapeHtml(reason)}</td><td>${total}</td><td>${num(total/rejectedBase*100,1)}%</td></tr>`).join(''):'<tr><td colspan="3" class="empty">Nenhum motivo de rejeição registrado nesta leitura.</td></tr>';
 }
