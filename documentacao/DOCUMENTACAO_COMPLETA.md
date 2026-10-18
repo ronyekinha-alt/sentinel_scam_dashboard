@@ -33,21 +33,24 @@ Existem dois repositorios publicados: `sentinel_scam_dashboard` e `sentinel-trad
 
 | Fonte | Papel atual |
 |---|---|
-| Binance Data API | Fonte prioritaria de candles, preco, volume e horario de corte. |
+| Binance Data API | Fonte prioritaria de candles, preco, volume e horario de corte. O motor tenta USDT e, se necessario, USDC. |
 | api.binance.com | Contingencia do Telegram quando `data-api.binance.vision` falha; duas tentativas por endereco. |
-| MEXC Spot publica | Fonte alternativa quando o par spot USDT nao esta negociavel na Binance. Busca 1H, 4H, diario e semanal; como a API nao oferece 2H nativo, o motor agrega candles 1H fechados em 2H localmente. |
+| OKX Spot publica | Primeiro fallback de candles e volume. Aceita USDT e USDC, com 1H, 2H, 4H, diario e semanal nativos. |
+| MEXC Spot publica | Segundo fallback quando o par nao esta negociavel nas fontes anteriores. Aceita USDT e USDC; busca 1H, 4H, diario e semanal e agrega 1H fechado em 2H localmente. |
+| Coinbase Advanced Trade | Fallback final, somente para pares USDT/USDC elegiveis e com candles suficientes. |
 | CoinGecko e CoinMarketCap | Ranking e capitalizacao para montar o universo. |
 | MEXC privada | Saldo, fills, ordens e posicoes somente leitura, via servidor local. |
 
-OKX, CoinGecko e CoinMarketCap nao sao fontes de candles no motor atual. CoinGecko e CoinMarketCap sao fontes de ranking. Adicionar OKX como terceira fonte de candles exige adaptador e testes de equivalencia antes de ativacao.
+CoinGecko e CoinMarketCap continuam sendo fontes de ranking, nao de candles. A ordem de mercado ativa e **Binance -> OKX -> MEXC -> Coinbase**. Dentro de cada corretora, USDT tem preferencia e USDC e usado somente quando USDT nao esta valido.
 
 Selecao do universo:
 
 1. Consulta as fontes de ranking, une candidatos e remove duplicidades.
-2. Procura par spot USDT na Binance; se nao existir/nao estiver negociavel, tenta MEXC.
-3. Aplica volume minimo configurado ao proprio par e a propria corretora.
-4. Exclui BTC, ETH, moedas estaveis e valores sem par valido.
-5. Aplica filtro de cripto nativa antes do scanner e da watchlist RSI.
+2. Procura um par spot valido na ordem Binance, OKX, MEXC e Coinbase; em cada fonte testa primeiro USDT e depois USDC.
+3. Escolhe **uma unica corretora e um unico par** por ativo e usa essa mesma serie de candles em todos os tempos. Nunca mistura 1H de uma corretora com 4H de outra.
+4. Aplica volume minimo configurado ao proprio par e a propria corretora.
+5. Exclui BTC, ETH, moedas estaveis e valores sem par valido.
+6. Aplica filtro de cripto nativa antes do scanner e da watchlist RSI.
 
 O bloqueio de TradFi tokenizado usa classe/descricao e uma lista explicita para tickers inequivocos: `KORUB`, `SOXLB` e `TSLAB`. Tickers genericos nao sao bloqueados apenas por nome para evitar excluir projetos cripto legitimos. Configuracoes validas: top de 1 a 700, score `0`, `85`, `90` ou `100`, volume `0`, US$1 mi, US$2 mi ou US$5 mi, desvio maximo de entrada de 0% a 5%, R:R minimo de 1R a 2R e maximo de 20 sinais.
 
@@ -140,7 +143,7 @@ O buscador RSI usa cripto nativa, tempos Diario/8H/4H/2H/1H e ordenacao por maio
 
 ## 9. Telegram
 
-O Telegram envia setups em blocos de ate tres: direcao, setup, tempo, score, fonte, ranking, entrada, limite de entrada, stop, TP2/TP3 e resumo tecnico. Segredos: `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID`. Variaveis: `MIN_SCORE`, `SCANNER_STRATEGY`, `MIN_VOLUME`, `ASSET_LIMIT`, `FORCE_ALERT`, `DELIVERY_DIAGNOSTICS`, `SEND_OVERSOLD_WATCHLIST` e `OVERSOLD_LIMIT`.
+O Telegram envia setups em blocos de ate tres: par real utilizado (inclusive USDC quando aplicavel), direcao, setup, tempo, score, fonte, ranking, entrada, limite de entrada, stop, TP2/TP3 e resumo tecnico. Segredos: `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID`. Variaveis: `MIN_SCORE`, `SCANNER_STRATEGY`, `MIN_VOLUME`, `ASSET_LIMIT`, `FORCE_ALERT`, `DELIVERY_DIAGNOSTICS`, `SEND_OVERSOLD_WATCHLIST` e `OVERSOLD_LIMIT`.
 
 Deduplicacao: uma vela enviada nao e nova; reenvio exige 12 horas ou mudanca de entrada >=1,5%. O estado dura sete dias. Diagnostico opcional informa quando havia sinais, mas todos ja tinham sido notificados.
 
@@ -174,8 +177,8 @@ Antes de ativar regra nova: implementar no motor compartilhado, cobrir com teste
 4. Uma protecao que bloqueie LONG precisa ser auditavel por ativo e visivel no resumo do dashboard. Falha de fonte deve ser distinguida de rejeicao tecnica.
 5. Todo ajuste de setup exige teste Node x navegador, teste de borda e atualizacao de versao/documentacao. Backtest nao autoriza automaticamente uma regra de producao.
 6. O motor nao envia ordens. Sinais, targets e stops sao referencias analiticas; a decisao, tamanho da posicao e execucao sao humanos.
+7. Uma fonte alternativa aumenta cobertura, nao confirma um setup por si so. Se nao houver candles fechados suficientes em todos os tempos da mesma fonte, o ativo falha a consulta e a auditoria deve mostrar a falha.
 
 ### Prompt consolidado usado nesta revisao
 
 > Voce e o engenheiro quantitativo senior responsavel pelo Sentinel Trade. Implemente melhorias de governanca, blindagem de risco e filtros no motor compartilhado, preservando paridade total entre dashboard e Telegram. Padronize o Setup 4 em EMA 22/52; aplique veto de LONG para altcoins quando BTC 4H fechar abaixo da EMA22 e MACD negativo ou RSI menor que 48; consulte funding e OI 4H do perpétuo Binance, bloqueando funding acima de +0,05% e somando +5 somente para funding entre -0,01% e +0,01% com OI crescente. No backtest, desconte 0,25% por trade fechado composto por taxas taker e slippage configuraveis. Para tendencias, documente breakeven em 1R e trailing do restante apos 2R; para pullbacks, exija secagem de venda no candle anterior; para EMA cross, exija pavio inferior minimo de 30%. Adicione VWAP semanal rompimento/reteste como setup experimental e trate CVD e squeeze Bollinger/Keltner como confluencias transparentes, nao como promessa. Atualize testes de paridade, versao semantica e documentacao; valide sintaxe e testes antes de publicar ou disparar o scanner.
-
