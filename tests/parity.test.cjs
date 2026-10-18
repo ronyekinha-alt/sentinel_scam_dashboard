@@ -70,6 +70,7 @@ test('ranking CMC não altera score técnico e identificação aparece no Telegr
 });
 test('ativos do mercado tradicional tokenizados não entram no universo cripto',()=>{
  assert(Core.isTradfiTokenized({symbol:'KORUBUSDT',name:'South Korea Bull 3X ETF (bStocks Tokenized Stock)'}));
+ assert(Core.isTradfiTokenized({symbol:'KORUBUSDC',name:'South Korea Bull 3X ETF (bStocks Tokenized Stock)'}));
  assert(Core.isTradfiTokenized({symbol:'SOXLBUSDT',name:'Semicon Bull 3X ETF (bStocks Tokenized Stock)'}));
  assert(Core.isTradfiTokenized({symbol:'TSLABUSDT',name:'Tesla Tokenized bStocks'}));
  assert.equal(Core.isTradfiTokenized({symbol:'LINKUSDT',name:'Chainlink'}),false);
