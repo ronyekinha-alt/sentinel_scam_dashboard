@@ -385,7 +385,17 @@ async function marketUniverse(getJson, options = DEFAULTS) {
 }
 async function fetchSeries(getJson,symbol,asOf,source=SOURCES.spot,hourlyLimit=210) {
   const limitFor=interval=>interval==='1h'?hourlyLimit:210;
-  if(source===SOURCES.mexc){const intervals={'1w':'1W','1d':'1D','4h':'4h','2h':'2h','1h':'1h'},values=await Promise.all(INTERVALS.map(async interval=>{const raw=await getJson(`${SOURCES.mexc}/klines?symbol=${encodeURIComponent(symbol)}&interval=${intervals[interval]}&limit=${limitFor(interval)}&endTime=${asOf-1}`);return closedCandles(raw,asOf);}));return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));}
+  if(source===SOURCES.mexc){
+    // A API spot da MEXC não oferece candle 2H nativo e exige start/end juntos
+    // quando a janela é informada. Buscamos os candles fechados mais recentes e
+    // agregamos 1H em 2H localmente, preservando a mesma regra do motor.
+    const intervals={'1w':'1W','1d':'1d','4h':'4h','1h':'1h'};
+    const native=Object.fromEntries(await Promise.all(Object.entries(intervals).map(async([interval,mexcInterval])=>{
+      const raw=await getJson(`${SOURCES.mexc}/klines?symbol=${encodeURIComponent(symbol)}&interval=${mexcInterval}&limit=${limitFor(interval)}`);
+      return [interval,closedCandles(raw,asOf)];
+    })));
+    return {...native,'2h':resampleHourly(native['1h'],2)};
+  }
   const values=await Promise.all(INTERVALS.map(interval=>getJson(`${source}/klines?symbol=${encodeURIComponent(symbol)}&interval=${interval}&limit=${limitFor(interval)}&endTime=${asOf-1}`).then(raw=>closedCandles(raw,asOf))));
   return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
 }
