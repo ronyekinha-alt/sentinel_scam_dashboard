@@ -1,4 +1,4 @@
-/* Motor único para painel e Telegram. */
+/* Motor único para painel e Telegram. Governança e risco v2026-10-18. */
 (function(root,factory){if(typeof module==='object' && module.exports)module.exports=factory();else root.SentinelCore=factory();})(typeof window!=='undefined'?window:globalThis,function(){
 'use strict';
 function last(values) { return values[values.length - 1]; }
@@ -51,9 +51,9 @@ function weeklyExtension(candles) {
   return { weekly, rise12, rise26, distanceAtr, nearHigh, blocked };
 }
 function analyseTimeframe(candles) {
-  const closes = candles.map(c => c.close), volumes = candles.map(c => c.volume), sellVolumes = candles.map(c => c.takerBuyVolume == null ? (c.close < c.open ? c.volume : c.volume * .4) : c.volume - c.takerBuyVolume), e8 = ema(closes, 8), e9 = ema(closes, 9), e22 = ema(closes, 22), e51 = ema(closes, 51), e80 = ema(closes, 80), rs = rsi(closes), mc = macd(closes), volumeAvg = sma(volumes, 20), sellAvg = sma(sellVolumes, 20), dx = adx(candles), stoch = stochRsi(closes);
+  const closes = candles.map(c => c.close), volumes = candles.map(c => c.volume), sellVolumes = candles.map(c => c.takerBuyVolume == null ? (c.close < c.open ? c.volume : c.volume * .4) : c.volume - c.takerBuyVolume), e8 = ema(closes, 8), e9 = ema(closes, 9), e22 = ema(closes, 22), e51 = ema(closes, 51), e80 = ema(closes, 80), e200 = ema(closes, 200), rs = rsi(closes), mc = macd(closes), volumeAvg = sma(volumes, 20), sellAvg = sma(sellVolumes, 20), dx = adx(candles), stoch = stochRsi(closes);
   const i = closes.length - 1, aligned = closes[i] > e9[i] && e9[i] > e22[i] && e22[i] > e51[i] && e51[i] > e80[i], rising = e22[i] > e22[i - 3], momentum = rs[i] >= 50 && rs[i] <= 72 && mc.histogram[i] > 0, relativeVolume = volumes[i] / Math.max(volumeAvg[i] || volumes[i], .00001), strong = (dx[i] || 0) >= 18, stochCrossUp = stoch.k[i] > stoch.d[i] && (stoch.k[i - 1] <= stoch.d[i - 1] || stoch.k[i - 2] <= stoch.d[i - 2]) && Math.min(stoch.k[i - 1], stoch.d[i - 1], stoch.k[i - 2], stoch.d[i - 2]) < 25, stochRecovery = stoch.k[i] > stoch.d[i] && stoch.k[i] <= 50 && Math.min(stoch.k[i - 1], stoch.k[i - 2]) < 25, sellerDrying = sellVolumes[i] <= (sellAvg[i] || sellVolumes[i]) * .9, buyerDominance = candles[i].takerBuyVolume == null ? candles[i].close > candles[i].open && relativeVolume >= 1.05 : candles[i].takerBuyVolume / Math.max(volumes[i], Number.EPSILON) >= .51;
-  return { aligned, rising, momentum, relativeVolume, strong, rsi: rs[i], adx: dx[i] || 0, atr: last(atr(candles)), ema8: e8[i], ema9: e9[i], ema22: e22[i], ema51: e51[i], ema80: e80[i], macdLine: mc.line[i], macdHistogram: mc.histogram[i], stochK: stoch.k[i], stochD: stoch.d[i], stochCrossUp, stochRecovery, sellerDrying, buyerDominance, lastLow: candles[i].low, recentLow: Math.min(...candles.slice(-10).map(c => c.low)), close: last(closes), pattern: candlePattern(candles), pivot: bullishPivot(candles), levels: supportResistance(candles, last(closes)) };
+  return { aligned, rising, momentum, relativeVolume, strong, rsi: rs[i], adx: dx[i] || 0, atr: last(atr(candles)), ema8: e8[i], ema9: e9[i], ema22: e22[i], ema51: e51[i], ema80: e80[i], ema200: e200[i], macdLine: mc.line[i], macdHistogram: mc.histogram[i], stochK: stoch.k[i], stochD: stoch.d[i], stochCrossUp, stochRecovery, sellerDrying, buyerDominance, sellVolume: sellVolumes[i], previousSellVolume: sellVolumes[i - 1], previousSellAverage: sellAvg[i - 1], previousSellerExhaustion: sellVolumes[i - 1] <= Math.max(sellAvg[i - 1] || sellVolumes[i - 1], Number.EPSILON), lastLow: candles[i].low, recentLow: Math.min(...candles.slice(-10).map(c => c.low)), close: last(closes), pattern: candlePattern(candles), pivot: bullishPivot(candles), levels: supportResistance(candles, last(closes)) };
 }
 function lateEntry(timing, triggerCandles, triggerTimeframe = '1h') {
   // Filtro anti-perseguição: não entrar depois de uma arrancada já esticada.
@@ -75,17 +75,20 @@ function pullbackStochCriteria(extension, day, two, one) {
 function aggressivePullbackCriteria(extension, day, four, two, one) {
   const macro = !extension.blocked && extension.weekly.close >= extension.weekly.ema22 && day.close >= day.ema51 && day.rsi >= 45 && day.macdHistogram >= 0 && four.aligned && four.rising;
   const pullback1h = one.close >= one.ema51 && (one.recentLow <= one.ema9 * 1.02 || one.recentLow <= one.ema22 * 1.02) && (one.pivot.bullish || one.pattern.bullish);
-  const confirmation = two.close >= two.ema51 && (two.pivot.bullish || two.pattern.bullish || two.momentum) && (one.buyerDominance || one.relativeVolume >= .9);
-  return { valid: macro && pullback1h && confirmation, pullback1h, confirmation };
+  // O candle imediatamente anterior não pode mostrar venda acima da média: isso
+  // diferencia uma correção saudável de uma possível reversão de tendência.
+  const volumeExhaustion = one.previousSellerExhaustion !== false;
+  const confirmation = two.close >= two.ema51 && (two.pivot.bullish || two.pattern.bullish || two.momentum) && (one.buyerDominance || one.relativeVolume >= .9) && volumeExhaustion;
+  return { valid: macro && pullback1h && confirmation, pullback1h, confirmation, volumeExhaustion };
 }
 function pullback1hConfirmationCriteria(extension, day, confirmation, one) {
   const macro = !extension.blocked && extension.weekly.close >= extension.weekly.ema22 && day.close >= day.ema51 && day.rsi >= 45 && day.macdHistogram >= 0;
   const pullback1h = one.close >= one.ema51 && (one.recentLow <= one.ema9 * 1.02 || one.recentLow <= one.ema22 * 1.02) && (one.pivot.bullish || one.pattern.bullish);
-  const confirmed = confirmation.close >= confirmation.ema51 && confirmation.aligned && confirmation.rising && (confirmation.pivot.bullish || confirmation.pattern.bullish || confirmation.momentum);
+  const confirmed = confirmation.close >= confirmation.ema51 && confirmation.aligned && confirmation.rising && (confirmation.pivot.bullish || confirmation.pattern.bullish || confirmation.momentum) && one.previousSellerExhaustion !== false;
   return { valid: macro && pullback1h && confirmed, pullback1h, confirmed };
 }
-const VERSION = '2026-10-16-crypto-only-universe-v1';
-const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', mexc: 'https://api.mexc.com/api/v3', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', paprika: 'https://api.coinpaprika.com/v1' });
+const VERSION = '2026-10-18-governance-risk-v2';
+const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', futuresData: 'https://fapi.binance.com/futures/data', mexc: 'https://api.mexc.com/api/v3', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', paprika: 'https://api.coinpaprika.com/v1' });
 const DEFAULTS = Object.freeze({ minScore: 90, minVolume: 1000000, assetLimit: 700, strategy: 'both', maxSignals: 20, enforceRiskPolicy: false, maxEntryDeviationPct: 2, minimumRewardRisk: 1.7 });
 const INTERVALS = ['1w', '1d', '4h', '2h', '1h'];
 const STABLE_BASES = new Set(['USDT','USDC','USDE','USD1','DAI','FDUSD','TUSD','USDD','BUSD','PYUSD','USDP','FRAX','GUSD','EURC','EURS','USDY']);
@@ -94,7 +97,7 @@ function isStableAsset(symbol) { return STABLE_BASES.has(String(symbol||'').repl
 // não entram aqui, pois também podem representar projetos cripto legítimos.
 const TRADFI_BASES = new Set(['KORUB','SOXLB','TSLAB']);
 function isTradfiTokenized(asset = {}) { const base=String(asset.symbol||'').replace(/USDT$/,'').toUpperCase(), descriptor=`${asset.name||''} ${asset.baseAsset||''} ${asset.baseCoin||''} ${asset.baseCoinName||''} ${asset.assetClass||''}`.toUpperCase(); return Boolean(asset.tokenized)||asset.assetClass==='TRADFI_TOKENIZED'||TRADFI_BASES.has(base)||/\b(BSTOCKS?|XSTOCKS?|TOKENIZED\s*(STOCK|EQUITY|ETF|ASSET)?|TRADFI|STOCK|EQUITY|ETF|COMMODIT(Y|IES)|INDEX\s*FUND|LEVERAGED\s+(BULL|BEAR))\b/.test(descriptor); }
-const STRATEGIES = Object.freeze({ trend: 'Tendência + pivô', 'aggressive-pullback': 'Pullback 2H + confirmação 4H', 'flexible-pullback-2h': 'Pullback 2H · diário flexível', 'ema-cross-retest-2h': 'Cruzamento EMA 9 + reteste 22/52 · 2H', 'compression-expansion-1h': '1H antecipado · Compressão + expansão', 'rsi-ema-recovery': 'Experimental · Recuperação RSI + EMA 8/22/80', 'bearish-breakdown': 'SHORT · Tendência baixista + rompimento' });
+const STRATEGIES = Object.freeze({ trend: 'Tendência + pivô', 'aggressive-pullback': 'Pullback 2H + confirmação 4H', 'flexible-pullback-2h': 'Pullback 2H · diário flexível', 'ema-cross-retest-2h': 'Cruzamento EMA 9 + reteste 22/52 · 2H', 'compression-expansion-1h': '1H antecipado · Compressão + expansão', 'vwap-retest-1h-2h': 'Experimental · VWAP semanal + reteste', 'rsi-ema-recovery': 'Experimental · Recuperação RSI + EMA 8/22/80', 'bearish-breakdown': 'SHORT · Tendência baixista + rompimento' });
 function settings(input = {}) {
   const result = { ...DEFAULTS, ...input };
   const selectedStrategies = Array.isArray(result.strategies) ? [...new Set(result.strategies)] : null;
@@ -123,9 +126,9 @@ function analyseSet(series) {
 function emaCrossRetest2hCriteria(series, analyses) {
   const candles = series['2h'], timing = analyses.two, { day, four, extension } = analyses;
   if (!Array.isArray(candles) || candles.length < 80) return { valid:false, reason:'Candles 2H insuficientes para cruzamento EMA' };
-  const closes = candles.map(candle => candle.close), e9 = ema(closes,9), e22 = ema(closes,22), e52 = ema(closes,51), i = closes.length - 1;
+  const closes = candles.map(candle => candle.close), e9 = ema(closes,9), e22 = ema(closes,22), e52 = ema(closes,52), i = closes.length - 1;
   const crossedRecently = Array.from({length:Math.min(10,i-1)},(_,offset)=>i-offset).some(index=>e9[index]>e22[index]&&e9[index]>e52[index]&&(e9[index-1]<=e22[index-1]||e9[index-1]<=e52[index-1]));
-  const retest = candles.slice(-8,-1).some((candle,offset)=>{const index=i-7+offset;return candle.low<=e22[index]*1.018||candle.low<=e52[index]*1.025;});
+  const retest = candles.slice(-8,-1).some((candle,offset)=>{const index=i-7+offset,range=Math.max(candle.high-candle.low,Number.EPSILON),lower=Math.min(candle.open,candle.close)-candle.low,wick=lower/range;return (candle.low<=e22[index]*1.018||candle.low<=e52[index]*1.025)&&wick>=.30;});
   const previousHigh = Math.max(...candles.slice(-7,-1).map(candle=>candle.high));
   const closedBreakout = timing.close>previousHigh && candles.at(-1).close>candles.at(-1).open;
   const structure = timing.close>timing.ema9&&timing.ema9>timing.ema22&&timing.ema22>timing.ema51;
@@ -160,6 +163,34 @@ function resampleHourly(candles, hours) {
     }
   }
   return [...buckets.values()].sort((a,b)=>a.time-b.time);
+}
+function weekStartUtc(time) { const date=new Date(time), day=(date.getUTCDay()+6)%7; return Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate()-day); }
+function anchoredWeeklyVwap(candles) {
+  const start=weekStartUtc(candles.at(-1)?.time||0), values=[]; let pv=0, volume=0;
+  for(const candle of candles){ if(candle.time<start){ values.push(null); continue; } const typical=(candle.high+candle.low+candle.close)/3, v=Math.max(0,Number(candle.volume)||0); pv+=typical*v; volume+=v; values.push(volume?pv/volume:null); }
+  return values;
+}
+function bollingerKeltner(candles) {
+  const closes=candles.map(c=>c.close), middle=sma(closes,20), deviations=closes.map((_,i)=>i<19?null:Math.sqrt(closes.slice(i-19,i+1).reduce((sum,value)=>sum+(value-middle[i])**2,0)/20)), averageTrueRange=atr(candles,20), upper=middle.map((value,i)=>value==null?null:value+2*deviations[i]), lower=middle.map((value,i)=>value==null?null:value-2*deviations[i]), kcUpper=middle.map((value,i)=>value==null?null:value+1.5*averageTrueRange[i]), kcLower=middle.map((value,i)=>value==null?null:value-1.5*averageTrueRange[i]);
+  const squeezed=upper.map((value,i)=>value!=null&&value<kcUpper[i]&&lower[i]>kcLower[i]);
+  return {middle,upper,lower,kcUpper,kcLower,squeezed};
+}
+function cvdProxy(candles) {
+  let cumulative=0; return candles.map(candle=>{const buy=Number.isFinite(candle.takerBuyVolume)?candle.takerBuyVolume:candle.volume*(candle.close>=candle.open?.58:.42); cumulative+=buy-(candle.volume-buy); return cumulative;});
+}
+function vwapRetestCriteria(series, analyses, timeframe) {
+  const candles=series[timeframe], timing={'1h':analyses.one,'2h':analyses.two}[timeframe];
+  if(!candles||!timing||candles.length<40)return {valid:false,reason:'Candles insuficientes para VWAP semanal'};
+  const vwap=anchoredWeeklyVwap(candles), bands=bollingerKeltner(candles), cvd=cvdProxy(candles), i=candles.length-1, current=candles[i], value=vwap[i];
+  if(!Number.isFinite(value))return {valid:false,reason:'VWAP semanal ainda indisponível'};
+  const average=candles.slice(-21,-1).reduce((sum,c)=>sum+c.volume,0)/20, volumeRatio=current.volume/Math.max(average,Number.EPSILON), retest=candles.slice(-4,-1).some((c,index)=>c.low<=vwap[i-3+index]*1.003&&c.close>=vwap[i-3+index]*.997), brokeRecently=candles.slice(-12,-1).some((c,index)=>c.close<=vwap[i-11+index])&&current.close>value, buyer=current.close>current.open&&(timing.pattern.bullish||timing.buyerDominance), squeezeReleased=bands.squeezed.slice(-7,-1).some(Boolean)&&!bands.squeezed[i], cvdRising=cvd[i]>cvd[Math.max(0,i-6)];
+  const macro=!analyses.extension.blocked&&analyses.day.close>=analyses.day.ema80*.98&&analyses.four.close>=analyses.four.ema51&&analyses.four.rsi>=45;
+  return {valid:macro&&brokeRecently&&retest&&buyer&&volumeRatio>=1.5, vwap:value, volumeRatio, retest, brokeRecently, buyer, macro, squeezeReleased, cvdRising};
+}
+function marketRegimeGate(analyses) {
+  const four=analyses?.four;
+  const veto=Boolean(four&&four.close<four.ema22&&(four.macdHistogram<0||four.rsi<48));
+  return {available:Boolean(four),vetoLongs:veto,status:veto?'VETO':'NORMAL',label:veto?'Veto Sistêmico Ativo: BTC em tendência de baixa intradiária':'Regime BTC liberado para novos LONGs',close:four?.close??null,ema22:four?.ema22??null,rsi:four?.rsi??null,macdHistogram:four?.macdHistogram??null};
 }
 function rsiEmaRecoveryCriteria(series, analyses, timeframe) {
   const candles=timeframe==='8h'?resampleHourly(series['1h'],8):series[timeframe];
@@ -225,18 +256,18 @@ function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS,
   if (strategy==='bearish-breakdown') return evaluateBearishBreakdown(asset,series,analyses,config,triggerTimeframe,reject);
   const { extension, day:d, four, two, one } = analyses;
   const recovery=strategy==='rsi-ema-recovery'?rsiEmaRecoveryCriteria(series,analyses,triggerTimeframe):null;
-  const timing = recovery?.analysis || { '1h':one,'2h':two,'4h':four,'1d':d }[triggerTimeframe], triggerSeries = recovery?.candles || series[triggerTimeframe], emaCross = strategy==='ema-cross-retest-2h' ? emaCrossRetest2hCriteria(series,analyses) : null, early1h=strategy==='compression-expansion-1h'?compressionExpansion1hCriteria(series,analyses):null;
-  const triggerBullish = timing?.pattern?.bullish || timing?.pivot?.bullish || early1h?.valid || recovery?.valid;
+  const timing = recovery?.analysis || { '1h':one,'2h':two,'4h':four,'1d':d }[triggerTimeframe], triggerSeries = recovery?.candles || series[triggerTimeframe], emaCross = strategy==='ema-cross-retest-2h' ? emaCrossRetest2hCriteria(series,analyses) : null, early1h=strategy==='compression-expansion-1h'?compressionExpansion1hCriteria(series,analyses):null, vwap=strategy==='vwap-retest-1h-2h'?vwapRetestCriteria(series,analyses,triggerTimeframe):null;
+  const triggerBullish = timing?.pattern?.bullish || timing?.pivot?.bullish || early1h?.valid || recovery?.valid || vwap?.buyer;
   if (!triggerSeries?.length) return reject('Sem candles fechados no tempo do gatilho');
   if (!triggerBullish && !emaCross?.closedBreakout) return reject('Sem padrão comprador, pivô ou rompimento fechado no gatilho');
   const flexibleMacro = !extension.blocked && extension.weekly.close >= extension.weekly.ema22 && d.close >= d.ema80 && d.rsi >= 40 && four.aligned && four.rising && two.close >= two.ema51 && one.aligned && one.momentum;
-  if (strategy==='rsi-ema-recovery' ? !recovery.valid : strategy==='ema-cross-retest-2h' ? (triggerTimeframe!=='2h'||!emaCross.valid) : strategy==='compression-expansion-1h' ? (triggerTimeframe!=='1h'||!early1h.valid) : strategy === 'flexible-pullback-2h' ? (!flexibleMacro || triggerTimeframe !== '2h') : !confirmedMacro(analyses)) return reject(strategy==='rsi-ema-recovery'?'RSI <= 30, espera mínima e cruzamento EMA 8 acima de 22/80 ainda não confirmados':strategy==='ema-cross-retest-2h' ? 'Cruzamento, reteste, rompimento ou macro 2H não confirmado' : strategy==='compression-expansion-1h'?'Base, rompimento, volume, RSI ou contexto diário ainda não confirmou':'Confirmação multi-tempo insuficiente');
+  if (strategy==='rsi-ema-recovery' ? !recovery.valid : strategy==='ema-cross-retest-2h' ? (triggerTimeframe!=='2h'||!emaCross.valid) : strategy==='compression-expansion-1h' ? (triggerTimeframe!=='1h'||!early1h.valid) : strategy==='vwap-retest-1h-2h' ? (!['1h','2h'].includes(triggerTimeframe)||!vwap.valid) : strategy === 'flexible-pullback-2h' ? (!flexibleMacro || triggerTimeframe !== '2h') : !confirmedMacro(analyses)) return reject(strategy==='rsi-ema-recovery'?'RSI <= 30, espera mínima e cruzamento EMA 8 acima de 22/80 ainda não confirmados':strategy==='ema-cross-retest-2h' ? 'Cruzamento, reteste, rompimento ou macro 2H não confirmado' :strategy==='vwap-retest-1h-2h'?'VWAP semanal, reteste, volume ou contexto macro ainda não confirmou':strategy==='compression-expansion-1h'?'Base, rompimento, volume, RSI ou contexto diário ainda não confirmou':'Confirmação multi-tempo insuficiente');
   const trendValid = !extension.blocked && extension.weekly.close >= extension.weekly.ema22 && d.close >= d.ema51 && d.rsi >= 48 && four.close >= four.ema51 && two.close >= two.ema51 && timing.close >= timing.ema51 && timing.rsi >= 46 && (timing.pivot.bullish || timing.pattern.bullish) && timing.relativeVolume >= .9;
   const pullback = aggressivePullbackCriteria(extension,d,four,two,one);
-  const flexiblePullback = flexibleMacro && one.close >= one.ema51 && (one.recentLow <= one.ema9 * 1.02 || one.recentLow <= one.ema22 * 1.02) && (one.pivot.bullish || one.pattern.bullish) && two.close >= two.ema51 && (two.pivot.bullish || two.pattern.bullish || two.momentum) && (one.buyerDominance || one.relativeVolume >= .9);
-  if (!(strategy==='rsi-ema-recovery'||strategy==='ema-cross-retest-2h'||strategy==='compression-expansion-1h'||(strategy === 'trend' ? trendValid : strategy === 'aggressive-pullback' ? pullback.valid : flexiblePullback))) return reject('Condições específicas do setup não confirmadas');
-  if (!['ema-cross-retest-2h','compression-expansion-1h','rsi-ema-recovery'].includes(strategy)&&lateEntry(timing,triggerSeries,triggerTimeframe)) return reject('Entrada esticada além do limite');
-  let score = strategy==='rsi-ema-recovery' ? (recovery.touchCount>=2?92:90) : strategy==='ema-cross-retest-2h' ? 90 : strategy==='compression-expansion-1h'?85 : strategy === 'trend' ? 58 : 60;
+  const flexiblePullback = flexibleMacro && one.close >= one.ema51 && (one.recentLow <= one.ema9 * 1.02 || one.recentLow <= one.ema22 * 1.02) && (one.pivot.bullish || one.pattern.bullish) && two.close >= two.ema51 && (two.pivot.bullish || two.pattern.bullish || two.momentum) && (one.buyerDominance || one.relativeVolume >= .9) && one.previousSellerExhaustion !== false;
+  if (!(strategy==='rsi-ema-recovery'||strategy==='ema-cross-retest-2h'||strategy==='compression-expansion-1h'||strategy==='vwap-retest-1h-2h'||(strategy === 'trend' ? trendValid : strategy === 'aggressive-pullback' ? pullback.valid : flexiblePullback))) return reject('Condições específicas do setup não confirmadas');
+  if (!['ema-cross-retest-2h','compression-expansion-1h','rsi-ema-recovery','vwap-retest-1h-2h'].includes(strategy)&&lateEntry(timing,triggerSeries,triggerTimeframe)) return reject('Entrada esticada além do limite');
+  let score = strategy==='rsi-ema-recovery' ? (recovery.touchCount>=2?92:90) : strategy==='ema-cross-retest-2h' ? 90 : strategy==='compression-expansion-1h'?85 : strategy==='vwap-retest-1h-2h'?84 : strategy === 'trend' ? 58 : 60;
   if (d.momentum) score += strategy === 'flexible-pullback-2h' ? 4 : 8;
   if (four.momentum) score += 10;
   if (two.momentum) score += 8;
@@ -245,6 +276,8 @@ function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS,
   if (timing.relativeVolume >= 1.25) score += 9;
   if (two.strong || timing.strong) score += 7;
   if (strategy==='compression-expansion-1h'&&early1h.rsiCross) score += 5;
+  if (strategy==='vwap-retest-1h-2h'&&vwap.squeezeReleased) score += 5;
+  if (strategy==='vwap-retest-1h-2h'&&vwap.cvdRising) score += 4;
   if ((strategy === 'aggressive-pullback' || strategy === 'flexible-pullback-2h') && timing.pivot.bullish) score += 8;
   score = Math.min(score,100);
   if (score < config.minScore) return reject(`Score ${score}, abaixo do mínimo ${config.minScore}`);
@@ -262,10 +295,10 @@ function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS,
   if ((tp2-entry)/entry < .03) return reject('Alvo 2R abaixo do mínimo de 3%');
   if (!['compression-expansion-1h','rsi-ema-recovery'].includes(strategy)&&timing.levels.resistance && timing.levels.resistance-entry < 2*risk) return reject('Resistência não deixa espaço mínimo de 2R');
   const stretchPct = timing.ema9 ? (entry / timing.ema9 - 1) * 100 : 0, stretchWarning = stretchPct > 0 ? `Entrada esticada em ${stretchPct.toFixed(1)}% vs EMA9` : 'Entrada sem esticamento vs EMA9';
-  const triggerLabel=strategy==='rsi-ema-recovery'?`RSI <= 30 · ${recovery.touchCount} toque(s) · EMA 8 acima de 22/80 após ${recovery.elapsedDays.toFixed(1)} dias`:strategy==='ema-cross-retest-2h'?'EMA 9 cruzou 22/52 · reteste confirmado · rompimento fechado':strategy==='compression-expansion-1h'?'Base comprimida · rompimento inicial com volume e RSI':(timing.pattern.bullish ? timing.pattern.name : timing.pivot.label);
-  const context=strategy==='rsi-ema-recovery'?'Experimental: recuperação pós-sobrevenda; confirmar visualmente estrutura, volume e resistência antes de operar':strategy==='ema-cross-retest-2h'?'Macro LONG: 1W · 1D · 4H, com cruzamento/reteste em 2H':strategy==='compression-expansion-1h'?'Antecipação 1H: base comprimida, expansão com volume e RSI; diário/4H sem viés baixista':'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H';
+  const triggerLabel=strategy==='rsi-ema-recovery'?`RSI <= 30 · ${recovery.touchCount} toque(s) · EMA 8 acima de 22/80 após ${recovery.elapsedDays.toFixed(1)} dias`:strategy==='ema-cross-retest-2h'?'EMA 9 cruzou 22/52 · reteste com pavio confirmado · rompimento fechado':strategy==='compression-expansion-1h'?'Base comprimida · rompimento inicial com volume e RSI':strategy==='vwap-retest-1h-2h'?'VWAP semanal rompida · primeiro reteste com volume':(timing.pattern.bullish ? timing.pattern.name : timing.pivot.label);
+  const context=strategy==='rsi-ema-recovery'?'Experimental: recuperação pós-sobrevenda; confirmar visualmente estrutura, volume e resistência antes de operar':strategy==='ema-cross-retest-2h'?'Macro LONG: 1W · 1D · 4H, com cruzamento/reteste em 2H':strategy==='compression-expansion-1h'?'Antecipação 1H: base comprimida, expansão com volume e RSI; diário/4H sem viés baixista':strategy==='vwap-retest-1h-2h'?'Experimental: rompimento e primeiro reteste da VWAP semanal; squeeze e CVD são confluências, não certeza':'Macro LONG confirmado: 1W · 1D · 4H · 2H · 1H';
   const entryLimitLabel=`Entrada válida até ${maxEntry.toFixed(8)} para preservar ${config.minimumRewardRisk.toFixed(1)}R`;
-  return { ...asset, source:asset.source||'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], tier:strategy==='rsi-ema-recovery'?'WATCH':score>=90?'VALIDATED':'WATCH', tierLabel:strategy==='rsi-ema-recovery'?'EXPERIMENTAL · CONFIRME O GRÁFICO':score>=90?'ENTRADA VALIDADA':'SETUP FORTE · AGUARDAR CONFIRMAÇÃO', triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, maxEntry, minimumRewardRisk:config.minimumRewardRisk, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:strategy==='compression-expansion-1h'?early1h.volumeRatio:timing.relativeVolume, context, trigger:`${triggerLabel} · RSI ${timing.rsi.toFixed(1)} · volume ${(strategy==='compression-expansion-1h'?early1h.volumeRatio:timing.relativeVolume).toFixed(2)}x · ${stretchWarning}`, entryStretchPct:stretchPct, entryWarning:highRisk?'Risco acima de 4%; somente SPOT, sem alavancagem':entryLimitLabel, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, rsiTouches:recovery?.touchCount, waitingDays:recovery?.elapsedDays, lateEntryAllowed:false, riskPct, maxLeverage:config.enforceRiskPolicy?(highRisk?1:2):3, riskTier:config.enforceRiskPolicy?(highRisk?'HIGH_RISK_SPOT':'STANDARD_LEVERAGE_2X'):null, engineVersion:VERSION };
+  return { ...asset, source:asset.source||'BINANCE', direction:'LONG', strategy, strategyName:STRATEGIES[strategy], setup:STRATEGIES[strategy], tier:strategy==='rsi-ema-recovery'||strategy==='vwap-retest-1h-2h'?'WATCH':score>=90?'VALIDATED':'WATCH', tierLabel:strategy==='rsi-ema-recovery'||strategy==='vwap-retest-1h-2h'?'EXPERIMENTAL · CONFIRME O GRÁFICO':score>=90?'ENTRADA VALIDADA':'SETUP FORTE · AGUARDAR CONFIRMAÇÃO', triggerTimeframe, triggerLabel:triggerTimeframe.toUpperCase(), timeframe:triggerTimeframe.toUpperCase(), score, entry, maxEntry, minimumRewardRisk:config.minimumRewardRisk, stop, tp2, tp3, target:tp2, candleTime:triggerSeries.at(-1).time, rsi:timing.rsi, adx:timing.adx, volumeRatio:strategy==='compression-expansion-1h'?early1h.volumeRatio:strategy==='vwap-retest-1h-2h'?vwap.volumeRatio:timing.relativeVolume, context, trigger:`${triggerLabel} · RSI ${timing.rsi.toFixed(1)} · volume ${(strategy==='compression-expansion-1h'?early1h.volumeRatio:strategy==='vwap-retest-1h-2h'?vwap.volumeRatio:timing.relativeVolume).toFixed(2)}x · ${stretchWarning}`, entryStretchPct:stretchPct, entryWarning:highRisk?'Risco acima de 4%; somente SPOT, sem alavancagem':entryLimitLabel, support:timing.levels.support, resistance:timing.levels.resistance, weeklyRise:extension.rise12, weeklyRsi:extension.weekly.rsi, rsiTouches:recovery?.touchCount, waitingDays:recovery?.elapsedDays, riskManagement:{breakevenAtR:1,runnerTrailAfterR:2,runnerTrail:'mínima dos dois últimos candles de 4H'}, institutional:{vwap:vwap?.vwap,squeezeReleased:vwap?.squeezeReleased||false,cvdProxyRising:vwap?.cvdRising||false,ema200Four:four.ema200,ema200Daily:d.ema200},lateEntryAllowed:false,riskPct, maxLeverage:config.enforceRiskPolicy?(highRisk?1:2):3, riskTier:config.enforceRiskPolicy?(highRisk?'HIGH_RISK_SPOT':'STANDARD_LEVERAGE_2X'):null, engineVersion:VERSION };
 }
 function evaluate(asset, series, options = DEFAULTS, diagnostics = null) {
   const config = settings(options), analyses = analyseSet(series);
@@ -273,13 +306,13 @@ function evaluate(asset, series, options = DEFAULTS, diagnostics = null) {
   if (!Number.isFinite(volume) || volume < config.minVolume) { if (diagnostics) diagnostics.push({strategy:'geral',reason:`Volume do par abaixo de US$ ${config.minVolume.toLocaleString('en-US')}`}); return null; }
   const strategies = config.strategies || (config.strategy === 'both' ? Object.keys(STRATEGIES) : [config.strategy]);
   const attempts = strategies.flatMap(strategy => {
-    const timeframes=strategy==='rsi-ema-recovery'?['8h','4h','2h','1h']:strategy==='compression-expansion-1h'?['1h']:strategy==='flexible-pullback-2h'||strategy==='ema-cross-retest-2h'?['2h']:['1h','2h','4h'];
+    const timeframes=strategy==='rsi-ema-recovery'?['8h','4h','2h','1h']:strategy==='compression-expansion-1h'?['1h']:strategy==='vwap-retest-1h-2h'?['1h','2h']:strategy==='flexible-pullback-2h'||strategy==='ema-cross-retest-2h'?['2h']:['1h','2h','4h'];
     return timeframes.map(triggerTimeframe=>{const trace={strategy:`${strategy} · ${triggerTimeframe.toUpperCase()}`,reason:null};const signal=evaluateAnalyses(asset,series,analyses,strategy,config,triggerTimeframe,trace);if(diagnostics)diagnostics.push(trace);return signal;});
   });
   return attempts.filter(Boolean).sort(compareSignals)[0] || null;
 }
 function compareSignals(a,b) {
-  const priority={trend:0,'aggressive-pullback':1,'flexible-pullback-2h':2,'ema-cross-retest-2h':3,'compression-expansion-1h':4,'bearish-breakdown':5,'rsi-ema-recovery':99};
+  const priority={trend:0,'aggressive-pullback':1,'flexible-pullback-2h':2,'ema-cross-retest-2h':3,'compression-expansion-1h':4,'vwap-retest-1h-2h':5,'bearish-breakdown':6,'rsi-ema-recovery':99};
   return (priority[a.strategy]??99)-(priority[b.strategy]??99) || b.score-a.score || (a.rank||99999)-(b.rank||99999) || a.symbol.localeCompare(b.symbol);
 }
 function consolidate(signals, limit = 20) { const seen=new Set(); return signals.slice().sort(compareSignals).filter(s=>{if(seen.has(s.symbol))return false; seen.add(s.symbol); return true;}).slice(0,limit); }
@@ -359,30 +392,43 @@ async function fetchSeries(getJson,symbol,asOf,source=SOURCES.spot,hourlyLimit=2
 async function vehicle(getJson,signal,asOf) {
   const spot={...signal,vehicle:'SPOT',leverage:'1×',vehicleReason:`Setup SPOT confirmado na ${signal.source||'BINANCE'}.`};
   if (signal.riskTier==='HIGH_RISK_SPOT') return {...spot,vehicleReason:'Risco entre 4% e 8%; somente SPOT, sem alavancagem.'};
-  if (signal.direction==='SHORT') return {...signal,vehicle:'FUTURES',leverage:'3× máx.',vehicleReason:'Direção SHORT: requer mercado de futuros; confirme margem e disponibilidade na corretora.'};
-  if(signal.source==='MEXC')return spot;
+  if(signal.source==='MEXC') return spot;
+  if (signal.direction==='SHORT') return {...signal,vehicle:'FUTURES BINANCE',leverage:'2× máx.',vehicleReason:'Direção SHORT: confirme contrato Binance, liquidez e margem antes de operar.'};
+  const derivatives=signal.derivatives;
+  if(!derivatives){try{const metrics=await fetchBinanceDerivatives(getJson,signal.symbol),gate=derivativesGate(metrics);if(gate.blocked)return {...spot,vehicleReason:gate.reason};if(!gate.available)return {...spot,vehicleReason:'Setup SPOT confirmado; contrato perpétuo Binance sem dados suficientes para liberar futuros.',vehicleWarning:metrics.warning};return vehicle(getJson,{...signal,derivatives:{...metrics,...gate}},asOf);}catch(error){return {...spot,vehicleReason:'Setup SPOT confirmado; consulta de futuros Binance indisponível.',vehicleWarning:error.message};}}
+  if(!derivatives.available || derivatives.blocked)return {...spot,vehicleReason:'Setup SPOT confirmado; contrato perpétuo Binance sem dados suficientes para liberar futuros.'};
+  const leverageCap=Math.min(2,signal.maxLeverage||2), fundingPct=(derivatives.funding*100).toFixed(3);
+  return {...signal,vehicle:'FUTURES BINANCE',leverage:`${leverageCap}× máx.`,funding:derivatives.funding,vehicleReason:`Perpétuo Binance disponível; funding ${fundingPct}% por período${derivatives.institutional?' e OI 4H crescente':''}.`};
+}
+function normalizeFundingRate(value) { if(value==null||value==='')return null; const rate=Number(value); if(!Number.isFinite(rate)) return null; return Math.abs(rate)>0.1?rate/100:rate; }
+function derivativesGate(metrics = {}) {
+  const funding=normalizeFundingRate(metrics.funding), oiIncreasing4h=metrics.oiIncreasing4h===true, euphoric=Number.isFinite(funding)&&funding>.0005, institutional=Number.isFinite(funding)&&funding>=-.0001&&funding<=.0001&&oiIncreasing4h;
+  return {available:Number.isFinite(funding),funding,euphoric,blocked:euphoric,oiIncreasing4h,institutional,scoreBonus:institutional?5:0,reason:euphoric?'Funding Binance acima de +0,05% por 8h; risco de long squeeze':institutional?'Funding neutro/levemente negativo e OI 4H crescente (+5)':'Métricas derivativas sem confluência adicional'};
+}
+async function fetchBinanceDerivatives(getJson,symbol) {
   try {
-    const [series,premium]=await Promise.all([fetchSeries(getJson,signal.symbol,asOf,SOURCES.futures),getJson(`${SOURCES.futures}/premiumIndex?symbol=${signal.symbol}`)]);
-    const analyses=analyseSet(series), funding=Number(premium.lastFundingRate);
-    if(!analyses || analyses.extension.blocked || analyses.weekly.close < analyses.weekly.ema22 || !confirmedMacro(analyses)) return {...spot,vehicleReason:'Setup SPOT confirmado; futuros sem confirmação suficiente.'};
-    const atrPct=analyses.one.atr/analyses.one.close*100;
-    if(signal.score>=90 && analyses.one.relativeVolume>=1.25 && atrPct<=3.5 && Number.isFinite(funding) && funding<=.0003) { const leverageCap=signal.riskTier?Math.min(2,signal.maxLeverage||2):(signal.maxLeverage||3); return {...signal,vehicle:'FUTURES',leverage:`${leverageCap}× máx.`,funding,atrPct,vehicleReason:`Futuros confirmados; alavancagem limitada a ${leverageCap}×, ATR ${atrPct.toFixed(1)}% e funding ${(funding*100).toFixed(3)}%.`}; }
-    return {...spot,vehicleReason:'Setup SPOT confirmado; volatilidade, volume ou funding não qualificam futuros.'};
-  }catch(error){return {...spot,vehicleReason:'Setup SPOT confirmado; consulta de futuros indisponível.',vehicleWarning:error.message};}
+    const ticker=await getJson(`${SOURCES.futures}/premiumIndex?symbol=${encodeURIComponent(symbol)}`), funding=normalizeFundingRate(ticker?.lastFundingRate);
+    let oiIncreasing4h=false;
+    try { const rows=await getJson(`${SOURCES.futuresData}/openInterestHist?symbol=${encodeURIComponent(symbol)}&period=4h&limit=2`); if(Array.isArray(rows)&&rows.length>=2){const first=Number(rows.at(-2)?.sumOpenInterestValue??rows.at(-2)?.sumOpenInterest), last=Number(rows.at(-1)?.sumOpenInterestValue??rows.at(-1)?.sumOpenInterest); oiIncreasing4h=Number.isFinite(first)&&Number.isFinite(last)&&last>first;} } catch { /* OI histórico é opcional; funding continua sendo aplicado. */ }
+    return {contract:symbol,funding,oiIncreasing4h};
+  } catch(error) { return {contract:symbol,funding:null,oiIncreasing4h:false,warning:error.message}; }
 }
 async function scanMarket(getJson,options=DEFAULTS,onProgress=()=>{}) {
   const config=settings(options), clock=await getJson(`${SOURCES.spot}/time`), asOf=Number(clock.serverTime);
   if(!Number.isFinite(asOf))throw new Error('Horário Binance inválido.');
   const universe=await marketUniverse(getJson,config), signals=[], failures=[], diagnostics=universe.candidateAudit.filter(item=>item.status==='excluded').map(item=>({...item,reasons:[item.reason]})), warnings=[...universe.warnings];let next=0,done=0;
+  let marketRegime={available:false,vetoLongs:false,status:'UNAVAILABLE',label:'Regime BTC indisponível'};
+  try { const btc=analyseSet(await fetchSeries(getJson,'BTCUSDT',asOf,SOURCES.spot)); marketRegime=marketRegimeGate(btc); if(marketRegime.vetoLongs)warnings.push(marketRegime.label); }
+  catch(error){ warnings.push(`Regime BTC indisponível: ${error.message}`); }
   const needsRecovery=(config.strategies||[config.strategy]).includes('rsi-ema-recovery')||config.strategy==='both';
-  async function worker(){while(next<universe.assets.length){const asset=universe.assets[next++];const audit={symbol:asset.symbol,name:asset.name,rank:asset.rank,source:asset.source,volume:asset.volume,status:'rejected',reasons:[]};try{const source=asset.source==='MEXC'?SOURCES.mexc:SOURCES.spot,series=await fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,asOf,source,needsRecovery?800:210), trace=[], signal=evaluate(asset,series,config,trace);audit.reasons=trace.filter(item=>item.reason).map(item=>`${item.strategy}: ${item.reason}`);if(signal){signals.push(signal);audit.status='signal';audit.score=signal.score;audit.strategy=signal.strategyName;}else if(!audit.reasons.length)audit.reasons=['Não atingiu todos os filtros do setup'];}catch(error){failures.push({symbol:asset.symbol,source:asset.source,error:error.message});audit.status='error';audit.reasons=[`Falha de consulta: ${error.message}`];}diagnostics.push(audit);onProgress(++done,universe.assets.length);}}
+  async function worker(){while(next<universe.assets.length){const asset=universe.assets[next++];const audit={symbol:asset.symbol,name:asset.name,rank:asset.rank,source:asset.source,volume:asset.volume,status:'rejected',reasons:[]};try{const source=asset.source==='MEXC'?SOURCES.mexc:SOURCES.spot,series=await fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,asOf,source,needsRecovery?800:210), trace=[], signal=evaluate(asset,series,config,trace);audit.reasons=trace.filter(item=>item.reason).map(item=>`${item.strategy}: ${item.reason}`);if(signal&&marketRegime.vetoLongs&&signal.direction==='LONG'){audit.reasons=[marketRegime.label];}else if(signal){signals.push(signal);audit.status='signal';audit.score=signal.score;audit.strategy=signal.strategyName;}else if(!audit.reasons.length)audit.reasons=['Não atingiu todos os filtros do setup'];}catch(error){failures.push({symbol:asset.symbol,source:asset.source,error:error.message});audit.status='error';audit.reasons=[`Falha de consulta: ${error.message}`];}diagnostics.push(audit);onProgress(++done,universe.assets.length);}}
   await Promise.all(Array.from({length:Math.min(4,universe.assets.length)},worker));
   if(universe.assets.length && failures.length===universe.assets.length)throw new Error(`Todas as ${failures.length} consultas de ativos falharam: ${failures[0].error}`);
   const qualified=consolidate(signals,config.maxSignals), selected=[];
-  for(const signal of qualified){const checked=await vehicle(getJson,signal,asOf);selected.push(checked);if(checked.vehicleWarning)warnings.push(`${signal.symbol}: ${checked.vehicleWarning}`);}
-  return {signals:selected,assets:universe.assets.length,eligibleAssets:universe.assets.length,requestedLimit:universe.requestedLimit,rankingCandidates:universe.rankingCandidates,diagnostics,mode:universe.mode,failures,warnings,asOf,config,engineVersion:VERSION};
+  for(const signal of qualified){const derivatives=signal.direction==='LONG'?await fetchBinanceDerivatives(getJson,signal.symbol):null, gate=derivatives?derivativesGate(derivatives):null;if(gate?.blocked){const audit=diagnostics.find(item=>item.symbol===signal.symbol&&item.status==='signal');if(audit){audit.status='rejected';audit.reasons=[gate.reason];}continue;}const enriched=gate?{...signal,score:Math.min(100,signal.score+gate.scoreBonus),derivatives:{...derivatives,...gate}}:signal,checked=await vehicle(getJson,enriched,asOf);selected.push(checked);if(checked.vehicleWarning)warnings.push(`${signal.symbol}: ${checked.vehicleWarning}`);if(derivatives?.warning)warnings.push(`${signal.symbol}: derivativos Binance indisponíveis (${derivatives.warning})`);}
+  return {signals:selected,assets:universe.assets.length,eligibleAssets:universe.assets.length,requestedLimit:universe.requestedLimit,rankingCandidates:universe.rankingCandidates,diagnostics,mode:universe.mode,failures,warnings,marketRegime,asOf,config,engineVersion:VERSION};
 }
 
-return Object.freeze({last,sma,ema,rsi,atr,macd,adx,stochRsi,candlePattern,bullishPivot,supportResistance,weeklyExtension,analyseTimeframe,lateEntry,pullbackStochCriteria,aggressivePullbackCriteria,pullback1hConfirmationCriteria,compressionExpansion1hCriteria,resampleHourly,rsiEmaRecoveryCriteria,VERSION,SOURCES,DEFAULTS,STRATEGIES,settings,closedCandles,confirmedMacro,analyseSet,evaluateAnalyses,evaluate,compareSignals,consolidate,isFresh,rankingLabel,isTradfiTokenized,marketUniverse,fetchSeries,vehicle,scanMarket});
+return Object.freeze({last,sma,ema,rsi,atr,macd,adx,stochRsi,candlePattern,bullishPivot,supportResistance,weeklyExtension,analyseTimeframe,lateEntry,pullbackStochCriteria,aggressivePullbackCriteria,pullback1hConfirmationCriteria,compressionExpansion1hCriteria,resampleHourly,anchoredWeeklyVwap,bollingerKeltner,cvdProxy,vwapRetestCriteria,rsiEmaRecoveryCriteria,marketRegimeGate,normalizeFundingRate,derivativesGate,fetchBinanceDerivatives,VERSION,SOURCES,DEFAULTS,STRATEGIES,settings,closedCandles,confirmedMacro,analyseSet,evaluateAnalyses,evaluate,compareSignals,consolidate,isFresh,rankingLabel,isTradfiTokenized,marketUniverse,fetchSeries,vehicle,scanMarket});
 });
 
