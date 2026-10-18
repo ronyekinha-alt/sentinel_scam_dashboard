@@ -2,6 +2,11 @@
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory(require('./sentinel-core.js'));else root.SentinelBacktest=factory(root.SentinelCore);})(typeof window!=='undefined'?window:globalThis,function(SentinelCore){
 'use strict';
 const { last,sma,ema,rsi,atr,macd,adx,stochRsi,candlePattern,bullishPivot,supportResistance,weeklyExtension,analyseTimeframe,lateEntry,pullbackStochCriteria,aggressivePullbackCriteria,pullback1hConfirmationCriteria }=SentinelCore;
+// Custos padrão por trade fechado: 0,075% taker na entrada e saída, mais 0,05%
+// de slippage em cada lado. Total líquido padrão: 0,25%.
+const DEFAULT_COSTS=Object.freeze({entryFeePct:.075,exitFeePct:.075,entrySlippagePct:.05,exitSlippagePct:.05});
+function operationalCostPct(costs=DEFAULT_COSTS){return ['entryFeePct','exitFeePct','entrySlippagePct','exitSlippagePct'].reduce((sum,key)=>sum+(Number(costs[key])||0),0);}
+function netTradeReturnPct(trade,multiplier=1,costs=DEFAULT_COSTS){return (Number(trade?.returnPct)||0)*multiplier-operationalCostPct(costs);}
 function historyUntil(series, timestamp, minimum = 210) { const index = series.findLastIndex(c => (c.closeTime ?? c.time) <= timestamp); return index < minimum - 1 ? null : series.slice(Math.max(0, index - 209), index + 1); }
 function ema80BreakoutCriteria(candles, timing, emaCandles = candles) {
   if (candles.length < 85) return { valid: false };
@@ -82,7 +87,7 @@ function breakout30EmaCriteria(candles, timing, mode = 'close', lookback = 30) {
   return { valid: valid && alignment && rsiOk, rangeHigh, alignment, volumeOk, rsiOk, breakoutSize };
 }
 function historicalSetup(week, day, h4, h2, h1, strategy, triggerTimeframe = '1h', emaCandles = h1, options = {}) {
-  if (['trend','aggressive-pullback','flexible-pullback-2h','ema-cross-retest-2h','compression-expansion-1h','rsi-ema-recovery','bearish-breakdown','ema8-ema80-daily'].includes(strategy)) {
+  if (['trend','aggressive-pullback','flexible-pullback-2h','ema-cross-retest-2h','compression-expansion-1h','vwap-retest-1h-2h','rsi-ema-recovery','bearish-breakdown','ema8-ema80-daily'].includes(strategy)) {
     const series={'1w':week,'1d':day,'4h':h4,'2h':h2,'1h':h1};
     const signal=SentinelCore.evaluateAnalyses({symbol:'BACKTEST',volume:1000000},series,SentinelCore.analyseSet(series),strategy,{minScore:options.minScore||90,enforceRiskPolicy:options.enforceRiskPolicy===true},triggerTimeframe);
     return signal ? {entry:signal.entry,stop:signal.stop,target:signal.tp2,target3:signal.tp3,score:signal.score,direction:signal.direction||'LONG'} : null;
@@ -119,11 +124,11 @@ function historicalSetup(week, day, h4, h2, h1, strategy, triggerTimeframe = '1h
   if (risk <= 0 || !Number.isFinite(risk) || risk / entry > .08 || supportDistance > .08 || (target - entry) / entry < 0.03 || (late && !['breakout-30-2h-close', 'breakout-30-2h-retest', 'breakout-30-2h-retest-fixed-3', 'breakout-30-2h-retest-fixed-4', 'breakout-30-2h-retest-fixed-7'].includes(strategy)) || (strategy === 'ema80-breakout' && risk / entry > 0.03) || (triggerTiming.levels.resistance && triggerTiming.levels.resistance - entry < (strategy === 'refined-moderate-ema-rsi' ? 1.75 : 2) * risk)) return null;
   return { entry, stop: fixedStop, target };
 }
-function backtestPortfolio(trades, capital, slots = 10, multiplier = 1) {
+function backtestPortfolio(trades, capital, slots = 10, multiplier = 1, costs = DEFAULT_COSTS) {
   const closed = trades.filter(trade => trade.result !== 'open'), allocation = capital / Math.max(1, slots);
-  const withoutReinvestment = capital + closed.reduce((total, trade) => total + allocation * ((Number(trade.returnPct) || 0) * multiplier / 100), 0);
-  const withReinvestment = closed.reduce((balance, trade) => balance + (balance / Math.max(1, slots)) * ((Number(trade.returnPct) || 0) * multiplier / 100), capital);
-  return { withoutReinvestment, withReinvestment, allocation };
+  const costPct=operationalCostPct(costs), withoutReinvestment = capital + closed.reduce((total, trade) => total + allocation * (netTradeReturnPct(trade,multiplier,costs)/100), 0);
+  const withReinvestment = closed.reduce((balance, trade) => balance + (balance / Math.max(1, slots)) * (netTradeReturnPct(trade,multiplier,costs)/100), capital);
+  return { withoutReinvestment, withReinvestment, allocation, costs:{...DEFAULT_COSTS,...costs}, operationalCostPct:costPct, totalCostPct:closed.length*costPct, expectancyNetPct:closed.length?closed.reduce((sum,trade)=>sum+netTradeReturnPct(trade,multiplier,costs),0)/closed.length:0 };
 }
 
 function hasConfirmedBullishEngulfing(candles, index) {
@@ -146,11 +151,11 @@ function correctionDepthInLastCandles(candles, index, lookback = 8) {
 }
 
 function simulate(series,symbol,start,end,timeframe,strategies,options={}) {
-  const {'1w':week,'1d':day,'4h':h4,'2h':h2,'1h':h1}=series, coreLiveStrategies=new Set(['trend','aggressive-pullback','flexible-pullback-2h','ema-cross-retest-2h','compression-expansion-1h','rsi-ema-recovery','bearish-breakdown']);
+  const {'1w':week,'1d':day,'4h':h4,'2h':h2,'1h':h1}=series, coreLiveStrategies=new Set(['trend','aggressive-pullback','flexible-pullback-2h','ema-cross-retest-2h','compression-expansion-1h','vwap-retest-1h-2h','rsi-ema-recovery','bearish-breakdown']);
   const timeframes = Array.isArray(timeframe) ? timeframe : [timeframe];
   return timeframes.flatMap(triggerTimeframe => { const triggerSeries = { '1h': h1, '2h': h2, '4h': h4, '1d': day }[triggerTimeframe]; return strategies.map(strategy => { const trades = []; let evaluated = 0, candidates = 0, shortRejected = 0, correctionRejected = 0, engulfRejected = 0, depthRejected = 0; const endIndex = triggerSeries.findLastIndex(candle => candle.time <= end); for (let i = 0; i < endIndex; i++) { const candle = triggerSeries[i]; if (candle.time < start) continue; if (candle.time > end) break; const signalAt=candle.closeTime ?? (candle.time + ({'1h':1,'2h':2,'4h':4,'1d':24}[triggerTimeframe]||1)*3600000-1), slices = [historyUntil(week,signalAt,51),historyUntil(day,signalAt),historyUntil(h4,signalAt),historyUntil(h2,signalAt)], hourlySlice=historyUntil(h1,signalAt), triggerSlice = triggerSeries.slice(Math.max(0, i - 209), i + 1); if (slices.some(x => !x) || !hourlySlice || triggerSlice.length < 210) continue; evaluated++; const setupSeries = strategy === 'ema8-ema80-daily' ? triggerSlice : coreLiveStrategies.has(strategy) ? hourlySlice : triggerSlice, setup = historicalSetup(...slices, setupSeries, strategy, triggerTimeframe, h1, options); if (!setup) continue; const direction = setup.direction || 'LONG'; if (options.longOnly === true && direction !== 'LONG') { shortRejected++; continue; } const confirmedEngulfing = hasConfirmedBullishEngulfing(triggerSeries, i); if (options.requireBullishEngulfing === true && !confirmedEngulfing) { engulfRejected++; continue; } if (options.requireCorrectionEngulf === true && !hasCorrectionBeforeBullishEngulfing(triggerSeries, i)) { correctionRejected++; continue; } const minCorrectionPct = Number(options.minCorrectionPct) || 0; if (minCorrectionPct > 0 && correctionDepthInLastCandles(triggerSeries, i, 8) < minCorrectionPct) { depthRejected++; continue; } candidates++; const entry = triggerSeries[i + 1].open, risk = direction === 'SHORT' ? setup.stop - entry : entry - setup.stop; if (risk <= 0) continue; const target = setup.target ?? (direction === 'SHORT' ? Math.min(entry - 2 * risk, entry * .92) : Math.max(entry + 2 * risk, entry * 1.08)), target3 = setup.target3 ?? (direction === 'SHORT' ? Math.min(entry - 3 * risk, entry * .12) : Math.max(entry + 3 * risk, entry * 1.12)); let peakHigh = entry, peakLow = entry, trade = { asset: symbol, strategyName: SentinelCore.STRATEGIES[strategy] || (strategy === 'expansion-retest-2h' ? 'Experimental · Rompimento + reteste 2H' : strategy === 'ema80-breakout' ? 'Rompimento antecipado · EMA 80' : strategy === 'early-breakout-2h-4h' ? 'Rompimento antecipado 2H + confirmação 4H' : strategy === 'legacy-pullback-1h' ? 'Histórico · Pullback 1H + confluência' : 'Setup experimental'), direction, time: triggerSeries[i + 1].time, entry, stop: setup.stop, target, target3, result: 'open', hit3R: false, returnPct: direction === 'SHORT' ? (entry / triggerSeries[endIndex].close - 1) * 100 : (triggerSeries[endIndex].close / entry - 1) * 100, maxRisePct: 0 }; let closedAt = i + 1; for (let j = i + 1; j <= endIndex; j++) { const future = triggerSeries[j]; peakHigh = Math.max(peakHigh, future.high); peakLow = Math.min(peakLow, future.low); const stopHit = direction === 'SHORT' ? future.high >= setup.stop : future.low <= setup.stop, targetHit = direction === 'SHORT' ? future.low <= target : future.high >= target; if (stopHit && targetHit || stopHit) { trade = { ...trade, exit: setup.stop, result: 'loss', returnPct: direction === 'SHORT' ? (entry / setup.stop - 1) * 100 : (setup.stop / entry - 1) * 100, maxRisePct: direction === 'SHORT' ? (entry / Math.max(peakHigh, Number.EPSILON) - 1) * 100 : (peakHigh / entry - 1) * 100 }; closedAt = j; break; } if (targetHit) { trade = { ...trade, exit: target, result: 'win', hit3R: direction === 'SHORT' ? future.low <= target3 : future.high >= target3, returnPct: direction === 'SHORT' ? (entry / target - 1) * 100 : (target / entry - 1) * 100, maxRisePct: direction === 'SHORT' ? (entry / Math.max(peakLow, Number.EPSILON) - 1) * 100 : (peakHigh / entry - 1) * 100 }; closedAt = j; break; } } if (trade.result === 'open') trade.maxRisePct = direction === 'SHORT' ? (entry / Math.max(peakLow, Number.EPSILON) - 1) * 100 : (peakHigh / entry - 1) * 100; trades.push(trade); i = closedAt; } return { strategy, timeframe: triggerTimeframe, trades, evaluated, candidates, shortRejected, correctionRejected, engulfRejected, depthRejected }; }); });
 }
 
-return Object.freeze({historyUntil,historicalSetup,backtestPortfolio,simulate});
+return Object.freeze({DEFAULT_COSTS,operationalCostPct,netTradeReturnPct,historyUntil,historicalSetup,backtestPortfolio,simulate});
 });
 
