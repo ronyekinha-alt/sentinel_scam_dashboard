@@ -1,4 +1,4 @@
-/* Motor único para painel e Telegram. Governança e risco v2026-10-18. */
+/* Motor único para painel e Telegram. Governança, risco e roteamento multi-corretora v2026-10-18. */
 (function(root,factory){if(typeof module==='object' && module.exports)module.exports=factory();else root.SentinelCore=factory();})(typeof window!=='undefined'?window:globalThis,function(){
 'use strict';
 function last(values) { return values[values.length - 1]; }
@@ -87,12 +87,18 @@ function pullback1hConfirmationCriteria(extension, day, confirmation, one) {
   const confirmed = confirmation.close >= confirmation.ema51 && confirmation.aligned && confirmation.rising && (confirmation.pivot.bullish || confirmation.pattern.bullish || confirmation.momentum) && one.previousSellerExhaustion !== false;
   return { valid: macro && pullback1h && confirmed, pullback1h, confirmed };
 }
-const VERSION = '2026-10-18-governance-risk-v2';
-const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', futuresData: 'https://fapi.binance.com/futures/data', mexc: 'https://api.mexc.com/api/v3', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', paprika: 'https://api.coinpaprika.com/v1' });
+const VERSION = '2026-10-18-multivenue-v3';
+const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', futuresData: 'https://fapi.binance.com/futures/data', mexc: 'https://api.mexc.com/api/v3', okx: 'https://www.okx.com/api/v5', coinbase: 'https://api.coinbase.com/api/v3/brokerage/market', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', paprika: 'https://api.coinpaprika.com/v1' });
 const DEFAULTS = Object.freeze({ minScore: 90, minVolume: 1000000, assetLimit: 700, strategy: 'both', maxSignals: 20, enforceRiskPolicy: false, maxEntryDeviationPct: 2, minimumRewardRisk: 1.7 });
 const INTERVALS = ['1w', '1d', '4h', '2h', '1h'];
 const STABLE_BASES = new Set(['USDT','USDC','USDE','USD1','DAI','FDUSD','TUSD','USDD','BUSD','PYUSD','USDP','FRAX','GUSD','EURC','EURS','USDY']);
-function isStableAsset(symbol) { return STABLE_BASES.has(String(symbol||'').replace(/USDT$/,'').toUpperCase()); }
+const VENUE_PRIORITY = Object.freeze(['BINANCE','OKX','MEXC','COINBASE']);
+const QUOTE_PRIORITY = Object.freeze(['USDT','USDC']);
+function baseOf(symbol) { return String(symbol||'').toUpperCase().replace(/[-_/]/g,'').replace(/(USDT|USDC|USD)$/, ''); }
+function isStableAsset(symbol) { return STABLE_BASES.has(baseOf(symbol)); }
+function canonicalSymbol(base) { return `${baseOf(base)}USDT`; }
+function sourceForAsset(asset = {}) { return ({ BINANCE:SOURCES.spot, OKX:SOURCES.okx, MEXC:SOURCES.mexc, COINBASE:SOURCES.coinbase })[String(asset.source||'BINANCE').toUpperCase()] || SOURCES.spot; }
+function sourceLabel(asset = {}) { const venue=String(asset.source||'BINANCE').toUpperCase(), pair=asset.exchangeSymbol||asset.symbol, quote=asset.quoteAsset||'USDT'; return `${venue} · ${pair||canonicalSymbol(asset.symbol)}${quote&&pair&&!String(pair).endsWith(quote)?`/${quote}`:''}`; }
 // Símbolos exclusivos das versões tokenizadas. Tickers genéricos (como META ou COIN)
 // não entram aqui, pois também podem representar projetos cripto legítimos.
 const TRADFI_BASES = new Set(['KORUB','SOXLB','TSLAB']);
@@ -332,25 +338,29 @@ function rankingLabel(asset) {
 }
 async function marketUniverse(getJson, options = DEFAULTS) {
   const config=settings(options);
-  const [exchange,tickers] = await Promise.all([getJson(`${SOURCES.spot}/exchangeInfo`),getJson(`${SOURCES.spot}/ticker/24hr`)]);
-  if (!Array.isArray(exchange.symbols) || !Array.isArray(tickers)) throw new Error('Universo Binance inválido.');
-  const pairs=new Set(exchange.symbols.filter(s=>s.status==='TRADING' && s.quoteAsset==='USDT' && s.isSpotTradingAllowed).map(s=>s.symbol));
-  const volumes=new Map(tickers.map(t=>[t.symbol,Number(t.quoteVolume)||0]));
-  const prices=new Map(tickers.map(t=>[t.symbol,Number(t.lastPrice)||0]));
-  const warnings=[], rankings={};
-  const mexcPairs=new Map(), mexcMetadata=new Map(), mexcVolumes=new Map(), mexcPrices=new Map();
-  const mexcJob=Promise.all([getJson(`${SOURCES.mexc}/exchangeInfo`),getJson(`${SOURCES.mexc}/ticker/24hr`)]).then(([info,quotes])=>{
-    if(!Array.isArray(info.symbols)||!Array.isArray(quotes))throw new Error('Universo MEXC inválido');
-    for(const p of info.symbols)if(p.status==='1'&&p.quoteAsset==='USDT'&&p.isSpotTradingAllowed!==false){mexcPairs.set(p.symbol,p.symbol);mexcMetadata.set(p.symbol,p);}
-    for(const q of quotes){mexcVolumes.set(q.symbol,Number(q.quoteVolume)||0);mexcPrices.set(q.symbol,Number(q.lastPrice)||0);}
-  }).catch(error=>warnings.push(`MEXC: ${error.message}`));
+  const warnings=[], rankings={}, venueBooks=new Map();
+  // O mesmo ativo é sempre lido integralmente em uma única corretora/par. A ordem
+  // privilegia Binance e USDT; USDC só é aceito como par alternativo da mesma fonte.
+  function addVenuePair(book, base, quote, pair, volume, price, metadata={}) {
+    if(!QUOTE_PRIORITY.includes(quote)||!base||!pair)return;
+    const candidate={source:book.source,base,quoteAsset:quote,exchangeSymbol:pair,volume:Number(volume)||0,price:Number(price)||0,metadata};
+    const previous=book.byBase.get(base);
+    if(!previous||QUOTE_PRIORITY.indexOf(candidate.quoteAsset)<QUOTE_PRIORITY.indexOf(previous.quoteAsset)||candidate.volume>previous.volume&&candidate.quoteAsset===previous.quoteAsset)book.byBase.set(base,candidate);
+  }
+  async function loadBinance(){const [info,quotes]=await Promise.all([getJson(`${SOURCES.spot}/exchangeInfo`),getJson(`${SOURCES.spot}/ticker/24hr`)]);if(!Array.isArray(info.symbols)||!Array.isArray(quotes))throw new Error('Universo Binance inválido');const book={source:'BINANCE',byBase:new Map()};const quoteMap=new Map(quotes.map(q=>[q.symbol,q]));for(const p of info.symbols)if(p.status==='TRADING'&&p.isSpotTradingAllowed!==false&&QUOTE_PRIORITY.includes(p.quoteAsset)){const q=quoteMap.get(p.symbol)||{};addVenuePair(book,baseOf(p.baseAsset||p.symbol),p.quoteAsset,p.symbol,q.quoteVolume,q.lastPrice,p);}return book;}
+  async function loadMexc(){const [info,quotes]=await Promise.all([getJson(`${SOURCES.mexc}/exchangeInfo`),getJson(`${SOURCES.mexc}/ticker/24hr`)]);if(!Array.isArray(info.symbols)||!Array.isArray(quotes))throw new Error('Universo MEXC inválido');const book={source:'MEXC',byBase:new Map()};const quoteMap=new Map(quotes.map(q=>[q.symbol,q]));for(const p of info.symbols)if(p.status==='1'&&p.isSpotTradingAllowed!==false&&QUOTE_PRIORITY.includes(p.quoteAsset)){const q=quoteMap.get(p.symbol)||{};addVenuePair(book,baseOf(p.baseAsset||p.baseCoin||p.symbol),p.quoteAsset,p.symbol,q.quoteVolume,q.lastPrice,p);}return book;}
+  async function loadOkx(){const [info,tickerPayload]=await Promise.all([getJson(`${SOURCES.okx}/public/instruments?instType=SPOT`),getJson(`${SOURCES.okx}/market/tickers?instType=SPOT`)]);const instruments=info?.data,quotes=tickerPayload?.data;if(!Array.isArray(instruments)||!Array.isArray(quotes))throw new Error('Universo OKX inválido');const book={source:'OKX',byBase:new Map()},quoteMap=new Map(quotes.map(q=>[q.instId,q]));for(const p of instruments)if(p.state==='live'&&QUOTE_PRIORITY.includes(p.quoteCcy)){const q=quoteMap.get(p.instId)||{};addVenuePair(book,baseOf(p.baseCcy||p.instId),p.quoteCcy,p.instId,q.volCcy24h,q.last,p);}return book;}
+  async function loadCoinbase(){const payload=await getJson(`${SOURCES.coinbase}/products?limit=1000`),products=Array.isArray(payload?.products)?payload.products:Array.isArray(payload)?payload:null;if(!products)throw new Error('Universo Coinbase inválido');const book={source:'COINBASE',byBase:new Map()};for(const p of products){const quote=String(p.quote_currency_id||p.quote_currency||'').toUpperCase(),base=String(p.base_currency_id||p.base_currency||'').toUpperCase(),pair=p.product_id;if((p.trading_disabled||p.is_disabled)||!QUOTE_PRIORITY.includes(quote))continue;addVenuePair(book,base,quote,pair,p.approximate_quote_24h_volume||p.quote_volume_24h,p.price,p);}return book;}
+  const venueSettled=await Promise.allSettled([loadBinance(),loadOkx(),loadMexc(),loadCoinbase()]);
+  venueSettled.forEach((result,index)=>{const venue=VENUE_PRIORITY[index];if(result.status==='fulfilled')venueBooks.set(venue,result.value);else warnings.push(`${venue}: ${result.reason.message}`);});
+  if(!venueBooks.has('BINANCE'))warnings.push('Binance indisponível: o regime BTC e derivativos continuam em modo de proteção.');
+  function selectVenue(base){for(const venue of VENUE_PRIORITY){const pair=venueBooks.get(venue)?.byBase.get(base);if(pair)return pair;}return null;}
   const primaryJobs=[['CoinGecko',async()=>{const rows=[];for(let page=1;page<=Math.ceil(config.assetLimit/250);page++){const coins=await getJson(`${SOURCES.ranking}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${page}&sparkline=false`);if(!Array.isArray(coins)||!coins.length)throw new Error('Ranking indisponível');rows.push(...coins);}return rows.map(c=>({...c,rank:Number(c.market_cap_rank)}));}],['CoinMarketCap',async()=>{const result=await getJson(`${SOURCES.cmc}/cryptocurrency/listings/latest?start=1&limit=${config.assetLimit}&convert=USD&sort=market_cap&sort_dir=desc`);if(!Array.isArray(result.data)||(result.status?.error_code != null && Number(result.status.error_code)!==0))throw new Error(result.status?.error_message||'Ranking inválido');return result.data.map(c=>({...c,rank:Number(c.cmc_rank)}));}]];
   let jobs=primaryJobs, settled=await Promise.allSettled(primaryJobs.map(([,load])=>load()));
   if(!settled.some(result=>result.status==='fulfilled')){
     jobs=[['CoinPaprika',async()=>{const rows=await getJson(`${SOURCES.paprika}/tickers?quotes=USD`);if(!Array.isArray(rows)||!rows.length)throw new Error('Ranking indisponível');return rows.map(c=>({symbol:c.symbol,name:c.name,rank:Number(c.rank)})).filter(c=>Number.isInteger(c.rank)&&c.rank>0).sort((a,b)=>a.rank-b.rank).slice(0,config.assetLimit);}]];
     settled=await Promise.allSettled(jobs.map(([,load])=>load()));
   }
-  await mexcJob;
   const merged=new Map();
   settled.forEach((result,index)=>{
     const source=jobs[index][0];
@@ -359,33 +369,40 @@ async function marketUniverse(getJson, options = DEFAULTS) {
     if(!rows.length){warnings.push(`${source}: ranking sem ativos válidos`);return;}
     rankings[source]=rows.length;
     const symbols=new Map();for(const c of rows){const symbol=String(c.symbol).toUpperCase();symbols.set(symbol,(symbols.get(symbol)||0)+1);}
-    for(const c of rows){const symbol=`${String(c.symbol).toUpperCase()}USDT`;if(symbols.get(String(c.symbol).toUpperCase())>1){if(pairs.has(symbol)||mexcPairs.has(symbol))warnings.push(`${source}: símbolo ambíguo ${symbol}, ignorado nessa fonte`);continue;}const old=merged.get(symbol)||{symbol,name:c.name,rank:c.rank,rankingSources:[],rankings:{}};const marketCap=Number(c.market_cap||c.quote?.USD?.market_cap||0);old.rank=Math.min(old.rank,c.rank);old.marketCap=Math.max(Number(old.marketCap)||0,Number.isFinite(marketCap)?marketCap:0);old.rankingSources.push(source);old.rankings[source]=c.rank;merged.set(symbol,old);}
+    for(const c of rows){const base=baseOf(c.symbol),symbol=canonicalSymbol(base);if(symbols.get(base)>1){if(selectVenue(base))warnings.push(`${source}: símbolo ambíguo ${symbol}, ignorado nessa fonte`);continue;}const old=merged.get(symbol)||{symbol,base,name:c.name,rank:c.rank,rankingSources:[],rankings:{}};const marketCap=Number(c.market_cap||c.quote?.USD?.market_cap||0);old.rank=Math.min(old.rank,c.rank);old.marketCap=Math.max(Number(old.marketCap)||0,Number.isFinite(marketCap)?marketCap:0);old.rankingSources.push(source);old.rankings[source]=c.rank;merged.set(symbol,old);}
   });
-  const tokenizedSymbols=[...mexcPairs.keys()].filter(symbol=>{
-    const metadata=mexcMetadata.get(symbol)||{}, descriptor=`${metadata.baseAsset||''} ${metadata.baseCoin||''} ${metadata.baseCoinName||''} ${metadata.quoteAsset||''}`.toUpperCase();
-    return isTradfiTokenized({symbol,name:descriptor,...metadata});
-  });
-  const tokenizedCandidates=tokenizedSymbols.filter(symbol=>(mexcVolumes.get(symbol)||0)>=config.minVolume).map((symbol,index)=>({symbol,name:`${mexcMetadata.get(symbol)?.baseAsset||symbol.replace(/USDT$/,'')} · Mercado tradicional tokenizado MEXC`,rank:config.assetLimit+index+1,rankingSources:['MEXC TradFi tokenizados'],rankings:{},source:'MEXC',exchangeSymbol:symbol,volume:mexcVolumes.get(symbol)||0,volume24h:mexcVolumes.get(symbol)||0,tokenized:true,assetClass:'TRADFI_TOKENIZED'}));
   const sources=Object.keys(rankings);
   let mode, candidates;
   if(!sources.length){
     // Contingência: os rankings por capitalização podem bloquear consultas públicas.
     // Mantemos o scanner operacional ordenando os pares Binance por volume USDT 24h.
     warnings.push('Rankings por capitalização indisponíveis; usando ranking fallback por volume 24h da Binance.');
-    const fallback=[...volumes.entries()].filter(([symbol,volume])=>pairs.has(symbol)&&!['BTCUSDT','ETHUSDT'].includes(symbol)&&!isStableAsset(symbol)&&Number(volume)>=config.minVolume).sort((a,b)=>b[1]-a[1]).slice(0,config.assetLimit);
-    candidates=fallback.map(([symbol,volume],index)=>({symbol,name:symbol.replace(/USDT$/,''),rank:index+1,rankingSources:['Binance volume 24h'],rankings:{'Binance volume 24h':index+1},volume,volume24h:volume}));
+    const fallback=[...(venueBooks.get('BINANCE')?.byBase||new Map()).values()].filter(pair=>!['BTC','ETH'].includes(pair.base)&&!isStableAsset(pair.base)&&pair.volume>=config.minVolume).sort((a,b)=>b.volume-a.volume).slice(0,config.assetLimit);
+    candidates=fallback.map((pair,index)=>({symbol:canonicalSymbol(pair.base),base:pair.base,name:pair.base,rank:index+1,rankingSources:['Binance volume 24h'],rankings:{'Binance volume 24h':index+1},volume:pair.volume,volume24h:pair.volume}));
     mode='volume 24h Binance (fallback)';
   } else { mode=`market cap (${sources.join(' + ')})`; candidates=[...merged.values()]; }
-  const candidateSymbols=new Set(candidates.map(c=>c.symbol));
-  candidates.push(...tokenizedCandidates.filter(c=>!candidateSymbols.has(c.symbol)));
-  const candidateAudit=candidates.map(c=>{const binance=pairs.has(c.symbol),mexc=mexcPairs.has(c.symbol),source=binance?'BINANCE':(mexc?'MEXC':null),exchangeSymbol=binance?c.symbol:(mexc?mexcPairs.get(c.symbol):null),volume=binance?(volumes.get(c.symbol)||0):(mexc?(mexcVolumes.get(exchangeSymbol)||0):0),stable=isStableAsset(c.symbol),tradfi=isTradfiTokenized({...c,...(mexcMetadata.get(exchangeSymbol)||{})});return {symbol:c.symbol,name:c.name,rank:c.rank,source,volume,status:source&&volume>=config.minVolume&&!stable&&!tradfi?'eligible':'excluded',reason:stable?'Stablecoin excluída do scanner':tradfi?'Ativo tradicional tokenizado excluído do scanner cripto':!source?'Par USDT não encontrado na Binance ou MEXC':`Volume ${volume.toLocaleString('en-US',{maximumFractionDigits:0})} abaixo do mínimo de US$ ${config.minVolume.toLocaleString('en-US')}`};});
+  const candidateAudit=candidates.map(c=>{const pair=selectVenue(c.base||baseOf(c.symbol)),stable=isStableAsset(c.base||c.symbol),tradfi=isTradfiTokenized({...c,...(pair?.metadata||{})}),source=pair?.source,volume=pair?.volume||0;return {symbol:c.symbol,name:c.name,rank:c.rank,source,quoteAsset:pair?.quoteAsset,exchangeSymbol:pair?.exchangeSymbol,volume,status:source&&volume>=config.minVolume&&!stable&&!tradfi?'eligible':'excluded',reason:stable?'Stablecoin excluída do scanner':tradfi?'Ativo tradicional tokenizado excluído do scanner cripto':!source?'Par USDT/USDC não encontrado nas corretoras configuradas':`Volume ${volume.toLocaleString('en-US',{maximumFractionDigits:0})} abaixo do mínimo de US$ ${config.minVolume.toLocaleString('en-US')}`};});
   const seen=new Set();
-  const assets=candidates.filter(c=>{const exchangeSymbol=pairs.has(c.symbol)?c.symbol:mexcPairs.get(c.symbol),metadata=mexcMetadata.get(exchangeSymbol)||{};return (pairs.has(c.symbol)||mexcPairs.has(c.symbol)) && !['BTCUSDT','ETHUSDT'].includes(c.symbol) && !isStableAsset(c.symbol) && !isTradfiTokenized({...c,...metadata}) && !seen.has(c.symbol) && (seen.add(c.symbol),true);}).map(c=>{const binance=pairs.has(c.symbol),mexc=mexcPairs.has(c.symbol),exchangeSymbol=binance?c.symbol:mexcPairs.get(c.symbol),source=binance?'BINANCE':'MEXC',volume=binance?(volumes.get(c.symbol)||0):(mexc?(mexcVolumes.get(exchangeSymbol)||0):0),price=binance?(prices.get(c.symbol)||0):(mexc?(mexcPrices.get(exchangeSymbol)||0):0);return {...c,source,exchangeSymbol,volume,volume24h:volume,price,lastPrice:price,tokenized:false,assetClass:'CRYPTO'};}).filter(a=>a.volume >= config.minVolume).sort((a,b)=>a.rank-b.rank||a.symbol.localeCompare(b.symbol));
+  const assets=candidates.map(c=>{const pair=selectVenue(c.base||baseOf(c.symbol));if(!pair)return null;return {...c,source:pair.source,exchangeSymbol:pair.exchangeSymbol,quoteAsset:pair.quoteAsset,volume:pair.volume,volume24h:pair.volume,price:pair.price,lastPrice:pair.price,tokenized:false,assetClass:'CRYPTO'};}).filter(a=>a&&!['BTCUSDT','ETHUSDT'].includes(a.symbol)&&!isStableAsset(a.base||a.symbol)&&!isTradfiTokenized({...a,...(selectVenue(a.base||baseOf(a.symbol))?.metadata||{})})&&!seen.has(a.symbol)&&(seen.add(a.symbol),true)).filter(a=>a.volume>=config.minVolume).sort((a,b)=>a.rank-b.rank||a.symbol.localeCompare(b.symbol));
   return {assets,mode,warnings,rankings,requestedLimit:config.assetLimit,rankingCandidates:candidates.length,candidateAudit};
+}
+function venueFromSource(source) {
+  if(source==='BINANCE'||source===SOURCES.spot)return 'BINANCE';
+  if(source==='MEXC'||source===SOURCES.mexc)return 'MEXC';
+  if(source==='OKX'||source===SOURCES.okx)return 'OKX';
+  if(source==='COINBASE'||source===SOURCES.coinbase)return 'COINBASE';
+  return 'BINANCE';
+}
+function intervalMs(interval){return ({'1h':3600000,'2h':7200000,'4h':14400000,'1d':86400000,'1w':604800000})[interval]||3600000;}
+function normaliseVenueCandles(raw,venue,interval,asOf){
+  if(venue==='BINANCE'||venue==='MEXC')return closedCandles(raw,asOf);
+  if(venue==='OKX'){const rows=Array.isArray(raw?.data)?raw.data:[];return rows.map(row=>({time:+row[0],closeTime:+row[0]+intervalMs(interval)-1,open:+row[1],high:+row[2],low:+row[3],close:+row[4],volume:+row[5],takerBuyVolume:null,confirmed:String(row[8]??'1')})).filter(c=>c.confirmed==='1'&&c.closeTime<asOf&&[c.time,c.closeTime,c.open,c.high,c.low,c.close,c.volume].every(Number.isFinite)).sort((a,b)=>a.time-b.time);}
+  const rows=Array.isArray(raw?.candles)?raw.candles:Array.isArray(raw)?raw:[];return rows.map(row=>({time:Number(row.start??row.start_time)*1000,open:+row.open,high:+row.high,low:+row.low,close:+row.close,volume:+row.volume,takerBuyVolume:null})).map(c=>({...c,closeTime:c.time+intervalMs(interval)-1})).filter(c=>c.closeTime<asOf&&[c.time,c.closeTime,c.open,c.high,c.low,c.close,c.volume].every(Number.isFinite)).sort((a,b)=>a.time-b.time);
 }
 async function fetchSeries(getJson,symbol,asOf,source=SOURCES.spot,hourlyLimit=210) {
   const limitFor=interval=>interval==='1h'?hourlyLimit:210;
-  if(source===SOURCES.mexc){
+  const venue=venueFromSource(source);
+  if(venue==='MEXC'){
     // A API spot da MEXC não oferece candle 2H nativo e exige start/end juntos
     // quando a janela é informada. Buscamos os candles fechados mais recentes e
     // agregamos 1H em 2H localmente, preservando a mesma regra do motor.
@@ -396,13 +413,26 @@ async function fetchSeries(getJson,symbol,asOf,source=SOURCES.spot,hourlyLimit=2
     })));
     return {...native,'2h':resampleHourly(native['1h'],2)};
   }
+  if(venue==='OKX'){
+    const bars={'1w':'1Wutc','1d':'1Dutc','4h':'4Hutc','2h':'2Hutc','1h':'1Hutc'};
+    const values=await Promise.all(INTERVALS.map(interval=>getJson(`${SOURCES.okx}/market/candles?instId=${encodeURIComponent(symbol)}&bar=${bars[interval]}&limit=${limitFor(interval)}`).then(raw=>normaliseVenueCandles(raw,'OKX',interval,asOf))));
+    return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
+  }
+  if(venue==='COINBASE'){
+    const grains={'1w':'ONE_WEEK','1d':'ONE_DAY','4h':'FOUR_HOUR','2h':'TWO_HOUR','1h':'ONE_HOUR'};
+    const start=Math.floor((asOf-intervalMs('1w')*Math.max(210,Math.ceil(hourlyLimit/168)))/1000), end=Math.floor(asOf/1000);
+    const values=await Promise.all(INTERVALS.map(interval=>getJson(`${SOURCES.coinbase}/products/${encodeURIComponent(symbol)}/candles?start=${start}&end=${end}&granularity=${grains[interval]}`).then(raw=>normaliseVenueCandles(raw,'COINBASE',interval,asOf))));
+    return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
+  }
   const values=await Promise.all(INTERVALS.map(interval=>getJson(`${source}/klines?symbol=${encodeURIComponent(symbol)}&interval=${interval}&limit=${limitFor(interval)}&endTime=${asOf-1}`).then(raw=>closedCandles(raw,asOf))));
   return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
 }
 async function vehicle(getJson,signal,asOf) {
   const spot={...signal,vehicle:'SPOT',leverage:'1×',vehicleReason:`Setup SPOT confirmado na ${signal.source||'BINANCE'}.`};
   if (signal.riskTier==='HIGH_RISK_SPOT') return {...spot,vehicleReason:'Risco entre 4% e 8%; somente SPOT, sem alavancagem.'};
-  if(signal.source==='MEXC') return spot;
+  // Dados de preço de outra corretora não autorizam automaticamente um futuro
+  // Binance: o alerta permanece SPOT para não misturar mercados na execução.
+  if(signal.source!=='BINANCE') return spot;
   if (signal.direction==='SHORT') return {...signal,vehicle:'FUTURES BINANCE',leverage:'2× máx.',vehicleReason:'Direção SHORT: confirme contrato Binance, liquidez e margem antes de operar.'};
   const derivatives=signal.derivatives;
   if(!derivatives){try{const metrics=await fetchBinanceDerivatives(getJson,signal.symbol),gate=derivativesGate(metrics);if(gate.blocked)return {...spot,vehicleReason:gate.reason};if(!gate.available)return {...spot,vehicleReason:'Setup SPOT confirmado; contrato perpétuo Binance sem dados suficientes para liberar futuros.',vehicleWarning:metrics.warning};return vehicle(getJson,{...signal,derivatives:{...metrics,...gate}},asOf);}catch(error){return {...spot,vehicleReason:'Setup SPOT confirmado; consulta de futuros Binance indisponível.',vehicleWarning:error.message};}}
@@ -431,7 +461,7 @@ async function scanMarket(getJson,options=DEFAULTS,onProgress=()=>{}) {
   try { const btc=analyseSet(await fetchSeries(getJson,'BTCUSDT',asOf,SOURCES.spot)); marketRegime=marketRegimeGate(btc); if(marketRegime.vetoLongs)warnings.push(marketRegime.label); }
   catch(error){ warnings.push(`Regime BTC indisponível: ${error.message}`); }
   const needsRecovery=(config.strategies||[config.strategy]).includes('rsi-ema-recovery')||config.strategy==='both';
-  async function worker(){while(next<universe.assets.length){const asset=universe.assets[next++];const audit={symbol:asset.symbol,name:asset.name,rank:asset.rank,source:asset.source,volume:asset.volume,status:'rejected',reasons:[]};try{const source=asset.source==='MEXC'?SOURCES.mexc:SOURCES.spot,series=await fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,asOf,source,needsRecovery?800:210), trace=[], signal=evaluate(asset,series,config,trace);audit.reasons=trace.filter(item=>item.reason).map(item=>`${item.strategy}: ${item.reason}`);if(signal&&marketRegime.vetoLongs&&signal.direction==='LONG'){audit.reasons=[marketRegime.label];}else if(signal){signals.push(signal);audit.status='signal';audit.score=signal.score;audit.strategy=signal.strategyName;}else if(!audit.reasons.length)audit.reasons=['Não atingiu todos os filtros do setup'];}catch(error){failures.push({symbol:asset.symbol,source:asset.source,error:error.message});audit.status='error';audit.reasons=[`Falha de consulta: ${error.message}`];}diagnostics.push(audit);onProgress(++done,universe.assets.length);}}
+  async function worker(){while(next<universe.assets.length){const asset=universe.assets[next++];const audit={symbol:asset.symbol,name:asset.name,rank:asset.rank,source:asset.source,quoteAsset:asset.quoteAsset,exchangeSymbol:asset.exchangeSymbol,volume:asset.volume,status:'rejected',reasons:[]};try{const source=sourceForAsset(asset),series=await fetchSeries(getJson,asset.exchangeSymbol||asset.symbol,asOf,source,needsRecovery?800:210), trace=[], signal=evaluate(asset,series,config,trace);audit.reasons=trace.filter(item=>item.reason).map(item=>`${item.strategy}: ${item.reason}`);if(signal&&marketRegime.vetoLongs&&signal.direction==='LONG'){audit.reasons=[marketRegime.label];}else if(signal){signals.push(signal);audit.status='signal';audit.score=signal.score;audit.strategy=signal.strategyName;}else if(!audit.reasons.length)audit.reasons=['Não atingiu todos os filtros do setup'];}catch(error){failures.push({symbol:asset.symbol,source:asset.source,exchangeSymbol:asset.exchangeSymbol,error:error.message});audit.status='error';audit.reasons=[`Falha de consulta: ${error.message}`];}diagnostics.push(audit);onProgress(++done,universe.assets.length);}}
   await Promise.all(Array.from({length:Math.min(4,universe.assets.length)},worker));
   if(universe.assets.length && failures.length===universe.assets.length)throw new Error(`Todas as ${failures.length} consultas de ativos falharam: ${failures[0].error}`);
   const qualified=consolidate(signals,config.maxSignals), selected=[];
@@ -439,6 +469,5 @@ async function scanMarket(getJson,options=DEFAULTS,onProgress=()=>{}) {
   return {signals:selected,assets:universe.assets.length,eligibleAssets:universe.assets.length,requestedLimit:universe.requestedLimit,rankingCandidates:universe.rankingCandidates,diagnostics,mode:universe.mode,failures,warnings,marketRegime,asOf,config,engineVersion:VERSION};
 }
 
-return Object.freeze({last,sma,ema,rsi,atr,macd,adx,stochRsi,candlePattern,bullishPivot,supportResistance,weeklyExtension,analyseTimeframe,lateEntry,pullbackStochCriteria,aggressivePullbackCriteria,pullback1hConfirmationCriteria,compressionExpansion1hCriteria,resampleHourly,anchoredWeeklyVwap,bollingerKeltner,cvdProxy,vwapRetestCriteria,rsiEmaRecoveryCriteria,marketRegimeGate,normalizeFundingRate,derivativesGate,fetchBinanceDerivatives,VERSION,SOURCES,DEFAULTS,STRATEGIES,settings,closedCandles,confirmedMacro,analyseSet,evaluateAnalyses,evaluate,compareSignals,consolidate,isFresh,rankingLabel,isTradfiTokenized,marketUniverse,fetchSeries,vehicle,scanMarket});
+return Object.freeze({last,sma,ema,rsi,atr,macd,adx,stochRsi,candlePattern,bullishPivot,supportResistance,weeklyExtension,analyseTimeframe,lateEntry,pullbackStochCriteria,aggressivePullbackCriteria,pullback1hConfirmationCriteria,compressionExpansion1hCriteria,resampleHourly,anchoredWeeklyVwap,bollingerKeltner,cvdProxy,vwapRetestCriteria,rsiEmaRecoveryCriteria,marketRegimeGate,normalizeFundingRate,derivativesGate,fetchBinanceDerivatives,VERSION,SOURCES,DEFAULTS,STRATEGIES,VENUE_PRIORITY,QUOTE_PRIORITY,baseOf,canonicalSymbol,sourceForAsset,sourceLabel,settings,closedCandles,confirmedMacro,analyseSet,evaluateAnalyses,evaluate,compareSignals,consolidate,isFresh,rankingLabel,isTradfiTokenized,marketUniverse,fetchSeries,vehicle,scanMarket});
 });
-
