@@ -35,7 +35,7 @@ Existem dois repositorios publicados: `sentinel_scam_dashboard` e `sentinel-trad
 |---|---|
 | Binance Data API | Fonte prioritaria de candles, preco, volume e horario de corte. |
 | api.binance.com | Contingencia do Telegram quando `data-api.binance.vision` falha; duas tentativas por endereco. |
-| MEXC Spot publica | Fonte alternativa quando o par spot USDT nao esta negociavel na Binance. Todos os tempos usam a mesma corretora. |
+| MEXC Spot publica | Fonte alternativa quando o par spot USDT nao esta negociavel na Binance. Busca 1H, 4H, diario e semanal; como a API nao oferece 2H nativo, o motor agrega candles 1H fechados em 2H localmente. |
 | CoinGecko e CoinMarketCap | Ranking e capitalizacao para montar o universo. |
 | MEXC privada | Saldo, fills, ordens e posicoes somente leitura, via servidor local. |
 
