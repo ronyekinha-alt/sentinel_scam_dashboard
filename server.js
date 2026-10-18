@@ -9,7 +9,7 @@ const port = Number(process.env.RADAR_PORT || 4173);
 const host = process.env.RADAR_HOST || '127.0.0.1';
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
 const json = (response, status, body) => { response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); response.end(JSON.stringify(body)); };
-const get = (url, headers = {}) => new Promise((resolve, reject) => {
+const getOnce = (url, headers = {}) => new Promise((resolve, reject) => {
   const request = https.get(url, { headers }, response => {
     let text = '';
     response.on('data', chunk => text += chunk);
@@ -23,16 +23,40 @@ const get = (url, headers = {}) => new Promise((resolve, reject) => {
       } catch { reject(new Error(`Resposta inválida da fonte ${new URL(url).hostname}`)); }
     });
   });
-  request.setTimeout(12000, () => request.destroy(new Error(`Tempo esgotado ao consultar ${new URL(url).hostname}`)));
+  request.setTimeout(15000, () => request.destroy(new Error(`Tempo esgotado ao consultar ${new URL(url).hostname}`)));
   request.on('error', reject);
 });
+const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+const get = async (url, headers = {}) => {
+  let lastError;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try { return await getOnce(url, headers); }
+    catch (error) { lastError = error; if (attempt === 0) await wait(700); }
+  }
+  throw lastError;
+};
 const signature = (secret, text) => crypto.createHmac('sha256', secret).update(text).digest('hex');
 const queryString = params => Object.entries(params).filter(([, value]) => value != null).sort(([a], [b]) => a.localeCompare(b)).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 const ninetyDaysAgo = () => String(Date.now() - 90 * 86400000);
-const publicMarketHosts = new Set(['api.coingecko.com', 'data-api.binance.vision', 'api.binance.com', 'fapi.binance.com', 'pro-api.coinmarketcap.com', 'api.coinpaprika.com', 'www.okx.com']);
+// Lista fechada de fontes públicas do motor; o proxy não aceita destinos livres.
+const publicMarketHosts = new Set(['api.coingecko.com', 'data-api.binance.vision', 'api.binance.com', 'fapi.binance.com', 'api.mexc.com', 'www.okx.com', 'api.coinbase.com', 'pro-api.coinmarketcap.com', 'api.coinpaprika.com']);
 const rankingCache = new Map();
+const mexcReadCache = { positions: null, at: 0 };
 async function publicData(target) {
-  if(target.hostname !== 'pro-api.coinmarketcap.com') return get(target.toString());
+  if(target.hostname !== 'pro-api.coinmarketcap.com') {
+    const urls = [target.toString()];
+    if (target.hostname === 'data-api.binance.vision') {
+      const fallback = new URL(target.toString());
+      fallback.hostname = 'api.binance.com';
+      urls.push(fallback.toString());
+    }
+    let lastError;
+    for (const url of urls) {
+      try { return await get(url); }
+      catch (error) { lastError = error; }
+    }
+    throw lastError;
+  }
   const key=target.toString(), cached=rankingCache.get(key);
   if(cached && Date.now()-cached.at < 5*60000) return cached.promise;
   // Share concurrent ranking requests; cache only successful official responses.
@@ -47,7 +71,6 @@ function proxyPublicMarket(request, response) {
   try { target = new URL(requested); } catch { return json(response, 400, { error: 'URL pública inválida.' }); }
   if (target.protocol !== 'https:' || !publicMarketHosts.has(target.hostname)) return json(response, 403, { error: 'Fonte pública não permitida.' });
   if (target.hostname === 'pro-api.coinmarketcap.com' && (target.port || target.username || target.password || target.pathname !== '/public-api/v3/cryptocurrency/listings/latest')) return json(response, 403, { error: 'Consulta CoinMarketCap não permitida.' });
-  if (target.hostname === 'www.okx.com' && (target.port || target.username || target.password || !['/api/v5/public/instruments','/api/v5/market/tickers','/api/v5/market/history-candles','/api/v5/market/ticker'].includes(target.pathname))) return json(response, 403, { error: 'Consulta OKX não permitida.' });
   return publicData(target).then(data => json(response, 200, data)).catch(error => json(response, 502, { error: error.message || 'Falha ao consultar fonte pública.' }));
 }
 async function mexcSpotTrades(apiKey, secret, symbols) { const time = await get('https://api.mexc.com/api/v3/time'), timestamp = String(time.serverTime || Date.now()), startTime = String(Number(timestamp) - 30 * 86400000); const jobs = symbols.map(async symbol => { const query = queryString({ symbol, limit: 1000, startTime, timestamp }); return get(`https://api.mexc.com/api/v3/myTrades?${query}&signature=${signature(secret, query)}`, { 'X-MEXC-APIKEY': apiKey }); }); const settled = await Promise.allSettled(jobs); return { trades: settled.filter(x => x.status === 'fulfilled').flatMap(x => x.value), errors: settled.filter(x => x.status === 'rejected').map(x => x.reason.message) }; }
@@ -58,7 +81,7 @@ async function mexcSpotAccount(apiKey, secret) { const time = await get('https:/
 http.createServer((request, response) => {
   if (request.method === 'GET' && request.url.startsWith('/api/public?')) return proxyPublicMarket(request, response);
   if (request.method === 'POST' && request.url === '/api/mexc/import') { let body = ''; request.on('data', chunk => body += chunk); return request.on('end', async () => { try { const { apiKey, secret, spotSymbol } = JSON.parse(body), symbols = String(spotSymbol || '').toUpperCase().split(/[\s,;]+/).filter(Boolean).slice(0, 20); if (!apiKey || !secret || !symbols.length || symbols.some(symbol => !/^[A-Z0-9]{5,14}$/.test(symbol))) throw new Error('Informe API Key, Secret Key e ao menos um par spot válido.'); const [spotResult, futuresResult, contractsResult, positionsResult, stopsHistoryResult] = await Promise.allSettled([mexcSpotTrades(apiKey, secret, symbols), mexcFuturesOrders(apiKey, secret), get('https://contract.mexc.com/api/v1/contract/detail'), mexcFuturesPrivate(apiKey, secret, '/api/v1/private/position/list/history_positions', { page_num: 1, page_size: 100 }), mexcFuturesPrivate(apiKey, secret, '/api/v1/private/stoporder/list/orders', { is_finished: 1, page_num: 1, page_size: 100, start_time: ninetyDaysAgo(), end_time: String(Date.now()) })]); const spot = spotResult.status === 'fulfilled' ? spotResult.value.trades : [], spotErrors = spotResult.status === 'fulfilled' ? spotResult.value.errors : [spotResult.reason.message], futures = futuresResult.status === 'fulfilled' && Array.isArray(futuresResult.value.data) ? futuresResult.value.data : [], futuresError = futuresResult.status === 'rejected' ? futuresResult.reason.message : null, contracts = contractsResult.status === 'fulfilled' && Array.isArray(contractsResult.value.data) ? contractsResult.value.data : [], closedPositions = positionsResult.status === 'fulfilled' && Array.isArray(positionsResult.value.data) ? positionsResult.value.data : [], positionsError = positionsResult.status === 'rejected' ? positionsResult.reason.message : null, stopHistory = stopsHistoryResult.status === 'fulfilled' && Array.isArray(stopsHistoryResult.value.data) ? stopsHistoryResult.value.data : [], stopsHistoryError = stopsHistoryResult.status === 'rejected' ? stopsHistoryResult.reason.message : null; json(response, 200, { spot, futures, contracts, closedPositions, stopHistory, errors: [...spotErrors, ...(futuresError ? [futuresError] : []), ...(positionsError ? [positionsError] : []), ...(stopsHistoryError ? [stopsHistoryError] : [])] }); } catch (error) { json(response, 400, { error: error.message || 'Falha ao importar operações.' }); } }); }
-  if (request.method === 'POST' && request.url === '/api/mexc/positions') { let body = ''; request.on('data', chunk => body += chunk); return request.on('end', async () => { try { const { apiKey, secret } = JSON.parse(body); if (!apiKey || !secret) throw new Error('Informe API Key e Secret Key para atualizar posições.'); const [positionsResult, stopsResult, contractsResult] = await Promise.allSettled([mexcFuturesPrivate(apiKey, secret, '/api/v1/private/position/open_positions'), mexcFuturesPrivate(apiKey, secret, '/api/v1/private/stoporder/list/orders', { is_finished: 0, page_num: 1, page_size: 100 }), get('https://contract.mexc.com/api/v1/contract/detail')]); if (positionsResult.status === 'rejected') throw positionsResult.reason; const positions = Array.isArray(positionsResult.value.data) ? positionsResult.value.data : [], stopOrders = stopsResult.status === 'fulfilled' && Array.isArray(stopsResult.value.data) ? stopsResult.value.data : [], contracts = contractsResult.status === 'fulfilled' && Array.isArray(contractsResult.value.data) ? contractsResult.value.data : []; const tickers = await Promise.allSettled(positions.map(position => get(`https://contract.mexc.com/api/v1/contract/ticker?symbol=${position.symbol}`))); json(response, 200, { positions, stopOrders, contracts, tickers: tickers.map((ticker, index) => ticker.status === 'fulfilled' ? ticker.value.data : { symbol: positions[index].symbol }), stopError: stopsResult.status === 'rejected' ? stopsResult.reason.message : null }); } catch (error) { json(response, 400, { error: error.message || 'Falha ao atualizar posições.' }); } }); }
+  if (request.method === 'POST' && request.url === '/api/mexc/positions') { let body = ''; request.on('data', chunk => body += chunk); return request.on('end', async () => { try { const { apiKey, secret } = JSON.parse(body); if (!apiKey || !secret) throw new Error('Informe API Key e Secret Key para atualizar posições.'); const [positionsResult, stopsResult, contractsResult] = await Promise.allSettled([mexcFuturesPrivate(apiKey, secret, '/api/v1/private/position/open_positions'), mexcFuturesPrivate(apiKey, secret, '/api/v1/private/stoporder/list/orders', { is_finished: 0, page_num: 1, page_size: 100 }), get('https://contract.mexc.com/api/v1/contract/detail')]); if (positionsResult.status === 'rejected') { if (mexcReadCache.positions) return json(response, 200, { ...mexcReadCache.positions, stale: true, staleError: positionsResult.reason.message }); throw positionsResult.reason; } const positions = Array.isArray(positionsResult.value.data) ? positionsResult.value.data : [], stopOrders = stopsResult.status === 'fulfilled' && Array.isArray(stopsResult.value.data) ? stopsResult.value.data : [], contracts = contractsResult.status === 'fulfilled' && Array.isArray(contractsResult.value.data) ? contractsResult.value.data : []; const tickers = await Promise.allSettled(positions.map(position => get(`https://contract.mexc.com/api/v1/contract/ticker?symbol=${position.symbol}`))); const payload = { positions, stopOrders, contracts, tickers: tickers.map((ticker, index) => ticker.status === 'fulfilled' ? ticker.value.data : { symbol: positions[index].symbol }), stopError: stopsResult.status === 'rejected' ? stopsResult.reason.message : null }; mexcReadCache.positions = payload; mexcReadCache.at = Date.now(); json(response, 200, payload); } catch (error) { json(response, 400, { error: error.message || 'Falha ao atualizar posições.' }); } }); }
   if (request.method === 'POST' && request.url === '/api/mexc/balance') { let body = ''; request.on('data', chunk => body += chunk); return request.on('end', async () => { try {
     const { apiKey, secret } = JSON.parse(body); if (!apiKey || !secret) throw new Error('Informe API Key e Secret Key para consultar o saldo.');
     const [spotResult, futuresResult] = await Promise.allSettled([mexcSpotAccount(apiKey, secret), mexcFuturesPrivate(apiKey, secret, '/api/v1/private/account/assets')]);
@@ -76,4 +99,3 @@ http.createServer((request, response) => {
   if (!file.startsWith(root)) { response.writeHead(403); return response.end('Acesso negado'); }
   fs.readFile(file, (error, data) => { if (error) { response.writeHead(404); return response.end('Arquivo não encontrado'); } response.writeHead(200, { 'Content-Type': types[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store, no-cache, must-revalidate' }); response.end(data); });
 }).listen(port, host, () => console.log(`Sentinel Trade disponível em http://${host}:${port}`));
-
