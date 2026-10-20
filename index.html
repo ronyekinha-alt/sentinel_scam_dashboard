@@ -3,7 +3,7 @@
   <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sentinel Trade | Setups</title>
+  <title>Painel Geral | Sentinel Trade</title>
   <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="light.css" />
     <link rel="stylesheet" href="backtest-ui.css" />
@@ -881,6 +881,92 @@
     #rsiFinderPanel tbody td.finder-context.zero { background:#fff0d6 !important; border-color:#edc379 !important; }
     #rsiFinderPanel .finder-pressure .sub, #rsiFinderPanel .finder-context .sub { color:#1f2933 !important; }
     #rsiFinderPanel .empty { color:#334e68 !important; background:#fff !important; }
+  </style>
+  <style id="scanner-strategy-cards">
+    /* Cartões explicam a regra sem alterar os controles ou a lógica do scanner. */
+    main > .controls .scanner-strategy-filter {
+      display:block !important;
+      padding:13px 14px 14px !important;
+      border:1px solid rgba(75,202,255,.72) !important;
+      border-radius:14px !important;
+      background:linear-gradient(135deg,rgba(5,21,46,.98),rgba(8,34,66,.94)) !important;
+    }
+    main > .controls .scanner-strategy-filter legend { padding:0 6px; }
+    .scanner-strategy-intro { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 3px 12px; color:#b9d9ef; font-size:12px; line-height:1.4; }
+    .scanner-strategy-intro strong { color:#effbff; }
+    .scanner-strategy-count { flex:0 0 auto; padding:5px 9px; border:1px solid rgba(77,214,255,.55); border-radius:999px; color:#71ebff; font-size:10px; font-weight:850; white-space:nowrap; }
+    main > .controls .scanner-strategy-filter .filter-all { display:flex !important; align-items:center; gap:8px; width:max-content; margin:0 3px 11px; padding:7px 9px !important; border:1px solid rgba(92,181,243,.42); border-radius:8px; background:rgba(13,52,88,.55); color:#f1fbff !important; font-weight:800; }
+    .scanner-strategy-card-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+    main > .controls .scanner-strategy-filter .scanner-strategy-card {
+      display:block !important; position:relative; min-height:184px; width:auto; margin:0; padding:12px !important;
+      border:1px solid rgba(78,129,177,.42); border-radius:11px; background:linear-gradient(155deg,rgba(13,41,76,.85),rgba(5,20,43,.96));
+      color:#c8dded !important; cursor:pointer; transition:border-color .18s ease, box-shadow .18s ease, opacity .18s ease, transform .18s ease;
+    }
+    main > .controls .scanner-strategy-filter .scanner-strategy-card:hover { transform:translateY(-1px); border-color:rgba(94,206,255,.78); }
+    main > .controls .scanner-strategy-filter .scanner-strategy-card:has(input:checked) { border-color:rgba(65,226,236,.85); box-shadow:0 0 0 1px rgba(60,221,246,.13),0 8px 18px rgba(0,0,0,.22),inset 0 0 17px rgba(45,161,255,.08); }
+    main > .controls .scanner-strategy-filter .scanner-strategy-card:has(input:not(:checked)) { opacity:.56; }
+    main > .controls .scanner-strategy-filter .scanner-strategy-card.strategy-short:has(input:checked) { border-color:rgba(255,104,136,.78); box-shadow:0 0 0 1px rgba(255,104,136,.13),0 8px 18px rgba(0,0,0,.22),inset 0 0 17px rgba(239,50,100,.08); }
+    .scanner-strategy-card-top { display:grid; grid-template-columns:16px 28px minmax(0,1fr); gap:8px; align-items:start; }
+    main > .controls .scanner-strategy-filter .scanner-strategy-card input { width:16px !important; height:16px !important; margin:2px 0 0 !important; padding:0 !important; accent-color:#3bf3df; }
+    .strategy-card-index { display:grid; place-items:center; width:27px; height:27px; border-radius:8px; background:#0a4673; color:#86efff; font-size:10px; font-weight:900; }
+    .strategy-card-title { min-width:0; color:#f3fbff; font-size:12px; font-weight:850; line-height:1.3; }
+    .strategy-card-kind { display:block; margin-top:2px; color:#92bad7; font-size:9px; font-weight:650; letter-spacing:.3px; }
+    .strategy-card-list { display:block; margin:11px 0 0; padding:0; }
+    .strategy-card-list > span { display:block; position:relative; padding:6px 0 6px 15px; border-top:1px solid rgba(97,148,191,.20); color:#b6cee1; font-size:10px; line-height:1.35; }
+    .strategy-card-list > span::before { content:'✓'; position:absolute; top:6px; left:0; color:#52e8ed; font-weight:900; }
+    .strategy-card-list b { color:#edf8ff; font-weight:800; }
+    .strategy-card-foot { position:absolute; right:11px; bottom:9px; color:#70c6ff; font-size:9px; font-weight:800; }
+    .strategy-rsi .strategy-card-index { background:#513d1d; color:#ffe39a; }.strategy-rsi .strategy-card-list > span::before { color:#ffd36a; }
+    .strategy-short .strategy-card-index { background:#54263c; color:#ffabc0; }.strategy-short .strategy-card-list > span::before { color:#ff91ac; }.strategy-short .strategy-card-foot { color:#ffb0bf; }
+    main > .controls #strategyHelp { display:block; margin-top:12px; padding-top:10px; border-top:1px solid rgba(91,160,209,.28); }
+    @media (max-width:1300px) { .scanner-strategy-card-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+    @media (max-width:700px) { .scanner-strategy-intro { align-items:flex-start; flex-direction:column; }.scanner-strategy-card-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width:480px) { .scanner-strategy-card-grid { grid-template-columns:minmax(0,1fr); } }
+  </style>
+  <style id="scanner-audit-summary-ui">
+    /* Auditoria compacta: cada número aparece uma vez, com neon de status mais nítido. */
+    #scannerAuditPanel { overflow:visible !important; border-color:rgba(64,192,255,.72) !important; background:linear-gradient(145deg,#06142b,#040d1e) !important; box-shadow:0 0 0 1px rgba(57,191,255,.11),0 0 28px rgba(31,153,255,.18),inset 0 0 28px rgba(9,84,155,.10) !important; }
+    #scannerAuditPanel > .section-heading { padding:19px 21px; border-bottom:1px solid rgba(82,177,242,.36); background:linear-gradient(90deg,rgba(9,38,73,.82),rgba(5,17,37,.25)); }
+    #scannerAuditPanel .audit-summary-layout { padding:18px 20px 20px; }
+    #scannerAuditPanel .audit-summary-grid { display:grid; grid-template-columns:1.2fr repeat(3,1fr); gap:11px; margin:0; }
+    /* Neutraliza integralmente a antiga composição orbital antes de aplicar os cards. */
+    #scannerAuditPanel #scannerAuditMetrics { display:grid !important; grid-template-columns:1.2fr repeat(3,minmax(0,1fr)) !important; gap:11px !important; margin:0 !important; padding:0 !important; position:static !important; overflow:visible !important; justify-items:stretch !important; background:none !important; border:0 !important; }
+    #scannerAuditPanel #scannerAuditMetrics::before, #scannerAuditPanel #scannerAuditMetrics::after { content:none !important; display:none !important; }
+    #scannerAuditPanel #scannerAuditMetrics .audit-metric, #scannerAuditPanel #scannerAuditMetrics .audit-metric:nth-child(n) { width:auto !important; max-width:none !important; aspect-ratio:auto !important; min-height:106px !important; display:block !important; padding:14px !important; overflow:hidden !important; text-align:left !important; border-top:1px solid rgba(91,162,221,.62) !important; border-radius:12px !important; }
+    #scannerAuditPanel .audit-metric { position:relative; min-height:106px; overflow:hidden; padding:14px; border:1px solid rgba(91,162,221,.62) !important; border-radius:12px; background:linear-gradient(150deg,rgba(10,38,75,.95),rgba(5,18,40,.98)) !important; box-shadow:0 0 0 1px rgba(75,170,255,.08),0 0 18px rgba(53,154,255,.20),inset 0 0 18px rgba(44,132,225,.08) !important; }
+    #scannerAuditPanel #scannerAuditMetrics .audit-metric:nth-child(n) { background:linear-gradient(150deg,rgba(10,38,75,.95),rgba(5,18,40,.98)) !important; border:1px solid rgba(91,162,221,.62) !important; box-shadow:0 0 0 1px rgba(75,170,255,.08),0 0 18px rgba(53,154,255,.20),inset 0 0 18px rgba(44,132,225,.08) !important; }
+    #scannerAuditPanel #scannerAuditMetrics .audit-metric::after { display:none !important; }
+    #scannerAuditPanel .audit-metric::before { content:''; display:inline-block; width:8px; height:8px; margin-right:7px; border-radius:50%; background:#6bb9ff; box-shadow:0 0 10px #43aaff; }
+    #scannerAuditPanel .audit-metric span { color:#bedcf1 !important; font-size:11px !important; font-weight:800; letter-spacing:.15px; text-shadow:none !important; }
+    #scannerAuditPanel .audit-metric strong { display:block; margin-top:8px; color:#ecf9ff !important; font-size:29px; line-height:1; text-shadow:0 0 5px #d5f5ff,0 0 17px rgba(71,188,255,.78) !important; }
+    #scannerAuditPanel #scannerAuditMetrics .audit-metric:nth-child(n) span { color:#bedcf1 !important; text-shadow:none !important; } #scannerAuditPanel #scannerAuditMetrics .audit-metric:nth-child(n) strong { color:#ecf9ff !important; text-shadow:0 0 5px #d5f5ff,0 0 17px rgba(71,188,255,.78) !important; }
+    #scannerAuditPanel .audit-metric small { display:block; margin-top:7px; color:#8badca; font-size:10px; line-height:1.3; }
+    #scannerAuditPanel .audit-metric.positive { border-color:rgba(74,255,166,.78) !important; box-shadow:0 0 0 1px rgba(74,255,166,.12),0 0 19px rgba(54,243,155,.28),inset 0 0 18px rgba(36,190,120,.09) !important; }
+    #scannerAuditPanel #scannerAuditMetrics .audit-metric.positive:nth-child(n) { border-color:rgba(74,255,166,.78) !important; background:linear-gradient(150deg,rgba(7,57,58,.93),rgba(5,22,39,.98)) !important; box-shadow:0 0 0 1px rgba(74,255,166,.12),0 0 19px rgba(54,243,155,.28),inset 0 0 18px rgba(36,190,120,.09) !important; }
+    #scannerAuditPanel .audit-metric.positive::before { background:#58ffad; box-shadow:0 0 11px #27ff91; } #scannerAuditPanel .audit-metric.positive strong { color:#9affc5 !important; text-shadow:0 0 5px #e1fff0,0 0 18px rgba(42,255,143,.86) !important; }
+    #scannerAuditPanel #scannerAuditMetrics .audit-metric.positive:nth-child(n) strong { color:#9affc5 !important; text-shadow:0 0 5px #e1fff0,0 0 18px rgba(42,255,143,.86) !important; }
+    #scannerAuditPanel .audit-metric.warn { border-color:rgba(255,211,100,.78) !important; box-shadow:0 0 0 1px rgba(255,211,100,.11),0 0 19px rgba(255,194,57,.25),inset 0 0 18px rgba(199,131,17,.10) !important; }
+    #scannerAuditPanel #scannerAuditMetrics .audit-metric.warn:nth-child(n) { border-color:rgba(255,211,100,.78) !important; background:linear-gradient(150deg,rgba(63,47,13,.92),rgba(25,20,18,.98)) !important; box-shadow:0 0 0 1px rgba(255,211,100,.11),0 0 19px rgba(255,194,57,.25),inset 0 0 18px rgba(199,131,17,.10) !important; }
+    #scannerAuditPanel .audit-metric.warn::before { background:#ffda70; box-shadow:0 0 11px #ffc84c; } #scannerAuditPanel .audit-metric.warn strong { color:#ffe39d !important; text-shadow:0 0 5px #fff9e5,0 0 18px rgba(255,198,58,.82) !important; }
+    #scannerAuditPanel #scannerAuditMetrics .audit-metric.warn:nth-child(n) strong { color:#ffe39d !important; text-shadow:0 0 5px #fff9e5,0 0 18px rgba(255,198,58,.82) !important; }
+    #scannerAuditPanel .audit-metric.negative { border-color:rgba(255,105,139,.78) !important; box-shadow:0 0 0 1px rgba(255,105,139,.12),0 0 19px rgba(255,61,109,.26),inset 0 0 18px rgba(204,31,75,.10) !important; }
+    #scannerAuditPanel #scannerAuditMetrics .audit-metric.negative:nth-child(n) { border-color:rgba(255,105,139,.78) !important; background:linear-gradient(150deg,rgba(67,16,42,.92),rgba(28,10,27,.98)) !important; box-shadow:0 0 0 1px rgba(255,105,139,.12),0 0 19px rgba(255,61,109,.26),inset 0 0 18px rgba(204,31,75,.10) !important; }
+    #scannerAuditPanel .audit-metric.negative::before { background:#ff7897; box-shadow:0 0 11px #ff4f78; } #scannerAuditPanel .audit-metric.negative strong { color:#ffafbf !important; text-shadow:0 0 5px #fff0f4,0 0 18px rgba(255,74,111,.83) !important; }
+    #scannerAuditPanel #scannerAuditMetrics .audit-metric.negative:nth-child(n) strong { color:#ffafbf !important; text-shadow:0 0 5px #fff0f4,0 0 18px rgba(255,74,111,.83) !important; }
+    #scannerAuditPanel .audit-detail-grid { display:grid; grid-template-columns:1.36fr .84fr; gap:13px; margin-top:14px; }
+    #scannerAuditPanel .audit-card { padding:16px; border:1px solid rgba(75,145,203,.46); border-radius:12px; background:linear-gradient(145deg,rgba(7,28,58,.88),rgba(5,15,34,.88)); }
+    #scannerAuditPanel .audit-card h3 { margin:0; color:#eefaff; font-size:14px; } #scannerAuditPanel .audit-card > p { margin:4px 0 13px; color:#96b6cd; font-size:11px; }
+    #scannerAuditPanel .audit-funnel-row { display:grid; grid-template-columns:124px minmax(0,1fr) 52px; gap:10px; align-items:center; padding:9px 0; border-top:1px solid rgba(80,144,195,.20); }
+    #scannerAuditPanel .audit-funnel-row:first-of-type { border-top:0; } #scannerAuditPanel .audit-funnel-name { color:#dbeefc; font-size:12px; } #scannerAuditPanel .audit-funnel-track { height:9px; overflow:hidden; border-radius:99px; background:#10294a; }
+    #scannerAuditPanel .audit-funnel-bar { height:100%; min-width:3px; border-radius:99px; background:linear-gradient(90deg,#3d77bb,#76b7ff); box-shadow:0 0 11px rgba(85,174,255,.65); } #scannerAuditPanel .audit-funnel-bar.valid { background:linear-gradient(90deg,#1e9b6b,#55f1ab); box-shadow:0 0 11px rgba(64,255,166,.72); } #scannerAuditPanel .audit-funnel-bar.watch { background:linear-gradient(90deg,#b98721,#ffdc70); box-shadow:0 0 11px rgba(255,201,65,.72); } #scannerAuditPanel .audit-funnel-bar.rejected { background:linear-gradient(90deg,#bc3c5f,#ff7897); box-shadow:0 0 11px rgba(255,79,119,.72); }
+    #scannerAuditPanel .audit-funnel-value { text-align:right; color:#f0faff; font-size:12px; font-weight:850; } #scannerAuditPanel .audit-funnel-value small { color:#91b2ca; font-size:9px; font-weight:650; }
+    #scannerAuditPanel .audit-next { position:relative; overflow:hidden; } #scannerAuditPanel .audit-next::after { content:''; position:absolute; right:-44px; bottom:-52px; width:165px; height:165px; border:1px solid rgba(70,219,255,.31); border-radius:50%; box-shadow:0 0 30px rgba(70,219,255,.13); }
+    #scannerAuditPanel .audit-action { position:relative; z-index:1; margin-top:13px; padding:13px; border-left:3px solid #4be4ff; border-radius:8px; background:linear-gradient(90deg,rgba(15,70,112,.58),rgba(7,26,54,.25)); } #scannerAuditPanel .audit-action span { color:#91dfff; font-size:9px; font-weight:900; letter-spacing:.7px; } #scannerAuditPanel .audit-action strong { display:block; margin:5px 0; color:#f3fbff; font-size:14px; } #scannerAuditPanel .audit-action p { margin:0; color:#b8d3e6; font-size:11px; line-height:1.45; }
+    #scannerAuditPanel .audit-quality { position:relative; z-index:1; display:grid; grid-template-columns:auto 1fr; gap:10px; margin-top:13px; padding-top:11px; border-top:1px solid rgba(82,145,195,.25); font-size:11px; } #scannerAuditPanel .audit-quality b { color:#e2f5ff; } #scannerAuditPanel .audit-quality span { color:#a4c2d5; }
+    #scannerAuditPanel details.audit-reasons-block { margin:14px 0 0; padding:0; border:1px solid rgba(79,145,198,.34); border-radius:10px; background:rgba(4,16,35,.48); } #scannerAuditPanel details.audit-reasons-block summary { padding:11px 13px; color:#bce5fa; cursor:pointer; font-size:12px; font-weight:800; } #scannerAuditPanel .audit-reasons-block .audit-subheading { display:none; } #scannerAuditPanel details.audit-reasons-block[open] summary { border-bottom:1px solid rgba(79,145,198,.30); }
+    #scannerAuditPanel .audit-summary-copy { display:none; }
+    @media (max-width:920px) { #scannerAuditPanel .audit-summary-grid, #scannerAuditPanel #scannerAuditMetrics { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } #scannerAuditPanel .audit-detail-grid { grid-template-columns:1fr; } }
+    @media (max-width:540px) { #scannerAuditPanel .audit-summary-layout { padding:13px; } #scannerAuditPanel .audit-summary-grid, #scannerAuditPanel #scannerAuditMetrics { grid-template-columns:1fr !important; } #scannerAuditPanel .audit-funnel-row { grid-template-columns:100px minmax(0,1fr) 42px; } }
   </style></head>
 <body>
   <header class="topbar">
@@ -891,7 +977,42 @@
     <section class="controls" aria-label="Filtros do scanner">
       <label class="scanner-limit-filter">Top por ranking ou volume 24h <select id="assetLimit"><option value="50">50</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="700" selected>700</option></select></label>
       <label class="scanner-score-filter" title="Score é uma pontuação de confluência técnica, não uma probabilidade matemática garantida.">Score mínimo <select id="minScore"><option value="85">85</option><option value="90">90</option><option value="100">100</option><option value="0" selected>Todos os Scores</option></select><span class="sub">85, 90, 100 ou todos · mesmo score do Telegram</span></label>
-      <fieldset class="filter-group scanner-strategy-filter" id="scannerStrategyFilters"><legend>Estratégia do scanner <span>selecione uma ou mais</span></legend><label class="filter-option filter-all"><input type="checkbox" data-backtest-all="scannerStrategy" checked /> Selecionar todos</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="trend" checked /> Tendência + pivô</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="aggressive-pullback" checked /> Pullback 2H + confirmação 4H</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="flexible-pullback-2h" checked /> Pullback 2H · diário flexível</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="ema-cross-retest-2h" checked /> Cruzamento EMA 9 + reteste 22/52 · 2H</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="compression-expansion-1h" checked /> Compressão + expansão inicial · 1H</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="rsi-ema-recovery" checked /> Experimental · recuperação RSI + EMA 8/22/80</label><label class="filter-option"><input type="checkbox" name="scannerStrategy" value="bearish-breakdown" checked /> SHORT · tendência baixista + rompimento</label><span id="strategyHelp" class="sub">Executa os sete critérios e mantém primeiro os sinais validados; os experimentais exigem confirmação manual no gráfico.</span></fieldset>
+      <fieldset class="filter-group scanner-strategy-filter" id="scannerStrategyFilters">
+        <legend>Estratégias do scanner <span>selecione uma ou mais</span></legend>
+        <div class="scanner-strategy-intro"><span><strong>O que cada setup considera.</strong> Os checkboxes mantêm exatamente a mesma seleção do motor.</span><span class="scanner-strategy-count" id="scannerStrategyCount">7 setups selecionados</span></div>
+        <label class="filter-option filter-all"><input type="checkbox" data-backtest-all="scannerStrategy" checked /> Selecionar todos</label>
+        <div class="scanner-strategy-card-grid">
+          <label class="filter-option scanner-strategy-card">
+            <span class="scanner-strategy-card-top"><input type="checkbox" name="scannerStrategy" value="trend" checked /><span class="strategy-card-index">01</span><span class="strategy-card-title">Tendência + pivô<span class="strategy-card-kind">LONG · 1H, 2H ou 4H</span></span></span>
+            <span class="strategy-card-list"><span><b>Macro:</b> semanal, diário, 4H e 2H acima das EMAs de tendência.</span><span><b>Gatilho:</b> padrão comprador ou pivô fechado no tempo escolhido.</span><span><b>Fluxo:</b> RSI, volume e espaço técnico para pelo menos 2R.</span></span><span class="strategy-card-foot">critério estrutural</span>
+          </label>
+          <label class="filter-option scanner-strategy-card">
+            <span class="scanner-strategy-card-top"><input type="checkbox" name="scannerStrategy" value="aggressive-pullback" checked /><span class="strategy-card-index">02</span><span class="strategy-card-title">Pullback 2H + confirmação 4H<span class="strategy-card-kind">LONG · continuação</span></span></span>
+            <span class="strategy-card-list"><span><b>4H:</b> alinhado, com EMA 22 ascendente e contexto de alta.</span><span><b>Pullback:</b> 1H reage perto da EMA 9 ou 22 com padrão comprador.</span><span><b>Confirmação:</b> 2H sustenta EMA 51; venda anterior sem exaustão.</span></span><span class="strategy-card-foot">dupla confirmação</span>
+          </label>
+          <label class="filter-option scanner-strategy-card">
+            <span class="scanner-strategy-card-top"><input type="checkbox" name="scannerStrategy" value="flexible-pullback-2h" checked /><span class="strategy-card-index">03</span><span class="strategy-card-title">Pullback 2H · diário flexível<span class="strategy-card-kind">LONG · continuação</span></span></span>
+            <span class="strategy-card-list"><span><b>Macro:</b> semanal acima da EMA 22; diário acima da EMA 80.</span><span><b>2H:</b> fecha acima da EMA 51 e confirma momentum ou pivô.</span><span><b>1H:</b> reteste técnico, pressão compradora e sem venda explosiva.</span></span><span class="strategy-card-foot">contexto flexível</span>
+          </label>
+          <label class="filter-option scanner-strategy-card">
+            <span class="scanner-strategy-card-top"><input type="checkbox" name="scannerStrategy" value="ema-cross-retest-2h" checked /><span class="strategy-card-index">04</span><span class="strategy-card-title">Cruzamento EMA 9 + reteste 22/52<span class="strategy-card-kind">LONG · 2H</span></span></span>
+            <span class="strategy-card-list"><span><b>Cruzamento:</b> EMA 9 supera EMA 22 e 52 recentemente.</span><span><b>Reteste:</b> toque nas médias com pavio inferior de pelo menos 30%.</span><span><b>Gatilho:</b> rompe máxima anterior com candle comprador, RSI e volume válidos.</span></span><span class="strategy-card-foot">reteste confirmado</span>
+          </label>
+          <label class="filter-option scanner-strategy-card">
+            <span class="scanner-strategy-card-top"><input type="checkbox" name="scannerStrategy" value="compression-expansion-1h" checked /><span class="strategy-card-index">05</span><span class="strategy-card-title">Compressão + expansão inicial<span class="strategy-card-kind">LONG · 1H antecipado</span></span></span>
+            <span class="strategy-card-list"><span><b>Base:</b> compressão de até 12% nas 18 velas anteriores.</span><span><b>Expansão:</b> rompimento comprador com volume relativo de pelo menos 1,5×.</span><span><b>Momentum:</b> EMA 8/22 e RSI em recuperação; diário e 4H sem viés baixista.</span></span><span class="strategy-card-foot">movimento inicial</span>
+          </label>
+          <label class="filter-option scanner-strategy-card strategy-rsi">
+            <span class="scanner-strategy-card-top"><input type="checkbox" name="scannerStrategy" value="rsi-ema-recovery" checked /><span class="strategy-card-index">06</span><span class="strategy-card-title">Recuperação RSI + EMA 8/22/80<span class="strategy-card-kind">LONG · experimental</span></span></span>
+            <span class="strategy-card-list"><span><b>RSI:</b> toque em ≤ 30; espera mínima de 8 dias, ou 7 com dois toques.</span><span><b>Reação:</b> EMA 8 cruza acima da 22 e 80 em candle fechado.</span><span><b>Proteção:</b> preço próximo da EMA 8; diário sem extensão semanal excessiva.</span></span><span class="strategy-card-foot">confirmar no gráfico</span>
+          </label>
+          <label class="filter-option scanner-strategy-card strategy-short">
+            <span class="scanner-strategy-card-top"><input type="checkbox" name="scannerStrategy" value="bearish-breakdown" checked /><span class="strategy-card-index">07</span><span class="strategy-card-title">SHORT · tendência baixista + rompimento<span class="strategy-card-kind">FUTUROS · 1H, 2H ou 4H</span></span></span>
+            <span class="strategy-card-list"><span><b>Baixa:</b> diário, 4H, 2H e gatilho alinhados para venda.</span><span><b>Rompimento:</b> perda de mínima fechada ou padrão vendedor; MACD negativo.</span><span><b>Risco:</b> volume, RSI entre 32–62, stop técnico e espaço mínimo de 2R.</span></span><span class="strategy-card-foot">continuação baixista</span>
+          </label>
+        </div>
+        <span id="strategyHelp" class="sub">Executa os sete critérios e mantém primeiro os sinais validados; os experimentais exigem confirmação manual no gráfico.</span>
+      </fieldset>
       <label class="scanner-volume-filter">Volume mínimo 24h <select id="volumeLimit"><option value="1000000" selected>US$ 1 mi</option><option value="2000000">US$ 2 mi</option><option value="5000000">US$ 5 mi</option></select></label>
       <label class="scanner-refresh-filter">Atualização automática <select id="autoRefresh"><option value="5" selected>A cada 5 min</option><option value="10">A cada 10 min</option><option value="20">A cada 20 min</option><option value="30">A cada 30 min</option><option value="60">A cada 1 hora</option><option value="120">A cada 2 horas</option><option value="180">A cada 3 horas</option><option value="240">A cada 4 horas</option></select></label>
       <label class="check scanner-alert-filter"><input id="browserAlerts" type="checkbox" /> Alertar novos setups neste navegador</label>
@@ -899,26 +1020,27 @@
       <p id="scanStatus" class="muted">Clique em “Atualizar scanner” para buscar o mercado.</p>
     </section>
     <section class="panel" id="scannerAuditPanel">
-      <div class="section-heading"><div><p class="eyebrow">AUDITORIA TÉCNICA · ÚLTIMA LEITURA</p><h2>Por que cada ativo passou ou foi rejeitado?</h2></div><label>Buscar um ativo <input id="diagnosticFilter" type="search" placeholder="Ex.: SKY ou SKYUSDT" /></label></div>
-      <div class="audit-summary-grid" id="scannerAuditMetrics">
-        <div class="audit-metric"><span>Ativos auditados</span><strong id="auditMetricAnalyzed">—</strong></div>
-        <div class="audit-metric positive"><span>Sinais válidos</span><strong id="auditMetricSignals">—</strong></div>
-        <div class="audit-metric warn"><span>Em observação</span><strong id="auditMetricWatch">—</strong></div>
-        <div class="audit-metric negative"><span>Rejeitados</span><strong id="auditMetricRejected">—</strong></div>
-        <div class="audit-metric"><span>Fora do universo</span><strong id="auditMetricExcluded">—</strong></div>
-        <div class="audit-metric negative"><span>Falhas de consulta</span><strong id="auditMetricErrors">—</strong></div>
+      <div class="section-heading"><div><p class="eyebrow">AUDITORIA TÉCNICA · ÚLTIMA LEITURA</p><h2>Resumo da leitura do scanner</h2><p class="muted">O que foi analisado, o que virou oportunidade e o que exige atenção — sem repetir os mesmos dados.</p></div><label>Buscar um ativo <input id="diagnosticFilter" type="search" placeholder="Ex.: SKY ou SKYUSDT" /></label></div>
+      <div class="audit-summary-layout">
+        <div class="audit-summary-grid" id="scannerAuditMetrics">
+          <div class="audit-metric"><span>Ativos auditados</span><strong id="auditMetricAnalyzed">—</strong><small>universo cripto elegível no filtro atual</small></div>
+          <div class="audit-metric positive"><span>Oportunidades</span><strong id="auditMetricSignals">—</strong><small>entradas tecnicamente validadas</small></div>
+          <div class="audit-metric warn"><span>Em observação</span><strong id="auditMetricWatch">—</strong><small>falta uma confirmação de candle ou contexto</small></div>
+          <div class="audit-metric negative"><span>Rejeitados</span><strong id="auditMetricRejected">—</strong><small>não passaram em estrutura ou risco</small></div>
+        </div>
+        <div class="audit-detail-grid">
+          <article class="audit-card"><h3>Funil de decisão</h3><p>Cada ativo aparece uma única vez, na etapa mais relevante da leitura.</p>
+            <div class="audit-funnel-row"><span class="audit-funnel-name">Auditados</span><div class="audit-funnel-track"><div class="audit-funnel-bar" id="auditFunnelAnalyzed"></div></div><span class="audit-funnel-value" id="auditFunnelAnalyzedValue">—</span></div>
+            <div class="audit-funnel-row"><span class="audit-funnel-name">Oportunidades</span><div class="audit-funnel-track"><div class="audit-funnel-bar valid" id="auditFunnelSignals"></div></div><span class="audit-funnel-value" id="auditFunnelSignalsValue">—</span></div>
+            <div class="audit-funnel-row"><span class="audit-funnel-name">Observação</span><div class="audit-funnel-track"><div class="audit-funnel-bar watch" id="auditFunnelWatch"></div></div><span class="audit-funnel-value" id="auditFunnelWatchValue">—</span></div>
+            <div class="audit-funnel-row"><span class="audit-funnel-name">Rejeitados</span><div class="audit-funnel-track"><div class="audit-funnel-bar rejected" id="auditFunnelRejected"></div></div><span class="audit-funnel-value" id="auditFunnelRejectedValue">—</span></div>
+          </article>
+          <aside class="audit-card audit-next"><h3>Próxima ação</h3><p>A leitura operacional mais útil deste ciclo.</p><div class="audit-action"><span>FOCO DO SCANNER</span><strong id="auditNextActionTitle">Aguardando leitura</strong><p id="auditNextActionCopy">Atualize o scanner para identificar se há setups que merecem revisão agora.</p></div><div class="audit-quality"><b>Qualidade dos dados</b><span id="auditDataQuality">—</span></div></aside>
+        </div>
+        <p id="scannerAuditSummary" class="audit-summary-copy">A auditoria aparecerá após uma leitura do scanner.</p>
+        <details class="audit-reasons-block"><summary>Ver principais motivos de rejeição</summary><div class="table-wrap"><table><thead><tr><th>Motivo de rejeição</th><th>Ocorrências</th><th>Participação nas rejeições</th></tr></thead><tbody id="scannerAuditReasonsBody"><tr><td colspan="3" class="empty">Execute o scanner para preencher a auditoria.</td></tr></tbody></table></div></details>
+        <div id="scannerAuditResult" class="audit-result muted">Digite um ativo para consultar o resultado da última leitura do scanner.</div>
       </div>
-      <div class="orbit-stage" aria-label="Visão orbital dos setups">
-        <div class="orbit-ring orbit-ring-a"></div><div class="orbit-ring orbit-ring-b"></div>
-        <div class="orbit-globe"><span class="orbit-globe-label">SETUPS<br>QUALIFICADOS</span><strong id="orbitSignalCount">—</strong><small>SINAIS VÁLIDOS</small></div>
-        <aside class="orbit-status"><h3>STATUS DOS SINAIS</h3><p><i class="dot valid"></i> Válido (<span id="orbitValidCount">—</span>)</p><p><i class="dot watch"></i> Em observação (<span id="orbitWatchCount">—</span>)</p><p><i class="dot rejected"></i> Rejeitado (<span id="orbitRejectedCount">—</span>)</p><p><i class="dot excluded"></i> Fora do universo (<span id="orbitExcludedCount">—</span>)</p><p><i class="dot errors"></i> Falha de consulta (<span id="orbitErrorCount">—</span>)</p></aside>
-      </div>
-      <p id="scannerAuditSummary" class="audit-summary-copy">A auditoria aparecerá após uma leitura do scanner.</p>
-      <div class="audit-reasons-block">
-        <div class="audit-subheading"><h3>Principais motivos de rejeição</h3><span>Ordenados por ocorrência nesta leitura</span></div>
-        <div class="table-wrap"><table><thead><tr><th>Motivo de rejeição</th><th>Ocorrências</th><th>Participação nas rejeições</th></tr></thead><tbody id="scannerAuditReasonsBody"><tr><td colspan="3" class="empty">Execute o scanner para preencher a auditoria.</td></tr></tbody></table></div>
-      </div>
-      <div id="scannerAuditResult" class="audit-result muted">Digite um ativo para consultar o resultado da última leitura do scanner.</div>
     </section>
     <section class="panel" id="signalsPanel">
       <div class="section-heading"><div><p class="eyebrow">OPORTUNIDADES ATUAIS · TOP 20</p><h2>Setups qualificados</h2></div><p class="muted">Melhor critério por ativo · sem entrada esticada · futuros até 3×</p></div>
@@ -992,6 +1114,8 @@
 <script src="sentinel-core.js?v=20261014-short-watchlist-1"></script>
   <script src="sentinel-backtest.js?v=20261014-short-watchlist-1"></script>
 <script src="app.js?v=20261014-short-watchlist-1"></script>
+<link rel="stylesheet" href="dashboard-layout.css?v=20261020-light-dashboard-1" />
+<script src="dashboard-layout.js?v=20261020-light-dashboard-1"></script>
   <script>
     (() => {
       const syncOrbit = () => {
