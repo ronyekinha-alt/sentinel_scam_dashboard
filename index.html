@@ -1,5 +1,5 @@
-Warning: truncated output (original token count: 36361)
-Total output lines: 1282
+Warning: truncated output (original token count: 36530)
+Total output lines: 1296
 
 <!doctype html>
 <html lang="pt-BR">
@@ -651,11 +651,7 @@ Total output lines: 1282
     #scannerAuditMetrics .audit-metric:nth-child(6) strong { color:#ffc4ed !important; text-shadow:0 0 5px #fff,0 0 14px #ff66cb,0 0 30px #ff28ad !important; }
     /* Resultados do backtest: texto luminoso, sem tarja colorida; cards-resumo permanecem ciano. */
     #backtestPanel table td.positive, #backtestPanel table td.result-win { background:transparent !important; color:#7dffad !important; text-shadow:0 0 5px #00ff77,0 0 13px rgba(0,255,119,.82) !important; box-shadow:none !important; }
-    #backtestPanel table td.negative, #backtestPanel table td.result-loss { background:transparent !important; color:#f…6361 tokens truncated…:0 0 0 1px rgba(255,104,136,.13),0 8px 18px rgba(0,0,0,.22),inset 0 0 17px rgba(239,50,100,.08); }
-    .scanner-strategy-card-top { display:grid; grid-template-columns:16px 28px minmax(0,1fr); gap:8px; align-items:start; }
-    main > .controls .scanner-strategy-filter .scanner-strategy-card input { width:16px !important; height:16px !important; margin:2px 0 0 !important; padding:0 !important; accent-color:#3bf3df; }
-    .strategy-card-index { display:grid; place-items:center; width:27px; height:27px; border-radius:8px; background:#0a4673; color:#86efff; font-size:10px; font-weight:900; }
-    .strategy-card-title { min-width:0; color:#f3fbff; font-size:12px; font-weight:850; line-height:1.3; }
+    #backtestPanel table td.negative, #backtestPanel table td.result-loss { background:transparent !important; color:#f…6530 tokens truncated…ght:850; line-height:1.3; }
     .strategy-card-kind { display:block; margin-top:2px; color:#92bad7; font-size:9px; font-weight:650; letter-spacing:.3px; }
     .strategy-card-list { display:block; margin:11px 0 0; padding:0; }
     .strategy-card-list > span { display:block; position:relative; padding:6px 0 6px 15px; border-top:1px solid rgba(97,148,191,.20); color:#b6cee1; font-size:10px; line-height:1.35; }
@@ -861,7 +857,7 @@ Total output lines: 1282
 <script src="sentinel-core.js?v=20261014-short-watchlist-1"></script>
   <script src="sentinel-backtest.js?v=20261014-short-watchlist-1"></script>
 <script src="app.js?v=20261014-short-watchlist-1"></script>
-<link rel="stylesheet" href="dashboard-layout.css?v=20261020-light-dashboard-28" />
+<link rel="stylesheet" href="dashboard-layout.css?v=20261020-light-dashboard-29" />
 <style id="sentinel-final-contrast-lock">
   body.sentinel-light-dashboard #scannerAuditPanel > .section-heading *,
   body.sentinel-light-dashboard #signalsPanel > .section-heading *,
@@ -978,6 +974,20 @@ Total output lines: 1282
   body.sentinel-light-dashboard input[type="checkbox"]:checked { background:#c9e0ae !important; border-color:#9cb982 !important; }
 </style>
 <script src="dashboard-layout.js?v=20261020-light-dashboard-1"></script>
+  <script>
+    (() => {
+      const forceImportedHeadingText = () => {
+        const heading = document.querySelector('#importedTradesPanel > .section-heading');
+        if (!heading) return;
+        [heading, ...heading.querySelectorAll('*')].forEach(node => {
+          node.style.setProperty('color', '#111111', 'important');
+          node.style.setProperty('text-shadow', 'none', 'important');
+          node.style.setProperty('opacity', '1', 'important');
+        });
+      };
+      document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', forceImportedHeadingText, { once:true }) : forceImportedHeadingText();
+    })();
+  </script>
   <script>
     (() => {
       const syncOrbit = () => {
