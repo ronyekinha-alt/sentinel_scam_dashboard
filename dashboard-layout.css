@@ -176,3 +176,14 @@ body.sentinel-light-dashboard #importedTradesPanel #mexcResultsBody td.positive{
 body.sentinel-light-dashboard #importedTradesPanel #mexcResultsBody td.result-loss,
 body.sentinel-light-dashboard #importedTradesPanel #mexcResultsBody td.negative{color:#9b2339!important;background:transparent!important;text-shadow:none!important;filter:none!important}
 
+/* Scanner: texto e indicadores legíveis sobre fundo claro. */
+body.sentinel-light-dashboard #signalsPanel #signalsBody tr,body.sentinel-light-dashboard #signalsPanel #signalsBody tr:nth-child(n),body.sentinel-light-dashboard #signalsPanel #signalsBody td{background:#fffefa!important;color:#243126!important;border-color:#dce5d7!important;box-shadow:none!important;text-shadow:none!important}
+body.sentinel-light-dashboard #signalsPanel #signalsBody tr:nth-child(even) td{background:#f8faf4!important}
+body.sentinel-light-dashboard #signalsPanel #signalsBody td .asset,body.sentinel-light-dashboard #signalsPanel #signalsBody td .sub,body.sentinel-light-dashboard #signalsPanel #signalsBody td strong,body.sentinel-light-dashboard #signalsPanel #signalsBody td span{color:#243126!important;text-shadow:none!important;opacity:1!important}
+body.sentinel-light-dashboard #signalsPanel #signalsBody .score{background:#e8f0da!important;border-color:#9cb883!important;color:#245b38!important;box-shadow:none!important}
+body.sentinel-light-dashboard #signalsPanel #signalsBody .best-badge{background:#e8bf61!important;color:#201806!important;box-shadow:none!important}
+body.sentinel-light-dashboard #signalsPanel #signalsBody .direction-badge.long,body.sentinel-light-dashboard #signalsPanel #signalsBody .tag.live{background:#dfeeda!important;border:1px solid #9fbe8d!important;color:#245b38!important;box-shadow:none!important}
+body.sentinel-light-dashboard #signalsPanel #signalsBody .direction-badge.short,body.sentinel-light-dashboard #signalsPanel #signalsBody .tag.loss{background:#f4dfe4!important;border:1px solid #d69aa8!important;color:#9b2339!important;box-shadow:none!important}
+body.sentinel-light-dashboard #signalsPanel #signalsBody .tag.tp1,body.sentinel-light-dashboard #signalsPanel #signalsBody .tag.tp2,body.sentinel-light-dashboard #signalsPanel #signalsBody .timeframe-badge{background:#e7f0d7!important;border:1px solid #bfd0a7!important;color:#31452d!important;box-shadow:none!important}
+body.sentinel-light-dashboard #signalsPanel #signalsBody .exchange-badge{background:#f1dda4!important;color:#332509!important;box-shadow:none!important}body.sentinel-light-dashboard #signalsPanel #signalsBody .vehicle-badge{background:#e5edda!important;color:#334b2f!important;box-shadow:none!important}body.sentinel-light-dashboard #signalsPanel #signalsBody .primary{background:#a9c78a!important;color:#1b2d1b!important;border-color:#8fab71!important;box-shadow:none!important}
+
