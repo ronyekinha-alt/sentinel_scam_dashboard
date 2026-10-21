@@ -140,6 +140,7 @@ body.sentinel-light-dashboard #mexcPositionsBody td.negative,body.sentinel-light
 
 /* Vermelho único para perdas e qualquer valor negativo. */
 body.sentinel-light-dashboard .negative,body.sentinel-light-dashboard .result-loss,body.sentinel-light-dashboard [class*="negative"],body.sentinel-light-dashboard [class*="loss"]{color:#9b2339!important;text-shadow:none!important}
+body.sentinel-light-dashboard .scanner-strategy-card.strategy-short .strategy-card-title{color:#9b2339!important}
 
 /* Paleta sage escolhida: verde pastel em camadas, texto sempre escuro. */
 body.sentinel-light-dashboard{--dash-bg:#f4f7ef;--dash-paper:#fffefa;--dash-ink:#293629;--dash-muted:#64705e;--dash-line:#d9e2ca;--dash-teal:#81966a;--dash-teal-soft:#e9f0dc;--dash-green:#2e6b43;--dash-green-soft:#e1edd8;--dash-red:#92233a;--dash-red-soft:#f6e5e8}
