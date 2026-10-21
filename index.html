@@ -1,5 +1,5 @@
-Warning: truncated output (original token count: 32941)
-Total output lines: 1189
+Warning: truncated output (original token count: 33616)
+Total output lines: 1210
 
 <!doctype html>
 <html lang="pt-BR">
@@ -651,55 +651,7 @@ Total output lines: 1189
     #scannerAuditMetrics .audit-metric:nth-child(6) strong { color:#ffc4ed !important; text-shadow:0 0 5px #fff,0 0 14px #ff66cb,0 0 30px #ff28ad !important; }
     /* Resultados do backtest: texto luminoso, sem tarja colorida; cards-resumo permanecem ciano. */
     #backtestPanel table td.positive, #backtestPanel table td.result-win { background:transparent !important; color:#7dffad !important; text-shadow:0 0 5px #00ff77,0 0 13px rgba(0,255,119,.82) !important; box-shadow:none !important; }
-    #backtestPanel table td.negative, #backtestPanel table td.result-loss { background:transparent !important; color:#f…2941 tokens truncated…ea:limit; }
-    main > .controls .scanner-score-filter { grid-area:score; }
-    main > .controls .scanner-volume-filter { grid-area:volume; }
-    main > .controls .scanner-refresh-filter { grid-area:refresh; }
-    main > .controls .scanner-alert-filter { grid-area:alerts; align-self:center; }
-    main > .controls .scanner-scan-button { grid-area:action; align-self:center; min-height:42px; white-space:nowrap; }
-    main > .controls #scanStatus { grid-area:status; margin:0; padding:0; }
-    main > .controls label { min-width:0; }
-    main > .controls select { width:100%; }
-    main > .controls .scanner-strategy-filter {
-      grid-area:strategies; display:grid !important;
-      grid-template-columns:repeat(6,minmax(0,1fr)); gap:7px 12px;
-      min-width:0 !important; max-width:none !important; width:100%;
-      margin:0; padding:10px 14px 12px;
-    }
-    main > .controls .scanner-strategy-filter .filter-option {
-      width:auto; min-width:0; align-items:flex-start; line-height:1.35;
-      overflow-wrap:anywhere; padding:4px 3px;
-    }
-    main > .controls .scanner-strategy-filter .filter-option input,
-    main > .controls .scanner-alert-filter input {
-      width:16px !important; height:16px !important; min-height:0 !important;
-      padding:0 !important; flex:0 0 16px; margin:1px 0 0;
-    }
-    main > .controls #strategyHelp { grid-column:1/-1; line-height:1.35; }
-    @media (max-width:1300px) {
-      main > .controls {
-        grid-template-columns:repeat(3,minmax(0,1fr));
-        grid-template-areas:"limit score volume" "refresh alerts action" "strategies strategies strategies" "status status status";
-      }
-      main > .controls .scanner-strategy-filter { grid-template-columns:repeat(3,minmax(0,1fr)); }
-    }
-    @media (max-width:700px) {
-      main > .controls {
-        grid-template-columns:repeat(2,minmax(0,1fr));
-        grid-template-areas:"limit score" "volume refresh" "strategies strategies" "alerts alerts" "action action" "status status";
-      }
-      main > .controls .scanner-strategy-filter { grid-template-columns:repeat(2,minmax(0,1fr)); }
-    }
-    @media (max-width:480px) {
-      main > .controls { display:flex !important; flex-direction:column; align-items:stretch; }
-      main > .controls .scanner-strategy-filter { grid-template-columns:minmax(0,1fr); }
-    }
-    /* Todos os seis mostradores usam o mesmo fundo sólido, com aro e texto coloridos. */
-    #scannerAuditMetrics .audit-metric {
-      --ring:#70cfff; --ring-glow:rgba(70,175,255,.32);
-      background:#07101f !important; filter:none !important;
-      border:2px solid var(--ring) !important;
-      box-shadow:0 0 0 3px rgba(115,180,235,.08),0 0 12px var(--ring-glow) !important;
+    #backtestPanel table td.negative, #backtestPanel table td.result-loss { background:transparent !important; color:#f…3616 tokens truncated…5,180,235,.08),0 0 12px var(--ring-glow) !important;
     }
     #scannerAuditMetrics .audit-metric:nth-child(2) { --ring:#62ffae; --ring-glow:rgba(58,255,151,.32); background:#07101f !important; box-shadow:0 0 0 3px rgba(115,180,235,.08),0 0 12px var(--ring-glow) !important; }
     #scannerAuditMetrics .audit-metric:nth-child(3) { --ring:#ffdc78; --ring-glow:rgba(255,201,67,.3); background:#07101f !important; box-shadow:0 0 0 3px rgba(115,180,235,.08),0 0 12px var(--ring-glow) !important; }
@@ -1010,7 +962,7 @@ Total output lines: 1189
 <script src="sentinel-core.js?v=20261014-short-watchlist-1"></script>
   <script src="sentinel-backtest.js?v=20261014-short-watchlist-1"></script>
 <script src="app.js?v=20261014-short-watchlist-1"></script>
-<link rel="stylesheet" href="dashboard-layout.css?v=20261020-light-dashboard-16" />
+<link rel="stylesheet" href="dashboard-layout.css?v=20261020-light-dashboard-17" />
 <style id="sentinel-final-contrast-lock">
   body.sentinel-light-dashboard #scannerAuditPanel > .section-heading *,
   body.sentinel-light-dashboard #signalsPanel > .section-heading *,
@@ -1032,6 +984,27 @@ Total output lines: 1189
   body.sentinel-light-dashboard #importedTradesPanel #mexcResultsBody td.positive { color:#2e6b43 !important; background:transparent !important; text-shadow:none !important; filter:none !important; }
   body.sentinel-light-dashboard #importedTradesPanel #mexcResultsBody td.result-loss,
   body.sentinel-light-dashboard #importedTradesPanel #mexcResultsBody td.negative { color:#9b2339 !important; background:transparent !important; text-shadow:none !important; filter:none !important; }
+  /* Resultado do scanner: conteúdo escuro e etiquetas opacas, sem o antigo tema neon. */
+  body.sentinel-light-dashboard #signalsPanel #signalsBody tr,
+  body.sentinel-light-dashboard #signalsPanel #signalsBody tr:nth-child(n),
+  body.sentinel-light-dashboard #signalsPanel #signalsBody td { background:#fffefa !important; color:#243126 !important; border-color:#dce5d7 !important; box-shadow:none !important; text-shadow:none !important; }
+  body.sentinel-light-dashboard #signalsPanel #signalsBody tr:nth-child(even) td { background:#f8faf4 !important; }
+  body.sentinel-light-dashboard #signalsPanel #signalsBody td .asset,
+  body.sentinel-light-dashboard #signalsPanel #signalsBody td .sub,
+  body.sentinel-light-dashboard #signalsPanel #signalsBody td strong,
+  body.sentinel-light-dashboard #signalsPanel #signalsBody td span { color:#243126 !important; text-shadow:none !important; opacity:1 !important; }
+  body.sentinel-light-dashboard #signalsPanel #signalsBody .score { background:#e8f0da !important; border:1px solid #9cb883 !important; color:#245b38 !important; box-shadow:none !important; }
+  body.sentinel-light-dashboard #signalsPanel #signalsBody .best-badge { background:#e8bf61 !important; color:#201806 !important; box-shadow:none !important; }
+  body.sentinel-light-dashboard #signalsPanel #signalsBody .direction-badge.long,
+  body.sentinel-light-dashboard #signalsPanel #signalsBody .tag.live { background:#dfeeda !important; border:1px solid #9fbe8d !important; color:#245b38 !important; box-shadow:none !important; }
+  body.sentinel-light-dashboard #signalsPanel #signalsBody .direction-badge.short,
+  body.sentinel-light-dashboard #signalsPanel #signalsBody .tag.loss { background:#f4dfe4 !important; border:1px solid #d69aa8 !important; color:#9b2339 !important; box-shadow:none !important; }
+  body.sentinel-light-dashboard #signalsPanel #signalsBody .tag.tp1,
+  body.sentinel-light-dashboard #signalsPanel #signalsBody .tag.tp2,
+  body.sentinel-light-dashboard #signalsPanel #signalsBody .timeframe-badge { background:#e7f0d7 !important; border:1px solid #bfd0a7 !important; color:#31452d !important; box-shadow:none !important; }
+  body.sentinel-light-dashboard #signalsPanel #signalsBody .exchange-badge { background:#f1dda4 !important; color:#332509 !important; box-shadow:none !important; }
+  body.sentinel-light-dashboard #signalsPanel #signalsBody .vehicle-badge { background:#e5edda !important; color:#334b2f !important; box-shadow:none !important; }
+  body.sentinel-light-dashboard #signalsPanel #signalsBody .primary { background:#a9c78a !important; color:#1b2d1b !important; border-color:#8fab71 !important; box-shadow:none !important; }
 </style>
 <script src="dashboard-layout.js?v=20261020-light-dashboard-1"></script>
   <script>
