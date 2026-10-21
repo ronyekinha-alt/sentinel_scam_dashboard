@@ -1,5 +1,5 @@
-Warning: truncated output (original token count: 33998)
-Total output lines: 1227
+Warning: truncated output (original token count: 34256)
+Total output lines: 1232
 
 <!doctype html>
 <html lang="pt-BR">
@@ -651,22 +651,7 @@ Total output lines: 1227
     #scannerAuditMetrics .audit-metric:nth-child(6) strong { color:#ffc4ed !important; text-shadow:0 0 5px #fff,0 0 14px #ff66cb,0 0 30px #ff28ad !important; }
     /* Resultados do backtest: texto luminoso, sem tarja colorida; cards-resumo permanecem ciano. */
     #backtestPanel table td.positive, #backtestPanel table td.result-win { background:transparent !important; color:#7dffad !important; text-shadow:0 0 5px #00ff77,0 0 13px rgba(0,255,119,.82) !important; box-shadow:none !important; }
-    #backtestPanel table td.negative, #backtestPanel table td.result-loss { background:transparent !important; color:#f…3998 tokens truncated…{
-      color:var(--ring) !important; text-shadow:none !important; filter:none !important;
-    }
-    /* A tabela permanece bem compartimentada, mesmo com mais largura. */
-    #signalsPanel tbody td:not(:last-child) { border-right:2px solid rgba(83,160,237,.42) !important; }
-    #signalsPanel thead th:not(:last-child) { border-right:2px solid rgba(98,191,255,.4) !important; }
-    #signalsPanel tbody td { border-top:1px solid rgba(83,160,237,.5) !important; border-bottom:2px solid rgba(83,160,237,.5) !important; }
-
-    /* Leitura confortável: um degrau acima no painel, com números do backtest sem névoa. */
-    body { font-size:16px !important; }
-    button, select, input, textarea { font-size:15px !important; }
-    .controls label { font-size:14px !important; }
-    .controls .scanner-strategy-filter legend { font-size:13px !important; }
-    .controls .scanner-strategy-filter legend span { font-size:11px !important; }
-    .controls .scanner-strategy-filter .filter-option { font-size:12px !important; }
-    .controls .scanner-strategy-filter .sub,
+    #backtestPanel table td.negative, #backtestPanel table td.result-loss { background:transparent !important; color:#f…4256 tokens truncated…    .controls .scanner-strategy-filter .sub,
     #signalsPanel .sub { font-size:13px !important; }
     #signalsPanel th { font-size:13px !important; }
     #signalsPanel td { font-size:15px !important; line-height:1.4; }
@@ -949,7 +934,7 @@ Total output lines: 1227
 <script src="sentinel-core.js?v=20261014-short-watchlist-1"></script>
   <script src="sentinel-backtest.js?v=20261014-short-watchlist-1"></script>
 <script src="app.js?v=20261014-short-watchlist-1"></script>
-<link rel="stylesheet" href="dashboard-layout.css?v=20261020-light-dashboard-19" />
+<link rel="stylesheet" href="dashboard-layout.css?v=20261020-light-dashboard-20" />
 <style id="sentinel-final-contrast-lock">
   body.sentinel-light-dashboard #scannerAuditPanel > .section-heading *,
   body.sentinel-light-dashboard #signalsPanel > .section-heading *,
@@ -1009,6 +994,11 @@ Total output lines: 1227
   body.sentinel-light-dashboard #signalsPanel > .section-heading .eyebrow,
   body.sentinel-light-dashboard #signalsPanel > .section-heading h2,
   body.sentinel-light-dashboard #signalsPanel > .section-heading .muted { color:#111a12 !important; text-shadow:none !important; opacity:1 !important; }
+  body.sentinel-light-dashboard input[type="checkbox"] { appearance:none !important; -webkit-appearance:none !important; display:inline-grid !important; place-content:center !important; width:18px !important; height:18px !important; margin:0 8px 0 0 !important; vertical-align:-3px !important; border:1px solid #6b7a58 !important; border-radius:3px !important; background:#f8fbf4 !important; box-shadow:none !important; }
+  body.sentinel-light-dashboard input[type="checkbox"]:checked { background:#a9c78a !important; border-color:#718b5a !important; }
+  body.sentinel-light-dashboard input[type="checkbox"]::after { content:"✓" !important; display:none; color:#293329 !important; font-size:15px !important; font-weight:900 !important; line-height:1 !important; }
+  body.sentinel-light-dashboard input[type="checkbox"]:checked::after { display:block !important; }
+  body.sentinel-light-dashboard #backtestPanel .backtest-section-heading strong { color:#111a12 !important; text-shadow:none !important; opacity:1 !important; }
 </style>
 <script src="dashboard-layout.js?v=20261020-light-dashboard-1"></script>
   <script>
