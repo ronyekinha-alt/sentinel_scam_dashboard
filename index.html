@@ -1,5 +1,5 @@
-Warning: truncated output (original token count: 33616)
-Total output lines: 1210
+Warning: truncated output (original token count: 33998)
+Total output lines: 1227
 
 <!doctype html>
 <html lang="pt-BR">
@@ -651,20 +651,7 @@ Total output lines: 1210
     #scannerAuditMetrics .audit-metric:nth-child(6) strong { color:#ffc4ed !important; text-shadow:0 0 5px #fff,0 0 14px #ff66cb,0 0 30px #ff28ad !important; }
     /* Resultados do backtest: texto luminoso, sem tarja colorida; cards-resumo permanecem ciano. */
     #backtestPanel table td.positive, #backtestPanel table td.result-win { background:transparent !important; color:#7dffad !important; text-shadow:0 0 5px #00ff77,0 0 13px rgba(0,255,119,.82) !important; box-shadow:none !important; }
-    #backtestPanel table td.negative, #backtestPanel table td.result-loss { background:transparent !important; color:#f…3616 tokens truncated…5,180,235,.08),0 0 12px var(--ring-glow) !important;
-    }
-    #scannerAuditMetrics .audit-metric:nth-child(2) { --ring:#62ffae; --ring-glow:rgba(58,255,151,.32); background:#07101f !important; box-shadow:0 0 0 3px rgba(115,180,235,.08),0 0 12px var(--ring-glow) !important; }
-    #scannerAuditMetrics .audit-metric:nth-child(3) { --ring:#ffdc78; --ring-glow:rgba(255,201,67,.3); background:#07101f !important; box-shadow:0 0 0 3px rgba(115,180,235,.08),0 0 12px var(--ring-glow) !important; }
-    #scannerAuditMetrics .audit-metric:nth-child(4) { --ring:#ff7997; --ring-glow:rgba(255,71,113,.32); background:#07101f !important; box-shadow:0 0 0 3px rgba(115,180,235,.08),0 0 12px var(--ring-glow) !important; }
-    #scannerAuditMetrics .audit-metric:nth-child(5) { --ring:#cba0ff; --ring-glow:rgba(166,103,255,.32); background:#07101f !important; box-shadow:0 0 0 3px rgba(115,180,235,.08),0 0 12px var(--ring-glow) !important; }
-    #scannerAuditMetrics .audit-metric:nth-child(6) { --ring:#ff86d5; --ring-glow:rgba(255,80,195,.32); background:#07101f !important; box-shadow:0 0 0 3px rgba(115,180,235,.08),0 0 12px var(--ring-glow) !important; }
-    #scannerAuditMetrics .audit-metric::after,
-    #scannerAuditMetrics .audit-metric:nth-child(n)::after {
-      inset:-6px; border:1px solid var(--ring) !important;
-      opacity:.46; background:none !important; box-shadow:none !important;
-    }
-    #scannerAuditMetrics .audit-metric:nth-child(n) span,
-    #scannerAuditMetrics .audit-metric:nth-child(n) strong {
+    #backtestPanel table td.negative, #backtestPanel table td.result-loss { background:transparent !important; color:#f…3998 tokens truncated…{
       color:var(--ring) !important; text-shadow:none !important; filter:none !important;
     }
     /* A tabela permanece bem compartimentada, mesmo com mais largura. */
@@ -962,7 +949,7 @@ Total output lines: 1210
 <script src="sentinel-core.js?v=20261014-short-watchlist-1"></script>
   <script src="sentinel-backtest.js?v=20261014-short-watchlist-1"></script>
 <script src="app.js?v=20261014-short-watchlist-1"></script>
-<link rel="stylesheet" href="dashboard-layout.css?v=20261020-light-dashboard-17" />
+<link rel="stylesheet" href="dashboard-layout.css?v=20261020-light-dashboard-19" />
 <style id="sentinel-final-contrast-lock">
   body.sentinel-light-dashboard #scannerAuditPanel > .section-heading *,
   body.sentinel-light-dashboard #signalsPanel > .section-heading *,
@@ -1005,6 +992,23 @@ Total output lines: 1210
   body.sentinel-light-dashboard #signalsPanel #signalsBody .exchange-badge { background:#f1dda4 !important; color:#332509 !important; box-shadow:none !important; }
   body.sentinel-light-dashboard #signalsPanel #signalsBody .vehicle-badge { background:#e5edda !important; color:#334b2f !important; box-shadow:none !important; }
   body.sentinel-light-dashboard #signalsPanel #signalsBody .primary { background:#a9c78a !important; color:#1b2d1b !important; border-color:#8fab71 !important; box-shadow:none !important; }
+  /* Informações de histórico MEXC: cinza escuro contínuo e legível. */
+  body.sentinel-light-dashboard #importedTradesPanel > .section-heading .eyebrow,
+  body.sentinel-light-dashboard #importedTradesPanel > .section-heading h2,
+  body.sentinel-light-dashboard #importedTradesPanel > .section-heading .check,
+  body.sentinel-light-dashboard #importedTradesPanel > .section-heading .muted,
+  body.sentinel-light-dashboard #importedTradesPanel #mexcMetricsNote { color:#3d4740 !important; text-shadow:none !important; opacity:1 !important; }
+  body.sentinel-light-dashboard #importedTradesPanel .mexc-metrics-performance + #mexcMetricsNote + .section-heading .eyebrow { color:#111a12 !important; }
+  body.sentinel-light-dashboard #importedTradesPanel .mexc-balance-heading .eyebrow,
+  body.sentinel-light-dashboard #importedTradesPanel .mexc-balance-heading .muted { color:#111a12 !important; }
+  body.sentinel-light-dashboard #mexcLivePanel > .section-heading .eyebrow,
+  body.sentinel-light-dashboard #mexcLiveStatus,
+  body.sentinel-light-dashboard #mexcStatus,
+  body.sentinel-light-dashboard #mexcPanel > .section-heading .muted,
+  body.sentinel-light-dashboard #backtestPanel > .section-heading .muted,
+  body.sentinel-light-dashboard #signalsPanel > .section-heading .eyebrow,
+  body.sentinel-light-dashboard #signalsPanel > .section-heading h2,
+  body.sentinel-light-dashboard #signalsPanel > .section-heading .muted { color:#111a12 !important; text-shadow:none !important; opacity:1 !important; }
 </style>
 <script src="dashboard-layout.js?v=20261020-light-dashboard-1"></script>
   <script>
