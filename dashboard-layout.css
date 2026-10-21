@@ -170,3 +170,9 @@ body.sentinel-light-dashboard #scannerAuditPanel>.section-heading p,body.sentine
 body.sentinel-light-dashboard #mexcLiveStatus,body.sentinel-light-dashboard #mexcStatus,body.sentinel-light-dashboard #mexcImportStatus,body.sentinel-light-dashboard #backtestStatus,body.sentinel-light-dashboard #rsiFinderStatus{color:#344334!important;text-shadow:none!important;font-size:13px!important;opacity:1!important}
 body.sentinel-light-dashboard #scannerAuditPanel #scannerAuditMetrics .audit-metric span{font-size:14px!important;line-height:1.25!important;color:#172217!important}body.sentinel-light-dashboard #scannerAuditPanel #scannerAuditMetrics .audit-metric small{font-size:12px!important;line-height:1.35!important;color:#354735!important}body.sentinel-light-dashboard #scannerAuditPanel .audit-card,body.sentinel-light-dashboard #scannerAuditPanel .audit-card *,body.sentinel-light-dashboard #scannerAuditPanel .audit-reasons-block,body.sentinel-light-dashboard #scannerAuditPanel .audit-reasons-block *{font-size:13px!important;color:#172217!important;text-shadow:none!important;opacity:1!important}
 
+/* Histórico MEXC por ativo: não herdar os antigos tons neon. */
+body.sentinel-light-dashboard #importedTradesPanel #mexcResultsBody td.result-win,
+body.sentinel-light-dashboard #importedTradesPanel #mexcResultsBody td.positive{color:#2e6b43!important;background:transparent!important;text-shadow:none!important;filter:none!important}
+body.sentinel-light-dashboard #importedTradesPanel #mexcResultsBody td.result-loss,
+body.sentinel-light-dashboard #importedTradesPanel #mexcResultsBody td.negative{color:#9b2339!important;background:transparent!important;text-shadow:none!important;filter:none!important}
+
