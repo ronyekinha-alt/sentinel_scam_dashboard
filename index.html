@@ -1,5 +1,5 @@
-Warning: truncated output (original token count: 35924)
-Total output lines: 1273
+Warning: truncated output (original token count: 36361)
+Total output lines: 1282
 
 <!doctype html>
 <html lang="pt-BR">
@@ -651,19 +651,7 @@ Total output lines: 1273
     #scannerAuditMetrics .audit-metric:nth-child(6) strong { color:#ffc4ed !important; text-shadow:0 0 5px #fff,0 0 14px #ff66cb,0 0 30px #ff28ad !important; }
     /* Resultados do backtest: texto luminoso, sem tarja colorida; cards-resumo permanecem ciano. */
     #backtestPanel table td.positive, #backtestPanel table td.result-win { background:transparent !important; color:#7dffad !important; text-shadow:0 0 5px #00ff77,0 0 13px rgba(0,255,119,.82) !important; box-shadow:none !important; }
-    #backtestPanel table td.negative, #backtestPanel table td.result-loss { background:transparent !important; color:#f…5924 tokens truncated…bff; }
-    .scanner-strategy-count { flex:0 0 auto; padding:5px 9px; border:1px solid rgba(77,214,255,.55); border-radius:999px; color:#71ebff; font-size:10px; font-weight:850; white-space:nowrap; }
-    main > .controls .scanner-strategy-filter .filter-all { display:flex !important; align-items:center; gap:8px; width:max-content; margin:0 3px 11px; padding:7px 9px !important; border:1px solid rgba(92,181,243,.42); border-radius:8px; background:rgba(13,52,88,.55); color:#f1fbff !important; font-weight:800; }
-    .scanner-strategy-card-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
-    main > .controls .scanner-strategy-filter .scanner-strategy-card {
-      display:block !important; position:relative; min-height:184px; width:auto; margin:0; padding:12px !important;
-      border:1px solid rgba(78,129,177,.42); border-radius:11px; background:linear-gradient(155deg,rgba(13,41,76,.85),rgba(5,20,43,.96));
-      color:#c8dded !important; cursor:pointer; transition:border-color .18s ease, box-shadow .18s ease, opacity .18s ease, transform .18s ease;
-    }
-    main > .controls .scanner-strategy-filter .scanner-strategy-card:hover { transform:translateY(-1px); border-color:rgba(94,206,255,.78); }
-    main > .controls .scanner-strategy-filter .scanner-strategy-card:has(input:checked) { border-color:rgba(65,226,236,.85); box-shadow:0 0 0 1px rgba(60,221,246,.13),0 8px 18px rgba(0,0,0,.22),inset 0 0 17px rgba(45,161,255,.08); }
-    main > .controls .scanner-strategy-filter .scanner-strategy-card:has(input:not(:checked)) { opacity:.56; }
-    main > .controls .scanner-strategy-filter .scanner-strategy-card.strategy-short:has(input:checked) { border-color:rgba(255,104,136,.78); box-shadow:0 0 0 1px rgba(255,104,136,.13),0 8px 18px rgba(0,0,0,.22),inset 0 0 17px rgba(239,50,100,.08); }
+    #backtestPanel table td.negative, #backtestPanel table td.result-loss { background:transparent !important; color:#f…6361 tokens truncated…:0 0 0 1px rgba(255,104,136,.13),0 8px 18px rgba(0,0,0,.22),inset 0 0 17px rgba(239,50,100,.08); }
     .scanner-strategy-card-top { display:grid; grid-template-columns:16px 28px minmax(0,1fr); gap:8px; align-items:start; }
     main > .controls .scanner-strategy-filter .scanner-strategy-card input { width:16px !important; height:16px !important; margin:2px 0 0 !important; padding:0 !important; accent-color:#3bf3df; }
     .strategy-card-index { display:grid; place-items:center; width:27px; height:27px; border-radius:8px; background:#0a4673; color:#86efff; font-size:10px; font-weight:900; }
@@ -873,7 +861,7 @@ Total output lines: 1273
 <script src="sentinel-core.js?v=20261014-short-watchlist-1"></script>
   <script src="sentinel-backtest.js?v=20261014-short-watchlist-1"></script>
 <script src="app.js?v=20261014-short-watchlist-1"></script>
-<link rel="stylesheet" href="dashboard-layout.css?v=20261020-light-dashboard-27" />
+<link rel="stylesheet" href="dashboard-layout.css?v=20261020-light-dashboard-28" />
 <style id="sentinel-final-contrast-lock">
   body.sentinel-light-dashboard #scannerAuditPanel > .section-heading *,
   body.sentinel-light-dashboard #signalsPanel > .section-heading *,
@@ -979,6 +967,15 @@ Total output lines: 1273
   body.sentinel-light-dashboard #importedTradesPanel > .section-heading *, body.sentinel-light-dashboard #mexcLivePanel > .section-heading * { color:#111a12 !important; text-shadow:none !important; opacity:1 !important; }
   body.sentinel-light-dashboard #mexcLivePanel #mexcLiveStatus, body.sentinel-light-dashboard #importedTradesPanel .mexc-results-pagination, body.sentinel-light-dashboard #importedTradesPanel .mexc-results-pagination * { color:#111a12 !important; text-shadow:none !important; opacity:1 !important; }
   body.sentinel-light-dashboard #importedTradesPanel #mexcResultsPrevious, body.sentinel-light-dashboard #importedTradesPanel #mexcResultsNext { background:#c6d6ad !important; color:#1c2b1b !important; border-color:#a8bd8c !important; }
+  body.sentinel-light-dashboard #importedTradesPanel .section-heading,
+  body.sentinel-light-dashboard #importedTradesPanel .section-heading *,
+  body.sentinel-light-dashboard #importedTradesPanel .section-heading .check,
+  body.sentinel-light-dashboard #importedTradesPanel .section-heading .muted { color:#111 !important; text-shadow:none !important; opacity:1 !important; }
+  /* Fundos verdes do layout mais claros; botões e valores positivos permanecem iguais. */
+  body.sentinel-light-dashboard { --dash-teal:#9cac85; --dash-teal-soft:#f2f6ea; --dash-green-soft:#edf5e8; }
+  body.sentinel-light-dashboard #signalsPanel > .section-heading, body.sentinel-light-dashboard #importedTradesPanel > .section-heading, body.sentinel-light-dashboard #mexcLivePanel > .section-heading, body.sentinel-light-dashboard #mexcPanel > .section-heading, body.sentinel-light-dashboard #backtestPanel > .section-heading, body.sentinel-light-dashboard #rsiFinderPanel > .section-heading, body.sentinel-light-dashboard #importedTradesPanel .mexc-balance-heading, body.sentinel-light-dashboard #scannerAuditPanel > .section-heading, body.sentinel-light-dashboard #backtestPanel .backtest-section-heading { background:#e9f2d8 !important; border-color:#d4e2bb !important; }
+  body.sentinel-light-dashboard #signalsPanel thead th, body.sentinel-light-dashboard #rsiFinderPanel thead th, body.sentinel-light-dashboard #importedTradesPanel thead th, body.sentinel-light-dashboard #mexcLivePanel thead th, body.sentinel-light-dashboard #backtestPanel thead th { background:#dfeaca !important; border-color:#cadab2 !important; }
+  body.sentinel-light-dashboard input[type="checkbox"]:checked { background:#c9e0ae !important; border-color:#9cb982 !important; }
 </style>
 <script src="dashboard-layout.js?v=20261020-light-dashboard-1"></script>
   <script>
