@@ -111,11 +111,17 @@ Somente 1H. Base de 18 candles com amplitude <=12%, rompimento de maxima da base
 
 Experimental; 1H, 2H, 4H e 8H. RSI cruzou para <=30 no passado; EMA8 cruza acima de EMA22 e EMA80 agora. Espera minima: 8 dias apos um toque RSI, ou 7 dias com dois ou mais toques. Preco a no maximo 3% da EMA8, RSI <=72, diario acima de 90% da EMA80, semanal nao bloqueado e minima desde o toque como base de stop. E `WATCH`, nao entrada validada automatica.
 
-### 6.7 Short por tendencia baixista e rompimento `bearish-breakdown`
+### 6.7 Double Oversold Bounce `double-oversold-bounce`
+
+Experimental; somente 2H e sempre em candle fechado. O macro aceita o diario acima da EMA80 ou com tendencia ascendente. O gatilho exige Stoch RSI 2H <=5, RSI 14 <=30 simultaneamente em 1H, 2H e 4H, candle 2H comprador com pavio inferior de pelo menos 35% da amplitude e proximidade de ate 2% da EMA22/EMA80 do 2H, EMA80 diaria ou suporte estatico. Tambem exige no minimo 3% de espaco tecnico ate a proxima resistencia; isso e filtro de estrutura, nao previsao de probabilidade.
+
+Os niveis informativos sao stop fixo de 4% e alvo de 8% (R:R 2:1), com teto tecnico de 3x informado pelo motor. O sinal fica em `WATCH` e exige confirmacao humana. Nao envia ordem, nao garante acerto e pode ficar mais raro devido a sobrevenda simultanea nos tres tempos.
+
+### 6.8 Short por tendencia baixista e rompimento `bearish-breakdown`
 
 Gatilhos 1H, 2H ou 4H. Diario, 4H e 2H abaixo de EMAs, com EMA9 < EMA22 < EMA51 e MACD negativo; gatilho conserva pilha baixista. RSI 32-62, volume >=1,05x e rompimento fechado de minima recente ou padrao vendedor. SHORT exige futuros; nunca ha envio de ordem.
 
-### 6.8 VWAP semanal: rompimento e primeiro reteste `vwap-retest-1h-2h`
+### 6.9 VWAP semanal: rompimento e primeiro reteste `vwap-retest-1h-2h`
 
 Experimental; 1H ou 2H. A VWAP inicia na segunda-feira UTC. O preco precisa romper para cima, realizar o primeiro reteste nos tres candles anteriores, fechar com padrao comprador e volume relativo >=1,5x. Diario deve estar proximo/acima da EMA80, 4H acima da EMA51 e RSI 4H >=45. Squeeze liberado e CVD proxy crescente somam confluencia, mas o setup fica em `WATCH` ate validacao historica independente.
 
@@ -182,3 +188,4 @@ Antes de ativar regra nova: implementar no motor compartilhado, cobrir com teste
 ### Prompt consolidado usado nesta revisao
 
 > Voce e o engenheiro quantitativo senior responsavel pelo Sentinel Trade. Implemente melhorias de governanca, blindagem de risco e filtros no motor compartilhado, preservando paridade total entre dashboard e Telegram. Padronize o Setup 4 em EMA 22/52; aplique veto de LONG para altcoins quando BTC 4H fechar abaixo da EMA22 e MACD negativo ou RSI menor que 48; consulte funding e OI 4H do perpétuo Binance, bloqueando funding acima de +0,05% e somando +5 somente para funding entre -0,01% e +0,01% com OI crescente. No backtest, desconte 0,25% por trade fechado composto por taxas taker e slippage configuraveis. Para tendencias, documente breakeven em 1R e trailing do restante apos 2R; para pullbacks, exija secagem de venda no candle anterior; para EMA cross, exija pavio inferior minimo de 30%. Adicione VWAP semanal rompimento/reteste como setup experimental e trate CVD e squeeze Bollinger/Keltner como confluencias transparentes, nao como promessa. Atualize testes de paridade, versao semantica e documentacao; valide sintaxe e testes antes de publicar ou disparar o scanner.
+
