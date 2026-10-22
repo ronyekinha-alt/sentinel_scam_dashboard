@@ -1,6 +1,6 @@
 # Sentinel Trade — painel e Telegram alinhados
 
-O painel local e o scanner Telegram executam `sentinel-core.js`, com os mesmos indicadores, fontes, score e condições de entrada. Setups ao vivo: **Tendência + pivô**, **Pullback 2H + confirmação 4H**, **Pullback 2H · diário flexível** e **Cruzamento EMA 9 + reteste 22/52 · 2H**. A EMA 8/80 diária, introduzida em 07/10/2026, foi retirada do motor ativo.
+O painel local e o scanner Telegram executam `sentinel-core.js`, com os mesmos indicadores, fontes, score e condições de entrada. Entre os setups disponíveis está o experimental **Double Oversold Bounce · 2H**. Ele apenas sinaliza uma oportunidade técnica: não envia ordens e exige validação humana.
 
 ## Abrir o painel
 
@@ -11,7 +11,7 @@ O diário e as preferências continuam no navegador. A integração privada MEXC
 ## Padrão comum
 
 - Score mínimo **90**, com opções **85** e **100**. Score mede confluência técnica, não probabilidade estatística de acerto.
-- Top **1.000 por capitalização em cada fonte**, os quatro setups e volume mínimo de **US$ 1 milhão** nas últimas 24h **do próprio par spot da corretora selecionada**.
+- Top **1.000 por capitalização em cada fonte**, os setups selecionados e volume mínimo de **US$ 1 milhão** nas últimas 24h **do próprio par spot da corretora selecionada**.
 - CoinGecko e CoinMarketCap selecionam o universo por capitalização: união dos top N de cada fonte, sem duplicar o mesmo par. A união pode exceder N; somente pares spot USDT negociáveis na Binance ou MEXC e com o volume mínimo são analisados. BTC/ETH continuam excluídos.
 - CoinMarketCap usa a API pública oficial sem chave. O painel acessa pelo servidor local, pois a fonte não libera acesso direto do navegador. Cada sinal informa fonte e posição no ranking; símbolo duplicado dentro de uma fonte é ignorado nessa fonte para evitar atribuição ambígua.
 - Se um ranking falhar, o outro mantém a busca com aviso de cobertura parcial. Se ambos falharem, a consulta é interrompida com erro explícito; não escolhe ativos por volume fora dos rankings. Estar no ranking não acrescenta pontos nem substitui a confirmação técnica.
@@ -25,6 +25,18 @@ O diário e as preferências continuam no navegador. A integração privada MEXC
 - Binance Futures é consultada pelos dois canais apenas para sugerir veículo/alavancagem até 3×. Se não qualificar ou estiver indisponível, preserva o setup SPOT já confirmado. Não executa ordens.
 - Erros por ativo e consultas parciais são reportados. Falha em todas as consultas não é tratada como ausência legítima de sinais.
 
+### Double Oversold Bounce · 2H
+
+Setup experimental de reversão em sobrevenda. Só fica elegível quando todos os itens abaixo ocorrem em candles fechados:
+
+- diário acima da EMA 80 ou em tendência ascendente;
+- Stoch RSI do 2H em `≤ 5`;
+- RSI 14 em `≤ 30` simultaneamente no 1H, 2H e 4H;
+- candle comprador de 2H com pavio inferior de pelo menos 35% da amplitude, junto de EMA 22/80 ou suporte estático a até 2% do fechamento;
+- ao menos 3% de espaço técnico até a próxima resistência.
+
+Os níveis informativos são **stop de 4%** e **alvo de 8%** (R:R 2:1). O filtro de espaço técnico não prevê preço nem garante probabilidade: ele apenas evita alertas sem margem gráfica mínima para uma alta de 3%. O alerta continua como `EXPERIMENTAL · CONFIRME O GRÁFICO`; a execução, tamanho e alavancagem são decisões manuais.
+
 ## Telegram
 
 O workflow existente continua no repositório `sentinel-trade-telegram`, com sua programação preservada. Secrets necessários: `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID`.
@@ -37,7 +49,7 @@ Mesmo motor e mesmas configurações produzem os mesmos setups **para os mesmos 
 
 ## Backtest
 
-Todos os setups históricos existentes, inclusive os experimentais EMA/RSI, rompimentos 30/60 e retestes com stop/alvo fixos, ficam em `sentinel-backtest.js`. Os experimentais permanecem exclusivamente em simulação, conforme solicitado. As duas estratégias oficiais usam os filtros e score do motor ao vivo. O histórico só consulta candles macro que já fecharam no instante do sinal; a entrada simulada ocorre no candle seguinte.
+Todos os setups históricos existentes, inclusive os experimentais EMA/RSI, rompimentos 30/60 e retestes com stop/alvo fixos, ficam em `sentinel-backtest.js`. O Double Oversold Bounce usa entrada no fechamento do candle de confirmação no estudo dedicado; demais simuladores podem usar a abertura seguinte conforme sua metodologia. O histórico só consulta candles macro que já fecharam no instante do sinal.
 
 Pode executar o mesmo motor no Node, sem enviar Telegram:
 
@@ -61,3 +73,4 @@ Os testes cobrem paridade navegador/Node, padrões compradores, score 90/100, vo
 O motor e o backtest são distribuídos com conteúdo idêntico nos repositórios do painel e Telegram. Alterações nesses módulos devem ser publicadas e verificadas nos dois; o campo `engineVersion` identifica a versão em uso.
 
 Referências: [ranking público CoinMarketCap](https://coinmarketcap.com/api/documentation/pro-api-reference/keyless-public-api), [API pública MEXC](https://mexcdevelop.github.io/apidocs/spot_v3_en/).
+
