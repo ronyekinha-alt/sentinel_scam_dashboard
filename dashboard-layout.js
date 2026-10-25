@@ -5,7 +5,8 @@
     ['▥', 'Relatório / histórico', 'importedTradesPanel'],
     ['⌬', 'Validação / simulador', 'backtestPanel'],
     ['◎', 'Gerenciamento de risco', 'signalsPanel'],
-    ['◌', 'Alertas do Telegram', 'signalsPanel']
+    ['◌', 'Alertas do Telegram', 'signalsPanel'],
+    ['◈', 'Atividade on-chain', 'onchainPanel']
   ];
 
   function init() {
