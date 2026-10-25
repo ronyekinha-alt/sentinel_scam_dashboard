@@ -4,7 +4,11 @@
   async function refresh() {
     const target=document.getElementById('onchainContent');
     try {
-      const response=await fetch('onchain-report.json',{cache:'no-store'});
+      let response;
+      try {
+        response=await fetch('https://raw.githubusercontent.com/ronyekinha-alt/sentinel_scam_dashboard/main/onchain-report.json',{cache:'no-store',signal:AbortSignal.timeout(15000)});
+        if(!response.ok)throw new Error('Fonte pública indisponível');
+      } catch { response=await fetch('onchain-report.json',{cache:'no-store'}); }
       if(!response.ok) throw new Error('Relatório indisponível');
       const report=await response.json();
       const stale=!Number.isFinite(Date.parse(report.asOf))||Date.now()-Date.parse(report.asOf)>86400000;
