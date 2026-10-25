@@ -26,6 +26,9 @@
   }
   function init() {
     const main=document.querySelector('main'); if(!main)return;
+    const style=document.createElement('style');
+    style.textContent='#onchainPanel{min-width:0;color:var(--dash-ink,var(--text,#12243a))}#onchainPanel p,#onchainPanel h3,#onchainPanel li,#onchainPanel summary{color:var(--dash-ink,var(--text,#12243a))!important}#onchainPanel .table-wrap{max-width:100%;overflow-x:auto}#onchainPanel table{min-width:1000px}#onchainPanel code{overflow-wrap:anywhere;white-space:normal}#onchainPanel details{margin:14px 0}#onchainPanel summary{cursor:pointer}';
+    document.head.append(style);
     const panel=document.createElement('section');panel.id='onchainPanel';panel.className='panel';
     panel.innerHTML='<div class="section-heading"><div><p class="eyebrow">CONTEXTO INFORMATIVO · SEM ORDENS</p><h2>Desbloqueios e atividade on-chain</h2></div><button type="button" id="refreshOnchain">Atualizar relatório</button></div><div style="padding:20px"><p>Posições em tokens: saldo atual versus 1, 7, 30 e 90 dias, mantendo o preço constante. Piloto LINK/AAVE; amostra de carteiras. Coleta programada a cada 30 minutos, sujeita a atrasos das fontes e do agendador. Receber tokens não comprova compra.</p><div id="onchainContent" aria-live="polite">Carregando cobertura…</div></div>';
     main.append(panel);document.getElementById('refreshOnchain').addEventListener('click',refresh);refresh();setInterval(()=>{if(!document.hidden)refresh();},60000);
