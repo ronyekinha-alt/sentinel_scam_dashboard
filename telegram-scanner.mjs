@@ -38,7 +38,7 @@ export async function main(dependencies={}) {
   const read=dependencies.getJson||getJson,send=dependencies.send||sendTelegram,load=dependencies.loadState||loadState,save=dependencies.saveState||saveState;
   if(!dependencies.send&&(!process.env.TELEGRAM_BOT_TOKEN||!CHAT_ID))throw new Error('Segredos TELEGRAM_BOT_TOKEN e TELEGRAM_CHAT_ID não configurados.');
   if(DISCOVER_CHAT){await discoverChats();return;}
-  const config=Core.settings({minScore:Number(process.env.MIN_SCORE||90),strategy:process.env.SCANNER_STRATEGY||'both',minVolume:Number(process.env.MIN_VOLUME||1000000),assetLimit:Number(process.env.ASSET_LIMIT||1000)});
+  const config=Core.settings({minScore:Number(process.env.MIN_SCORE||90),strategy:process.env.SCANNER_STRATEGY||'both',minVolume:Number(process.env.MIN_VOLUME||1000000),assetLimit:Number(process.env.ASSET_LIMIT||700)});
   const result=await (dependencies.scan||Core.scanMarket)(read,config), state=await load(), now=Date.now(), sent=state.sent||{};
   for(const [symbol,item] of Object.entries(sent))if(now-item.at>7*86400000)delete sent[symbol];
   const fresh=result.signals.filter(s=>FORCE_ALERT||Core.isFresh(s,sent[s.symbol],now));
