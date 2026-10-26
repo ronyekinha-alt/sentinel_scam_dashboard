@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "asOf": "2026-10-26T01:06:12.672Z",
+  "asOf": "2026-10-26T06:06:16.579Z",
   "status": "ready",
   "assets": [
     {
@@ -10,7 +10,7 @@
       "coverage": {
         "complete": false,
         "startTime": null,
-        "collectedAt": "2026-10-26T01:06:12.672Z",
+        "collectedAt": "2026-10-26T06:06:16.579Z",
         "source": "Blockscout + dRPC público (fallback Blockscout RPC)",
         "negotiationsDecoded": false,
         "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
@@ -22,26 +22,28 @@
         ],
         "fresh": true
       },
-      "recordCount": 100,
+      "recordCount": 93,
       "candidates": [
         {
-          "address": "0xbcf0061a38529536db14b67cb0dcd7532e4c6809",
+          "address": "0xeb05706a876b36b9069332abce1607e557aee36a",
           "label": "Titular não identificado",
           "windows": {
             "1": {
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -436.4999894367003,
+              "netTransferred": 24567.058989999998,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
               "evidence": [
                 {
-                  "id": "0x56452ac442caa7c6cc2dd53a66fb9aa67bb67b02349ed033769de02f05eff6ff:42",
-                  "transactionHash": "0x56452ac442caa7c6cc2dd53a66fb9aa67bb67b02349ed033769de02f05eff6ff",
-                  "source": "https://eth.blockscout.com/tx/0x56452ac442caa7c6cc2dd53a66fb9aa67bb67b02349ed033769de02f05eff6ff"
+                  "id": "0x73010f850c1b30e4b4a20c79c71390c89ee9c487dc125980bd47baa53d1f2de9:343",
+                  "transactionHash": "0x73010f850c1b30e4b4a20c79c71390c89ee9c487dc125980bd47baa53d1f2de9",
+                  "source": "https://eth.blockscout.com/tx/0x73010f850c1b30e4b4a20c79c71390c89ee9c487dc125980bd47baa53d1f2de9"
                 }
               ]
             },
@@ -49,16 +51,18 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -436.4999894367003,
+              "netTransferred": 24567.058989999998,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
               "evidence": [
                 {
-                  "id": "0x56452ac442caa7c6cc2dd53a66fb9aa67bb67b02349ed033769de02f05eff6ff:42",
-                  "transactionHash": "0x56452ac442caa7c6cc2dd53a66fb9aa67bb67b02349ed033769de02f05eff6ff",
-                  "source": "https://eth.blockscout.com/tx/0x56452ac442caa7c6cc2dd53a66fb9aa67bb67b02349ed033769de02f05eff6ff"
+                  "id": "0x73010f850c1b30e4b4a20c79c71390c89ee9c487dc125980bd47baa53d1f2de9:343",
+                  "transactionHash": "0x73010f850c1b30e4b4a20c79c71390c89ee9c487dc125980bd47baa53d1f2de9",
+                  "source": "https://eth.blockscout.com/tx/0x73010f850c1b30e4b4a20c79c71390c89ee9c487dc125980bd47baa53d1f2de9"
                 }
               ]
             },
@@ -66,16 +70,18 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -436.4999894367003,
+              "netTransferred": 24567.058989999998,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
               "evidence": [
                 {
-                  "id": "0x56452ac442caa7c6cc2dd53a66fb9aa67bb67b02349ed033769de02f05eff6ff:42",
-                  "transactionHash": "0x56452ac442caa7c6cc2dd53a66fb9aa67bb67b02349ed033769de02f05eff6ff",
-                  "source": "https://eth.blockscout.com/tx/0x56452ac442caa7c6cc2dd53a66fb9aa67bb67b02349ed033769de02f05eff6ff"
+                  "id": "0x73010f850c1b30e4b4a20c79c71390c89ee9c487dc125980bd47baa53d1f2de9:343",
+                  "transactionHash": "0x73010f850c1b30e4b4a20c79c71390c89ee9c487dc125980bd47baa53d1f2de9",
+                  "source": "https://eth.blockscout.com/tx/0x73010f850c1b30e4b4a20c79c71390c89ee9c487dc125980bd47baa53d1f2de9"
                 }
               ]
             },
@@ -83,16 +89,18 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -436.4999894367003,
+              "netTransferred": 24567.058989999998,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
               "evidence": [
                 {
-                  "id": "0x56452ac442caa7c6cc2dd53a66fb9aa67bb67b02349ed033769de02f05eff6ff:42",
-                  "transactionHash": "0x56452ac442caa7c6cc2dd53a66fb9aa67bb67b02349ed033769de02f05eff6ff",
-                  "source": "https://eth.blockscout.com/tx/0x56452ac442caa7c6cc2dd53a66fb9aa67bb67b02349ed033769de02f05eff6ff"
+                  "id": "0x73010f850c1b30e4b4a20c79c71390c89ee9c487dc125980bd47baa53d1f2de9:343",
+                  "transactionHash": "0x73010f850c1b30e4b4a20c79c71390c89ee9c487dc125980bd47baa53d1f2de9",
+                  "source": "https://eth.blockscout.com/tx/0x73010f850c1b30e4b4a20c79c71390c89ee9c487dc125980bd47baa53d1f2de9"
                 }
               ]
             }
@@ -103,23 +111,23 @@
           "confidence": "baixa"
         },
         {
-          "address": "0x621ed6b211e3c6d1e56eec3a0b4e5f355aab3f2d",
+          "address": "0x4de6593b8767449fd03dec758462c1393d93f8cd",
           "label": "Titular não identificado",
           "windows": {
             "1": {
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -326.2206142,
+              "netTransferred": -3981.0810906834554,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x4c0f0d0f99a44ce147454463e67a2d766c375a06cdd90103765f1a4c10459f46:271",
-                  "transactionHash": "0x4c0f0d0f99a44ce147454463e67a2d766c375a06cdd90103765f1a4c10459f46",
-                  "source": "https://eth.blockscout.com/tx/0x4c0f0d0f99a44ce147454463e67a2d766c375a06cdd90103765f1a4c10459f46"
+                  "id": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5:364",
+                  "transactionHash": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5",
+                  "source": "https://eth.blockscout.com/tx/0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5"
                 }
               ]
             },
@@ -127,16 +135,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -326.2206142,
+              "netTransferred": -3981.0810906834554,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x4c0f0d0f99a44ce147454463e67a2d766c375a06cdd90103765f1a4c10459f46:271",
-                  "transactionHash": "0x4c0f0d0f99a44ce147454463e67a2d766c375a06cdd90103765f1a4c10459f46",
-                  "source": "https://eth.blockscout.com/tx/0x4c0f0d0f99a44ce147454463e67a2d766c375a06cdd90103765f1a4c10459f46"
+                  "id": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5:364",
+                  "transactionHash": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5",
+                  "source": "https://eth.blockscout.com/tx/0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5"
                 }
               ]
             },
@@ -144,16 +152,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -326.2206142,
+              "netTransferred": -3981.0810906834554,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x4c0f0d0f99a44ce147454463e67a2d766c375a06cdd90103765f1a4c10459f46:271",
-                  "transactionHash": "0x4c0f0d0f99a44ce147454463e67a2d766c375a06cdd90103765f1a4c10459f46",
-                  "source": "https://eth.blockscout.com/tx/0x4c0f0d0f99a44ce147454463e67a2d766c375a06cdd90103765f1a4c10459f46"
+                  "id": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5:364",
+                  "transactionHash": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5",
+                  "source": "https://eth.blockscout.com/tx/0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5"
                 }
               ]
             },
@@ -161,16 +169,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -326.2206142,
+              "netTransferred": -3981.0810906834554,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x4c0f0d0f99a44ce147454463e67a2d766c375a06cdd90103765f1a4c10459f46:271",
-                  "transactionHash": "0x4c0f0d0f99a44ce147454463e67a2d766c375a06cdd90103765f1a4c10459f46",
-                  "source": "https://eth.blockscout.com/tx/0x4c0f0d0f99a44ce147454463e67a2d766c375a06cdd90103765f1a4c10459f46"
+                  "id": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5:364",
+                  "transactionHash": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5",
+                  "source": "https://eth.blockscout.com/tx/0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5"
                 }
               ]
             }
@@ -181,23 +189,25 @@
           "confidence": "baixa"
         },
         {
-          "address": "0xf8b8b9172c92ed1229944f65ef5689561a025bd4",
-          "label": "Titular não identificado",
+          "address": "0x307576dd4f73f91bb8c4a2edb762938e8e067d31",
+          "label": "Rainbet.com",
           "windows": {
             "1": {
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -200,
+              "netTransferred": 3981.0810906834554,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
               "evidence": [
                 {
-                  "id": "0x91c0e6f65c1efdfad932ba8f6add884eb43c899c09bc8097314872c771bc7d67:35",
-                  "transactionHash": "0x91c0e6f65c1efdfad932ba8f6add884eb43c899c09bc8097314872c771bc7d67",
-                  "source": "https://eth.blockscout.com/tx/0x91c0e6f65c1efdfad932ba8f6add884eb43c899c09bc8097314872c771bc7d67"
+                  "id": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5:364",
+                  "transactionHash": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5",
+                  "source": "https://eth.blockscout.com/tx/0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5"
                 }
               ]
             },
@@ -205,16 +215,18 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -200,
+              "netTransferred": 3981.0810906834554,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
               "evidence": [
                 {
-                  "id": "0x91c0e6f65c1efdfad932ba8f6add884eb43c899c09bc8097314872c771bc7d67:35",
-                  "transactionHash": "0x91c0e6f65c1efdfad932ba8f6add884eb43c899c09bc8097314872c771bc7d67",
-                  "source": "https://eth.blockscout.com/tx/0x91c0e6f65c1efdfad932ba8f6add884eb43c899c09bc8097314872c771bc7d67"
+                  "id": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5:364",
+                  "transactionHash": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5",
+                  "source": "https://eth.blockscout.com/tx/0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5"
                 }
               ]
             },
@@ -222,16 +234,18 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -200,
+              "netTransferred": 3981.0810906834554,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
               "evidence": [
                 {
-                  "id": "0x91c0e6f65c1efdfad932ba8f6add884eb43c899c09bc8097314872c771bc7d67:35",
-                  "transactionHash": "0x91c0e6f65c1efdfad932ba8f6add884eb43c899c09bc8097314872c771bc7d67",
-                  "source": "https://eth.blockscout.com/tx/0x91c0e6f65c1efdfad932ba8f6add884eb43c899c09bc8097314872c771bc7d67"
+                  "id": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5:364",
+                  "transactionHash": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5",
+                  "source": "https://eth.blockscout.com/tx/0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5"
                 }
               ]
             },
@@ -239,16 +253,296 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -200,
+              "netTransferred": 3981.0810906834554,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
               "evidence": [
                 {
-                  "id": "0x91c0e6f65c1efdfad932ba8f6add884eb43c899c09bc8097314872c771bc7d67:35",
-                  "transactionHash": "0x91c0e6f65c1efdfad932ba8f6add884eb43c899c09bc8097314872c771bc7d67",
-                  "source": "https://eth.blockscout.com/tx/0x91c0e6f65c1efdfad932ba8f6add884eb43c899c09bc8097314872c771bc7d67"
+                  "id": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5:364",
+                  "transactionHash": "0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5",
+                  "source": "https://eth.blockscout.com/tx/0x9f62115e077055a6c75abb8696bbe29500cca295b6b0bb072b809cdef93a56b5"
+                }
+              ]
+            }
+          },
+          "netBuyUsd": 0,
+          "classification": "Movimentação observada",
+          "signal": false,
+          "confidence": "baixa"
+        },
+        {
+          "address": "0xed9ab5bc05a0152b9dc2f7902e8369af7bc18771",
+          "label": "Titular não identificado",
+          "windows": {
+            "1": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 2249.24557468,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0x4f6fea611559757b5d309abfb6cf2881b46362d7ade9dc2f4b79bb7b22884267:5040",
+                  "transactionHash": "0x4f6fea611559757b5d309abfb6cf2881b46362d7ade9dc2f4b79bb7b22884267",
+                  "source": "https://eth.blockscout.com/tx/0x4f6fea611559757b5d309abfb6cf2881b46362d7ade9dc2f4b79bb7b22884267"
+                }
+              ]
+            },
+            "7": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 2249.24557468,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0x4f6fea611559757b5d309abfb6cf2881b46362d7ade9dc2f4b79bb7b22884267:5040",
+                  "transactionHash": "0x4f6fea611559757b5d309abfb6cf2881b46362d7ade9dc2f4b79bb7b22884267",
+                  "source": "https://eth.blockscout.com/tx/0x4f6fea611559757b5d309abfb6cf2881b46362d7ade9dc2f4b79bb7b22884267"
+                }
+              ]
+            },
+            "30": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 2249.24557468,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0x4f6fea611559757b5d309abfb6cf2881b46362d7ade9dc2f4b79bb7b22884267:5040",
+                  "transactionHash": "0x4f6fea611559757b5d309abfb6cf2881b46362d7ade9dc2f4b79bb7b22884267",
+                  "source": "https://eth.blockscout.com/tx/0x4f6fea611559757b5d309abfb6cf2881b46362d7ade9dc2f4b79bb7b22884267"
+                }
+              ]
+            },
+            "90": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 2249.24557468,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0x4f6fea611559757b5d309abfb6cf2881b46362d7ade9dc2f4b79bb7b22884267:5040",
+                  "transactionHash": "0x4f6fea611559757b5d309abfb6cf2881b46362d7ade9dc2f4b79bb7b22884267",
+                  "source": "https://eth.blockscout.com/tx/0x4f6fea611559757b5d309abfb6cf2881b46362d7ade9dc2f4b79bb7b22884267"
+                }
+              ]
+            }
+          },
+          "netBuyUsd": 0,
+          "classification": "Movimentação observada",
+          "signal": false,
+          "confidence": "baixa"
+        },
+        {
+          "address": "0x2a7af0f7e36d845a52f6d13a17b10791e97b6c92",
+          "label": "Titular não identificado",
+          "windows": {
+            "1": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 2220.531421915778,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0xe3f3795f19faa5876cc2933462d2b0b2abafdb0af8b2ddadf4c3f8cf7ae58f9e:611",
+                  "transactionHash": "0xe3f3795f19faa5876cc2933462d2b0b2abafdb0af8b2ddadf4c3f8cf7ae58f9e",
+                  "source": "https://eth.blockscout.com/tx/0xe3f3795f19faa5876cc2933462d2b0b2abafdb0af8b2ddadf4c3f8cf7ae58f9e"
+                }
+              ]
+            },
+            "7": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 2220.531421915778,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0xe3f3795f19faa5876cc2933462d2b0b2abafdb0af8b2ddadf4c3f8cf7ae58f9e:611",
+                  "transactionHash": "0xe3f3795f19faa5876cc2933462d2b0b2abafdb0af8b2ddadf4c3f8cf7ae58f9e",
+                  "source": "https://eth.blockscout.com/tx/0xe3f3795f19faa5876cc2933462d2b0b2abafdb0af8b2ddadf4c3f8cf7ae58f9e"
+                }
+              ]
+            },
+            "30": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 2220.531421915778,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0xe3f3795f19faa5876cc2933462d2b0b2abafdb0af8b2ddadf4c3f8cf7ae58f9e:611",
+                  "transactionHash": "0xe3f3795f19faa5876cc2933462d2b0b2abafdb0af8b2ddadf4c3f8cf7ae58f9e",
+                  "source": "https://eth.blockscout.com/tx/0xe3f3795f19faa5876cc2933462d2b0b2abafdb0af8b2ddadf4c3f8cf7ae58f9e"
+                }
+              ]
+            },
+            "90": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 2220.531421915778,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0xe3f3795f19faa5876cc2933462d2b0b2abafdb0af8b2ddadf4c3f8cf7ae58f9e:611",
+                  "transactionHash": "0xe3f3795f19faa5876cc2933462d2b0b2abafdb0af8b2ddadf4c3f8cf7ae58f9e",
+                  "source": "https://eth.blockscout.com/tx/0xe3f3795f19faa5876cc2933462d2b0b2abafdb0af8b2ddadf4c3f8cf7ae58f9e"
+                }
+              ]
+            }
+          },
+          "netBuyUsd": 0,
+          "classification": "Movimentação observada",
+          "signal": false,
+          "confidence": "baixa"
+        },
+        {
+          "address": "0x249fe486b4b2f6d85c6d26a10882b15cd8b69d88",
+          "label": "Titular não identificado",
+          "windows": {
+            "1": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 639.86,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0x7dcb150b3a241531b92483ba54993762a59efd5c3dccb681f2aefc09cc33099e:4738",
+                  "transactionHash": "0x7dcb150b3a241531b92483ba54993762a59efd5c3dccb681f2aefc09cc33099e",
+                  "source": "https://eth.blockscout.com/tx/0x7dcb150b3a241531b92483ba54993762a59efd5c3dccb681f2aefc09cc33099e"
+                },
+                {
+                  "id": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c:387",
+                  "transactionHash": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c",
+                  "source": "https://eth.blockscout.com/tx/0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c"
+                }
+              ]
+            },
+            "7": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 639.86,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0x7dcb150b3a241531b92483ba54993762a59efd5c3dccb681f2aefc09cc33099e:4738",
+                  "transactionHash": "0x7dcb150b3a241531b92483ba54993762a59efd5c3dccb681f2aefc09cc33099e",
+                  "source": "https://eth.blockscout.com/tx/0x7dcb150b3a241531b92483ba54993762a59efd5c3dccb681f2aefc09cc33099e"
+                },
+                {
+                  "id": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c:387",
+                  "transactionHash": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c",
+                  "source": "https://eth.blockscout.com/tx/0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c"
+                }
+              ]
+            },
+            "30": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 639.86,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0x7dcb150b3a241531b92483ba54993762a59efd5c3dccb681f2aefc09cc33099e:4738",
+                  "transactionHash": "0x7dcb150b3a241531b92483ba54993762a59efd5c3dccb681f2aefc09cc33099e",
+                  "source": "https://eth.blockscout.com/tx/0x7dcb150b3a241531b92483ba54993762a59efd5c3dccb681f2aefc09cc33099e"
+                },
+                {
+                  "id": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c:387",
+                  "transactionHash": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c",
+                  "source": "https://eth.blockscout.com/tx/0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c"
+                }
+              ]
+            },
+            "90": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 639.86,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0x7dcb150b3a241531b92483ba54993762a59efd5c3dccb681f2aefc09cc33099e:4738",
+                  "transactionHash": "0x7dcb150b3a241531b92483ba54993762a59efd5c3dccb681f2aefc09cc33099e",
+                  "source": "https://eth.blockscout.com/tx/0x7dcb150b3a241531b92483ba54993762a59efd5c3dccb681f2aefc09cc33099e"
+                },
+                {
+                  "id": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c:387",
+                  "transactionHash": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c",
+                  "source": "https://eth.blockscout.com/tx/0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c"
                 }
               ]
             }
@@ -266,18 +560,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 143.86,
+              "netTransferred": -579.86,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
+              "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x6d65a793c823e9d1b1e829d23828debc20711bad34c4d7a0c673961fe8ea40eb:648",
-                  "transactionHash": "0x6d65a793c823e9d1b1e829d23828debc20711bad34c4d7a0c673961fe8ea40eb",
-                  "source": "https://eth.blockscout.com/tx/0x6d65a793c823e9d1b1e829d23828debc20711bad34c4d7a0c673961fe8ea40eb"
+                  "id": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c:387",
+                  "transactionHash": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c",
+                  "source": "https://eth.blockscout.com/tx/0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c"
                 }
               ]
             },
@@ -285,18 +577,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 143.86,
+              "netTransferred": -579.86,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
+              "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x6d65a793c823e9d1b1e829d23828debc20711bad34c4d7a0c673961fe8ea40eb:648",
-                  "transactionHash": "0x6d65a793c823e9d1b1e829d23828debc20711bad34c4d7a0c673961fe8ea40eb",
-                  "source": "https://eth.blockscout.com/tx/0x6d65a793c823e9d1b1e829d23828debc20711bad34c4d7a0c673961fe8ea40eb"
+                  "id": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c:387",
+                  "transactionHash": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c",
+                  "source": "https://eth.blockscout.com/tx/0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c"
                 }
               ]
             },
@@ -304,18 +594,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 143.86,
+              "netTransferred": -579.86,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
+              "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x6d65a793c823e9d1b1e829d23828debc20711bad34c4d7a0c673961fe8ea40eb:648",
-                  "transactionHash": "0x6d65a793c823e9d1b1e829d23828debc20711bad34c4d7a0c673961fe8ea40eb",
-                  "source": "https://eth.blockscout.com/tx/0x6d65a793c823e9d1b1e829d23828debc20711bad34c4d7a0c673961fe8ea40eb"
+                  "id": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c:387",
+                  "transactionHash": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c",
+                  "source": "https://eth.blockscout.com/tx/0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c"
                 }
               ]
             },
@@ -323,18 +611,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 143.86,
+              "netTransferred": -579.86,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
+              "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x6d65a793c823e9d1b1e829d23828debc20711bad34c4d7a0c673961fe8ea40eb:648",
-                  "transactionHash": "0x6d65a793c823e9d1b1e829d23828debc20711bad34c4d7a0c673961fe8ea40eb",
-                  "source": "https://eth.blockscout.com/tx/0x6d65a793c823e9d1b1e829d23828debc20711bad34c4d7a0c673961fe8ea40eb"
+                  "id": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c:387",
+                  "transactionHash": "0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c",
+                  "source": "https://eth.blockscout.com/tx/0xffc31956692f60d0147971f839c5b1b90d7edc7b2a984630a59ad0c6a10e504c"
                 }
               ]
             }
@@ -345,25 +631,23 @@
           "confidence": "baixa"
         },
         {
-          "address": "0xff270bc315b4d2a4d3d179161abbf45b6a8ce5ce",
+          "address": "0xe3bbd1524a47185c3ae0d53023a799e737e0f226",
           "label": "Titular não identificado",
           "windows": {
             "1": {
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 80.28271141543551,
+              "netTransferred": -460.45160639,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
+              "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x9b5ead3ad0ee8a0647604042b00e79b05b22bc6bb360fb2d0190bd34febd8bac:213",
-                  "transactionHash": "0x9b5ead3ad0ee8a0647604042b00e79b05b22bc6bb360fb2d0190bd34febd8bac",
-                  "source": "https://eth.blockscout.com/tx/0x9b5ead3ad0ee8a0647604042b00e79b05b22bc6bb360fb2d0190bd34febd8bac"
+                  "id": "0x854d3fecba44396fdf53f180b61d7a352370d8a48891e83d821e15f92621f34f:350",
+                  "transactionHash": "0x854d3fecba44396fdf53f180b61d7a352370d8a48891e83d821e15f92621f34f",
+                  "source": "https://eth.blockscout.com/tx/0x854d3fecba44396fdf53f180b61d7a352370d8a48891e83d821e15f92621f34f"
                 }
               ]
             },
@@ -371,18 +655,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 80.28271141543551,
+              "netTransferred": -460.45160639,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
+              "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x9b5ead3ad0ee8a0647604042b00e79b05b22bc6bb360fb2d0190bd34febd8bac:213",
-                  "transactionHash": "0x9b5ead3ad0ee8a0647604042b00e79b05b22bc6bb360fb2d0190bd34febd8bac",
-                  "source": "https://eth.blockscout.com/tx/0x9b5ead3ad0ee8a0647604042b00e79b05b22bc6bb360fb2d0190bd34febd8bac"
+                  "id": "0x854d3fecba44396fdf53f180b61d7a352370d8a48891e83d821e15f92621f34f:350",
+                  "transactionHash": "0x854d3fecba44396fdf53f180b61d7a352370d8a48891e83d821e15f92621f34f",
+                  "source": "https://eth.blockscout.com/tx/0x854d3fecba44396fdf53f180b61d7a352370d8a48891e83d821e15f92621f34f"
                 }
               ]
             },
@@ -390,18 +672,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 80.28271141543551,
+              "netTransferred": -460.45160639,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
+              "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x9b5ead3ad0ee8a0647604042b00e79b05b22bc6bb360fb2d0190bd34febd8bac:213",
-                  "transactionHash": "0x9b5ead3ad0ee8a0647604042b00e79b05b22bc6bb360fb2d0190bd34febd8bac",
-                  "source": "https://eth.blockscout.com/tx/0x9b5ead3ad0ee8a0647604042b00e79b05b22bc6bb360fb2d0190bd34febd8bac"
+                  "id": "0x854d3fecba44396fdf53f180b61d7a352370d8a48891e83d821e15f92621f34f:350",
+                  "transactionHash": "0x854d3fecba44396fdf53f180b61d7a352370d8a48891e83d821e15f92621f34f",
+                  "source": "https://eth.blockscout.com/tx/0x854d3fecba44396fdf53f180b61d7a352370d8a48891e83d821e15f92621f34f"
                 }
               ]
             },
@@ -409,288 +689,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 80.28271141543551,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
-              "evidence": [
-                {
-                  "id": "0x9b5ead3ad0ee8a0647604042b00e79b05b22bc6bb360fb2d0190bd34febd8bac:213",
-                  "transactionHash": "0x9b5ead3ad0ee8a0647604042b00e79b05b22bc6bb360fb2d0190bd34febd8bac",
-                  "source": "https://eth.blockscout.com/tx/0x9b5ead3ad0ee8a0647604042b00e79b05b22bc6bb360fb2d0190bd34febd8bac"
-                }
-              ]
-            }
-          },
-          "netBuyUsd": 0,
-          "classification": "Movimentação observada",
-          "signal": false,
-          "confidence": "baixa"
-        },
-        {
-          "address": "0x435a2b9a27510a463699911030ae58bc6ff4023a",
-          "label": "Titular não identificado",
-          "windows": {
-            "1": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": 62.64584352,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
-              "evidence": [
-                {
-                  "id": "0x82430cb1fafd1eb6a0d7d96137b165b454a2d447493a1c12c388cad1e22cb2ac:57",
-                  "transactionHash": "0x82430cb1fafd1eb6a0d7d96137b165b454a2d447493a1c12c388cad1e22cb2ac",
-                  "source": "https://eth.blockscout.com/tx/0x82430cb1fafd1eb6a0d7d96137b165b454a2d447493a1c12c388cad1e22cb2ac"
-                },
-                {
-                  "id": "0x4d172439008d36a7a21a85a188570af8599b7adada59dcc3238044c271b96f31:28",
-                  "transactionHash": "0x4d172439008d36a7a21a85a188570af8599b7adada59dcc3238044c271b96f31",
-                  "source": "https://eth.blockscout.com/tx/0x4d172439008d36a7a21a85a188570af8599b7adada59dcc3238044c271b96f31"
-                }
-              ]
-            },
-            "7": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": 62.64584352,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
-              "evidence": [
-                {
-                  "id": "0x82430cb1fafd1eb6a0d7d96137b165b454a2d447493a1c12c388cad1e22cb2ac:57",
-                  "transactionHash": "0x82430cb1fafd1eb6a0d7d96137b165b454a2d447493a1c12c388cad1e22cb2ac",
-                  "source": "https://eth.blockscout.com/tx/0x82430cb1fafd1eb6a0d7d96137b165b454a2d447493a1c12c388cad1e22cb2ac"
-                },
-                {
-                  "id": "0x4d172439008d36a7a21a85a188570af8599b7adada59dcc3238044c271b96f31:28",
-                  "transactionHash": "0x4d172439008d36a7a21a85a188570af8599b7adada59dcc3238044c271b96f31",
-                  "source": "https://eth.blockscout.com/tx/0x4d172439008d36a7a21a85a188570af8599b7adada59dcc3238044c271b96f31"
-                }
-              ]
-            },
-            "30": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": 62.64584352,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
-              "evidence": [
-                {
-                  "id": "0x82430cb1fafd1eb6a0d7d96137b165b454a2d447493a1c12c388cad1e22cb2ac:57",
-                  "transactionHash": "0x82430cb1fafd1eb6a0d7d96137b165b454a2d447493a1c12c388cad1e22cb2ac",
-                  "source": "https://eth.blockscout.com/tx/0x82430cb1fafd1eb6a0d7d96137b165b454a2d447493a1c12c388cad1e22cb2ac"
-                },
-                {
-                  "id": "0x4d172439008d36a7a21a85a188570af8599b7adada59dcc3238044c271b96f31:28",
-                  "transactionHash": "0x4d172439008d36a7a21a85a188570af8599b7adada59dcc3238044c271b96f31",
-                  "source": "https://eth.blockscout.com/tx/0x4d172439008d36a7a21a85a188570af8599b7adada59dcc3238044c271b96f31"
-                }
-              ]
-            },
-            "90": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": 62.64584352,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
-              "evidence": [
-                {
-                  "id": "0x82430cb1fafd1eb6a0d7d96137b165b454a2d447493a1c12c388cad1e22cb2ac:57",
-                  "transactionHash": "0x82430cb1fafd1eb6a0d7d96137b165b454a2d447493a1c12c388cad1e22cb2ac",
-                  "source": "https://eth.blockscout.com/tx/0x82430cb1fafd1eb6a0d7d96137b165b454a2d447493a1c12c388cad1e22cb2ac"
-                },
-                {
-                  "id": "0x4d172439008d36a7a21a85a188570af8599b7adada59dcc3238044c271b96f31:28",
-                  "transactionHash": "0x4d172439008d36a7a21a85a188570af8599b7adada59dcc3238044c271b96f31",
-                  "source": "https://eth.blockscout.com/tx/0x4d172439008d36a7a21a85a188570af8599b7adada59dcc3238044c271b96f31"
-                }
-              ]
-            }
-          },
-          "netBuyUsd": 0,
-          "classification": "Movimentação observada",
-          "signal": false,
-          "confidence": "baixa"
-        },
-        {
-          "address": "0x29b38ad668faadbec5f70649a00ea907c4476f5b",
-          "label": "Titular não identificado",
-          "windows": {
-            "1": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": 61.449,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
-              "evidence": [
-                {
-                  "id": "0xc0e84205ca2c192cdcc2bd758f83bb9cb3684b1f159258c44932fa27bee19b94:189",
-                  "transactionHash": "0xc0e84205ca2c192cdcc2bd758f83bb9cb3684b1f159258c44932fa27bee19b94",
-                  "source": "https://eth.blockscout.com/tx/0xc0e84205ca2c192cdcc2bd758f83bb9cb3684b1f159258c44932fa27bee19b94"
-                }
-              ]
-            },
-            "7": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": 61.449,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
-              "evidence": [
-                {
-                  "id": "0xc0e84205ca2c192cdcc2bd758f83bb9cb3684b1f159258c44932fa27bee19b94:189",
-                  "transactionHash": "0xc0e84205ca2c192cdcc2bd758f83bb9cb3684b1f159258c44932fa27bee19b94",
-                  "source": "https://eth.blockscout.com/tx/0xc0e84205ca2c192cdcc2bd758f83bb9cb3684b1f159258c44932fa27bee19b94"
-                }
-              ]
-            },
-            "30": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": 61.449,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
-              "evidence": [
-                {
-                  "id": "0xc0e84205ca2c192cdcc2bd758f83bb9cb3684b1f159258c44932fa27bee19b94:189",
-                  "transactionHash": "0xc0e84205ca2c192cdcc2bd758f83bb9cb3684b1f159258c44932fa27bee19b94",
-                  "source": "https://eth.blockscout.com/tx/0xc0e84205ca2c192cdcc2bd758f83bb9cb3684b1f159258c44932fa27bee19b94"
-                }
-              ]
-            },
-            "90": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": 61.449,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
-              "evidence": [
-                {
-                  "id": "0xc0e84205ca2c192cdcc2bd758f83bb9cb3684b1f159258c44932fa27bee19b94:189",
-                  "transactionHash": "0xc0e84205ca2c192cdcc2bd758f83bb9cb3684b1f159258c44932fa27bee19b94",
-                  "source": "https://eth.blockscout.com/tx/0xc0e84205ca2c192cdcc2bd758f83bb9cb3684b1f159258c44932fa27bee19b94"
-                }
-              ]
-            }
-          },
-          "netBuyUsd": 0,
-          "classification": "Movimentação observada",
-          "signal": false,
-          "confidence": "baixa"
-        },
-        {
-          "address": "0x6872b6630a3afcd3117191a8403c2002e13df7de",
-          "label": "Fake_Phishing5938164 Stake: Wallet 1 Poisoning Address Phish / Hack note_0 Stake",
-          "windows": {
-            "1": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": -55.36218149,
+              "netTransferred": -460.45160639,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x668e423d9759cb32f41a875f63e0d4a58c57ba410d6fe110d45c58a07305975d:2614",
-                  "transactionHash": "0x668e423d9759cb32f41a875f63e0d4a58c57ba410d6fe110d45c58a07305975d",
-                  "source": "https://eth.blockscout.com/tx/0x668e423d9759cb32f41a875f63e0d4a58c57ba410d6fe110d45c58a07305975d"
-                }
-              ]
-            },
-            "7": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": -55.36218149,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [],
-              "evidence": [
-                {
-                  "id": "0x668e423d9759cb32f41a875f63e0d4a58c57ba410d6fe110d45c58a07305975d:2614",
-                  "transactionHash": "0x668e423d9759cb32f41a875f63e0d4a58c57ba410d6fe110d45c58a07305975d",
-                  "source": "https://eth.blockscout.com/tx/0x668e423d9759cb32f41a875f63e0d4a58c57ba410d6fe110d45c58a07305975d"
-                }
-              ]
-            },
-            "30": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": -55.36218149,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [],
-              "evidence": [
-                {
-                  "id": "0x668e423d9759cb32f41a875f63e0d4a58c57ba410d6fe110d45c58a07305975d:2614",
-                  "transactionHash": "0x668e423d9759cb32f41a875f63e0d4a58c57ba410d6fe110d45c58a07305975d",
-                  "source": "https://eth.blockscout.com/tx/0x668e423d9759cb32f41a875f63e0d4a58c57ba410d6fe110d45c58a07305975d"
-                }
-              ]
-            },
-            "90": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": -55.36218149,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [],
-              "evidence": [
-                {
-                  "id": "0x668e423d9759cb32f41a875f63e0d4a58c57ba410d6fe110d45c58a07305975d:2614",
-                  "transactionHash": "0x668e423d9759cb32f41a875f63e0d4a58c57ba410d6fe110d45c58a07305975d",
-                  "source": "https://eth.blockscout.com/tx/0x668e423d9759cb32f41a875f63e0d4a58c57ba410d6fe110d45c58a07305975d"
+                  "id": "0x854d3fecba44396fdf53f180b61d7a352370d8a48891e83d821e15f92621f34f:350",
+                  "transactionHash": "0x854d3fecba44396fdf53f180b61d7a352370d8a48891e83d821e15f92621f34f",
+                  "source": "https://eth.blockscout.com/tx/0x854d3fecba44396fdf53f180b61d7a352370d8a48891e83d821e15f92621f34f"
                 }
               ]
             }
@@ -701,15 +709,15 @@
           "confidence": "baixa"
         }
       ],
-      "exchangeInflow": 0,
-      "exchangeInflowUsd": 0,
+      "exchangeInflow": 882.630777729228,
+      "exchangeInflowUsd": 9982.55409611757,
       "interpretation": "Transferências não comprovam compras, vendas, identidade, informação privilegiada ou posição líquida em outras redes e derivativos.",
       "positions": [
         {
           "address": "0x0757e27ac1631beeb37eed3270cc6301dd3d57d4",
           "label": "Titular não identificado",
           "balances": {
-            "0": 19248138.589030623,
+            "0": 19274125.814107623,
             "1": 19248138.589030623,
             "7": 19314129.73573407,
             "30": 19282650.46622286,
@@ -719,57 +727,57 @@
             "1": {
               "available": true,
               "initial": 19248138.589030623,
-              "current": 19248138.589030623,
-              "delta": 0,
-              "percent": 0,
+              "current": 19274125.814107623,
+              "delta": 25987.225076999515,
+              "percent": 0.13501162700381558,
               "newPosition": false,
-              "priceNeutralUsd": 0,
-              "interpretation": "Posição em tokens estável."
+              "priceNeutralUsd": 293915.5156208645,
+              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             },
             "7": {
               "available": true,
               "initial": 19314129.73573407,
-              "current": 19248138.589030623,
-              "delta": -65991.14670344815,
-              "percent": -0.34167289754378377,
+              "current": 19274125.814107623,
+              "delta": -40003.92162644863,
+              "percent": -0.2071225686779731,
               "newPosition": false,
-              "priceNeutralUsd": -758898.1870896537,
+              "priceNeutralUsd": -452444.35359513405,
               "interpretation": "Posição em tokens diminuiu."
             },
             "30": {
               "available": true,
               "initial": 19282650.46622286,
-              "current": 19248138.589030623,
-              "delta": -34511.87719223648,
-              "percent": -0.17897890776317518,
+              "current": 19274125.814107623,
+              "delta": -8524.652115236968,
+              "percent": -0.04420892309472434,
               "newPosition": false,
-              "priceNeutralUsd": -396886.58771071956,
+              "priceNeutralUsd": -96413.8154233301,
               "interpretation": "Posição em tokens diminuiu."
             },
             "90": {
               "available": true,
               "initial": 19721373.507592622,
-              "current": 19248138.589030623,
-              "delta": -473234.91856199875,
-              "percent": -2.39960425869834,
+              "current": 19274125.814107623,
+              "delta": -447247.69348499924,
+              "percent": -2.267832376445846,
               "newPosition": false,
-              "priceNeutralUsd": -5442201.563462986,
+              "priceNeutralUsd": -5058371.413315342,
               "interpretation": "Posição em tokens diminuiu."
             }
           },
           "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
           },
           "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
           },
           "source": "https://eth.blockscout.com/address/0x0757e27ac1631beeb37eed3270cc6301dd3d57d4",
           "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
@@ -803,7 +811,7 @@
               "delta": -415315.5899,
               "percent": -3.5236016258864002,
               "newPosition": false,
-              "priceNeutralUsd": -4776129.28385,
+              "priceNeutralUsd": -4697219.321769,
               "interpretation": "Posição em tokens diminuiu."
             },
             "30": {
@@ -813,7 +821,7 @@
               "delta": -393717.7747161593,
               "percent": -3.346494515066752,
               "newPosition": false,
-              "priceNeutralUsd": -4527754.409235832,
+              "priceNeutralUsd": -4452948.0320397625,
               "interpretation": "Posição em tokens diminuiu."
             },
             "90": {
@@ -823,23 +831,23 @@
               "delta": -293717.7747161612,
               "percent": -2.5179232487566954,
               "newPosition": false,
-              "priceNeutralUsd": -3377754.4092358537,
+              "priceNeutralUsd": -3321948.0320397834,
               "interpretation": "Posição em tokens diminuiu."
             }
           },
           "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
           },
           "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
           },
           "source": "https://eth.blockscout.com/address/0x1d48963dd8fada6ab5c2c7b92eba81ecc5030270",
           "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
@@ -898,18 +906,18 @@
             }
           },
           "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
           },
           "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
           },
           "source": "https://eth.blockscout.com/address/0x40b38765696e3d5d8d9d834d8aad4bb6e418e489",
           "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
@@ -953,7 +961,7 @@
               "delta": 9619.712374429218,
               "percent": 0.184155366121143,
               "newPosition": false,
-              "priceNeutralUsd": 110626.69230593601,
+              "priceNeutralUsd": 108798.94695479446,
               "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             },
             "90": {
@@ -963,33 +971,33 @@
               "delta": 80184.6457947595,
               "percent": 1.5560380585363287,
               "newPosition": false,
-              "priceNeutralUsd": 922123.4266397343,
+              "priceNeutralUsd": 906888.3439387301,
               "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             }
           },
           "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
           },
           "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
           },
           "source": "https://eth.blockscout.com/address/0xf197c6f2ac14d25ee2789a73e4847732c7f16bc9",
           "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
           "precision": "Quantidades aproximadas para exibição; não usar para execução financeira."
         },
         {
-          "address": "0xbcf0061a38529536db14b67cb0dcd7532e4c6809",
+          "address": "0xeb05706a876b36b9069332abce1607e557aee36a",
           "label": "Titular não identificado",
           "balances": {
-            "0": 0,
+            "0": 24567.058989999998,
             "1": 0,
             "7": 0,
             "30": 0,
@@ -999,269 +1007,269 @@
             "1": {
               "available": true,
               "initial": 0,
-              "current": 0,
-              "delta": 0,
+              "current": 24567.058989999998,
+              "delta": 24567.058989999998,
               "percent": null,
-              "newPosition": false,
-              "priceNeutralUsd": 0,
-              "interpretation": "Posição em tokens estável."
+              "newPosition": true,
+              "priceNeutralUsd": 277853.4371769,
+              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             },
             "7": {
               "available": true,
               "initial": 0,
-              "current": 0,
-              "delta": 0,
+              "current": 24567.058989999998,
+              "delta": 24567.058989999998,
               "percent": null,
-              "newPosition": false,
-              "priceNeutralUsd": 0,
-              "interpretation": "Posição em tokens estável."
+              "newPosition": true,
+              "priceNeutralUsd": 277853.4371769,
+              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             },
             "30": {
               "available": true,
               "initial": 0,
-              "current": 0,
-              "delta": 0,
+              "current": 24567.058989999998,
+              "delta": 24567.058989999998,
               "percent": null,
-              "newPosition": false,
-              "priceNeutralUsd": 0,
-              "interpretation": "Posição em tokens estável."
+              "newPosition": true,
+              "priceNeutralUsd": 277853.4371769,
+              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             },
             "90": {
               "available": true,
               "initial": 0,
-              "current": 0,
-              "delta": 0,
+              "current": 24567.058989999998,
+              "delta": 24567.058989999998,
               "percent": null,
-              "newPosition": false,
-              "priceNeutralUsd": 0,
-              "interpretation": "Posição em tokens estável."
+              "newPosition": true,
+              "priceNeutralUsd": 277853.4371769,
+              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             }
           },
           "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
           },
           "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
           },
-          "source": "https://eth.blockscout.com/address/0xbcf0061a38529536db14b67cb0dcd7532e4c6809",
+          "source": "https://eth.blockscout.com/address/0xeb05706a876b36b9069332abce1607e557aee36a",
           "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
           "precision": "Quantidades aproximadas para exibição; não usar para execução financeira."
         },
         {
-          "address": "0x621ed6b211e3c6d1e56eec3a0b4e5f355aab3f2d",
+          "address": "0x4de6593b8767449fd03dec758462c1393d93f8cd",
           "label": "Titular não identificado",
           "balances": {
-            "0": 1073.2435192888838,
-            "1": 1073.2435192888838,
-            "7": 75.67284760888384,
-            "30": 194.15072679888385,
-            "90": 1854.830911698774
-          },
-          "changes": {
-            "1": {
-              "available": true,
-              "initial": 1073.2435192888838,
-              "current": 1073.2435192888838,
-              "delta": 0,
-              "percent": 0,
-              "newPosition": false,
-              "priceNeutralUsd": 0,
-              "interpretation": "Posição em tokens estável."
-            },
-            "7": {
-              "available": true,
-              "initial": 75.67284760888384,
-              "current": 1073.2435192888838,
-              "delta": 997.57067168,
-              "percent": 1318.2676524028245,
-              "newPosition": false,
-              "priceNeutralUsd": 11472.06272432,
-              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
-            },
-            "30": {
-              "available": true,
-              "initial": 194.15072679888385,
-              "current": 1073.2435192888838,
-              "delta": 879.09279249,
-              "percent": 452.78882391237784,
-              "newPosition": false,
-              "priceNeutralUsd": 10109.567113635,
-              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
-            },
-            "90": {
-              "available": true,
-              "initial": 1854.830911698774,
-              "current": 1073.2435192888838,
-              "delta": -781.5873924098901,
-              "percent": -42.13793222229955,
-              "newPosition": false,
-              "priceNeutralUsd": -8988.255012713737,
-              "interpretation": "Posição em tokens diminuiu."
-            }
-          },
-          "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
-          },
-          "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
-          },
-          "source": "https://eth.blockscout.com/address/0x621ed6b211e3c6d1e56eec3a0b4e5f355aab3f2d",
-          "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
-          "precision": "Quantidades aproximadas para exibição; não usar para execução financeira."
-        },
-        {
-          "address": "0xf8b8b9172c92ed1229944f65ef5689561a025bd4",
-          "label": "Titular não identificado",
-          "balances": {
-            "0": 200,
-            "1": 150,
-            "7": 150.27321359856643,
-            "30": 149.27321359856643,
-            "90": 212.52407970755254
-          },
-          "changes": {
-            "1": {
-              "available": true,
-              "initial": 150,
-              "current": 200,
-              "delta": 50,
-              "percent": 33.33333333333333,
-              "newPosition": false,
-              "priceNeutralUsd": 575,
-              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
-            },
-            "7": {
-              "available": true,
-              "initial": 150.27321359856643,
-              "current": 200,
-              "delta": 49.72678640143357,
-              "percent": 33.09091834175559,
-              "newPosition": false,
-              "priceNeutralUsd": 571.858043616486,
-              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
-            },
-            "30": {
-              "available": true,
-              "initial": 149.27321359856643,
-              "current": 200,
-              "delta": 50.72678640143357,
-              "percent": 33.98251111405076,
-              "newPosition": false,
-              "priceNeutralUsd": 583.358043616486,
-              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
-            },
-            "90": {
-              "available": true,
-              "initial": 212.52407970755254,
-              "current": 200,
-              "delta": -12.524079707552545,
-              "percent": -5.893016793573002,
-              "newPosition": false,
-              "priceNeutralUsd": -144.02691663685425,
-              "interpretation": "Posição em tokens diminuiu."
-            }
-          },
-          "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
-          },
-          "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
-          },
-          "source": "https://eth.blockscout.com/address/0xf8b8b9172c92ed1229944f65ef5689561a025bd4",
-          "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
-          "precision": "Quantidades aproximadas para exibição; não usar para execução financeira."
-        },
-        {
-          "address": "0x3584f2408bb6bc3a049fa6264aae4f0a6f733132",
-          "label": "Titular não identificado",
-          "balances": {
-            "0": 579.8600000099993,
-            "1": 281.0000000099993,
-            "7": 8.999375104e-9,
-            "30": 3.999505152e-9,
+            "0": 0,
+            "1": 2312.9556796134552,
+            "7": 479.5252475329471,
+            "30": 0,
             "90": 0
           },
           "changes": {
             "1": {
               "available": true,
-              "initial": 281.0000000099993,
-              "current": 579.8600000099993,
-              "delta": 298.86,
-              "percent": 106.35587188233634,
+              "initial": 2312.9556796134552,
+              "current": 0,
+              "delta": -2312.9556796134552,
+              "percent": -100,
               "newPosition": false,
-              "priceNeutralUsd": 3436.8900000000003,
+              "priceNeutralUsd": -26159.52873642818,
+              "interpretation": "Posição em tokens diminuiu."
+            },
+            "7": {
+              "available": true,
+              "initial": 479.5252475329471,
+              "current": 0,
+              "delta": -479.5252475329471,
+              "percent": -100,
+              "newPosition": false,
+              "priceNeutralUsd": -5423.430549597632,
+              "interpretation": "Posição em tokens diminuiu."
+            },
+            "30": {
+              "available": true,
+              "initial": 0,
+              "current": 0,
+              "delta": 0,
+              "percent": null,
+              "newPosition": false,
+              "priceNeutralUsd": 0,
+              "interpretation": "Posição em tokens estável."
+            },
+            "90": {
+              "available": true,
+              "initial": 0,
+              "current": 0,
+              "delta": 0,
+              "percent": null,
+              "newPosition": false,
+              "priceNeutralUsd": 0,
+              "interpretation": "Posição em tokens estável."
+            }
+          },
+          "blocks": {
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
+          },
+          "timestamps": {
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
+          },
+          "source": "https://eth.blockscout.com/address/0x4de6593b8767449fd03dec758462c1393d93f8cd",
+          "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
+          "precision": "Quantidades aproximadas para exibição; não usar para execução financeira."
+        },
+        {
+          "address": "0x307576dd4f73f91bb8c4a2edb762938e8e067d31",
+          "label": "Rainbet.com",
+          "balances": {
+            "0": 13554.112504534945,
+            "1": 9573.02061395149,
+            "7": 3253.20701702588,
+            "30": 41338.39633864219,
+            "90": 570.8297690252009
+          },
+          "changes": {
+            "1": {
+              "available": true,
+              "initial": 9573.02061395149,
+              "current": 13554.112504534945,
+              "delta": 3981.091890583455,
+              "percent": 41.58658015194815,
+              "newPosition": false,
+              "priceNeutralUsd": 45026.14928249888,
               "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             },
             "7": {
               "available": true,
-              "initial": 8.999375104e-9,
-              "current": 579.8600000099993,
-              "delta": 579.860000001,
-              "percent": 6443336268351.194,
+              "initial": 3253.20701702588,
+              "current": 13554.112504534945,
+              "delta": 10300.905487509066,
+              "percent": 316.63848730187095,
               "newPosition": false,
-              "priceNeutralUsd": 6668.3900000115,
+              "priceNeutralUsd": 116503.24106372755,
               "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             },
             "30": {
               "available": true,
-              "initial": 3.999505152e-9,
-              "current": 579.8600000099993,
-              "delta": 579.8600000059998,
-              "percent": 14498293613049.453,
+              "initial": 41338.39633864219,
+              "current": 13554.112504534945,
+              "delta": -27784.283834107242,
+              "percent": -67.21180862097238,
               "newPosition": false,
-              "priceNeutralUsd": 6668.390000068998,
+              "priceNeutralUsd": -314240.25016375293,
+              "interpretation": "Posição em tokens diminuiu."
+            },
+            "90": {
+              "available": true,
+              "initial": 570.8297690252009,
+              "current": 13554.112504534945,
+              "delta": 12983.282735509745,
+              "percent": 2274.457892706111,
+              "newPosition": false,
+              "priceNeutralUsd": 146840.92773861522,
+              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
+            }
+          },
+          "blocks": {
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
+          },
+          "timestamps": {
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
+          },
+          "source": "https://eth.blockscout.com/address/0x307576dd4f73f91bb8c4a2edb762938e8e067d31",
+          "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
+          "precision": "Quantidades aproximadas para exibição; não usar para execução financeira."
+        },
+        {
+          "address": "0xed9ab5bc05a0152b9dc2f7902e8369af7bc18771",
+          "label": "Titular não identificado",
+          "balances": {
+            "0": 92108.25982595081,
+            "1": 89900.72218929081,
+            "7": 19198.561611049503,
+            "30": 0,
+            "90": 0
+          },
+          "changes": {
+            "1": {
+              "available": true,
+              "initial": 89900.72218929081,
+              "current": 92108.25982595081,
+              "delta": 2207.5376366599958,
+              "percent": 2.455528257061057,
+              "newPosition": false,
+              "priceNeutralUsd": 24967.250670624555,
+              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
+            },
+            "7": {
+              "available": true,
+              "initial": 19198.561611049503,
+              "current": 92108.25982595081,
+              "delta": 72909.6982149013,
+              "percent": 379.7664621548471,
+              "newPosition": false,
+              "priceNeutralUsd": 824608.6868105337,
+              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
+            },
+            "30": {
+              "available": true,
+              "initial": 0,
+              "current": 92108.25982595081,
+              "delta": 92108.25982595081,
+              "percent": null,
+              "newPosition": true,
+              "priceNeutralUsd": 1041744.4186315037,
               "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             },
             "90": {
               "available": true,
               "initial": 0,
-              "current": 579.8600000099993,
-              "delta": 579.8600000099993,
+              "current": 92108.25982595081,
+              "delta": 92108.25982595081,
               "percent": null,
               "newPosition": true,
-              "priceNeutralUsd": 6668.390000114992,
+              "priceNeutralUsd": 1041744.4186315037,
               "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             }
           },
           "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
           },
           "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
           },
-          "source": "https://eth.blockscout.com/address/0x3584f2408bb6bc3a049fa6264aae4f0a6f733132",
+          "source": "https://eth.blockscout.com/address/0xed9ab5bc05a0152b9dc2f7902e8369af7bc18771",
           "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
           "precision": "Quantidades aproximadas para exibição; não usar para execução financeira."
         }
@@ -1279,7 +1287,7 @@
       "coverage": {
         "complete": false,
         "startTime": null,
-        "collectedAt": "2026-10-26T01:06:12.672Z",
+        "collectedAt": "2026-10-26T06:06:16.579Z",
         "source": "Blockscout + dRPC público (fallback Blockscout RPC)",
         "negotiationsDecoded": false,
         "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
@@ -1291,26 +1299,26 @@
         ],
         "fresh": true
       },
-      "recordCount": 95,
+      "recordCount": 96,
       "candidates": [
         {
-          "address": "0xe2d4c380854ec331e5db5fb32b4ea43c1cb413cd",
+          "address": "0xbe963450ebe63cff4bf80c7de6ef5dda409b691b",
           "label": "Titular não identificado",
           "windows": {
             "1": {
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -999.9,
+              "netTransferred": -585.69290567,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x0dd14a88a36d553c088871b31a04e6dd44799d8cfae676c0853c745f60daa6e3:402",
-                  "transactionHash": "0x0dd14a88a36d553c088871b31a04e6dd44799d8cfae676c0853c745f60daa6e3",
-                  "source": "https://eth.blockscout.com/tx/0x0dd14a88a36d553c088871b31a04e6dd44799d8cfae676c0853c745f60daa6e3"
+                  "id": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca:122",
+                  "transactionHash": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca",
+                  "source": "https://eth.blockscout.com/tx/0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca"
                 }
               ]
             },
@@ -1318,16 +1326,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -999.9,
+              "netTransferred": -585.69290567,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x0dd14a88a36d553c088871b31a04e6dd44799d8cfae676c0853c745f60daa6e3:402",
-                  "transactionHash": "0x0dd14a88a36d553c088871b31a04e6dd44799d8cfae676c0853c745f60daa6e3",
-                  "source": "https://eth.blockscout.com/tx/0x0dd14a88a36d553c088871b31a04e6dd44799d8cfae676c0853c745f60daa6e3"
+                  "id": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca:122",
+                  "transactionHash": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca",
+                  "source": "https://eth.blockscout.com/tx/0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca"
                 }
               ]
             },
@@ -1335,16 +1343,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -999.9,
+              "netTransferred": -585.69290567,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x0dd14a88a36d553c088871b31a04e6dd44799d8cfae676c0853c745f60daa6e3:402",
-                  "transactionHash": "0x0dd14a88a36d553c088871b31a04e6dd44799d8cfae676c0853c745f60daa6e3",
-                  "source": "https://eth.blockscout.com/tx/0x0dd14a88a36d553c088871b31a04e6dd44799d8cfae676c0853c745f60daa6e3"
+                  "id": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca:122",
+                  "transactionHash": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca",
+                  "source": "https://eth.blockscout.com/tx/0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca"
                 }
               ]
             },
@@ -1352,16 +1360,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -999.9,
+              "netTransferred": -585.69290567,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x0dd14a88a36d553c088871b31a04e6dd44799d8cfae676c0853c745f60daa6e3:402",
-                  "transactionHash": "0x0dd14a88a36d553c088871b31a04e6dd44799d8cfae676c0853c745f60daa6e3",
-                  "source": "https://eth.blockscout.com/tx/0x0dd14a88a36d553c088871b31a04e6dd44799d8cfae676c0853c745f60daa6e3"
+                  "id": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca:122",
+                  "transactionHash": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca",
+                  "source": "https://eth.blockscout.com/tx/0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca"
                 }
               ]
             }
@@ -1372,14 +1380,14 @@
           "confidence": "baixa"
         },
         {
-          "address": "0xfc442a70f8f4e3d436f1cf8d666d29aa02c3594b",
+          "address": "0xf239ccf1594fc47f8c5f29c965f4c3a2d09f6581",
           "label": "Titular não identificado",
           "windows": {
             "1": {
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 81.98978,
+              "netTransferred": 585.69290567,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
@@ -1388,14 +1396,9 @@
               ],
               "evidence": [
                 {
-                  "id": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609:1550",
-                  "transactionHash": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609",
-                  "source": "https://eth.blockscout.com/tx/0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609"
-                },
-                {
-                  "id": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf:26",
-                  "transactionHash": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf",
-                  "source": "https://eth.blockscout.com/tx/0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf"
+                  "id": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca:122",
+                  "transactionHash": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca",
+                  "source": "https://eth.blockscout.com/tx/0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca"
                 }
               ]
             },
@@ -1403,7 +1406,7 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 81.98978,
+              "netTransferred": 585.69290567,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
@@ -1412,14 +1415,9 @@
               ],
               "evidence": [
                 {
-                  "id": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609:1550",
-                  "transactionHash": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609",
-                  "source": "https://eth.blockscout.com/tx/0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609"
-                },
-                {
-                  "id": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf:26",
-                  "transactionHash": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf",
-                  "source": "https://eth.blockscout.com/tx/0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf"
+                  "id": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca:122",
+                  "transactionHash": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca",
+                  "source": "https://eth.blockscout.com/tx/0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca"
                 }
               ]
             },
@@ -1427,7 +1425,7 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 81.98978,
+              "netTransferred": 585.69290567,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
@@ -1436,14 +1434,9 @@
               ],
               "evidence": [
                 {
-                  "id": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609:1550",
-                  "transactionHash": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609",
-                  "source": "https://eth.blockscout.com/tx/0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609"
-                },
-                {
-                  "id": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf:26",
-                  "transactionHash": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf",
-                  "source": "https://eth.blockscout.com/tx/0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf"
+                  "id": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca:122",
+                  "transactionHash": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca",
+                  "source": "https://eth.blockscout.com/tx/0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca"
                 }
               ]
             },
@@ -1451,7 +1444,7 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 81.98978,
+              "netTransferred": 585.69290567,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
@@ -1460,14 +1453,9 @@
               ],
               "evidence": [
                 {
-                  "id": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609:1550",
-                  "transactionHash": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609",
-                  "source": "https://eth.blockscout.com/tx/0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609"
-                },
-                {
-                  "id": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf:26",
-                  "transactionHash": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf",
-                  "source": "https://eth.blockscout.com/tx/0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf"
+                  "id": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca:122",
+                  "transactionHash": "0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca",
+                  "source": "https://eth.blockscout.com/tx/0x2dad0761af9896479951206ba03b3948bdee0552891bf327700037ea5e9196ca"
                 }
               ]
             }
@@ -1478,30 +1466,23 @@
           "confidence": "baixa"
         },
         {
-          "address": "0x7d94077f58593f8b97c5cab56c8924e13b49946e",
+          "address": "0x36d6617ee82521ba4fdaa81dc7b64dc874971d3d",
           "label": "Titular não identificado",
           "windows": {
             "1": {
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -81.09978,
+              "netTransferred": -64.98,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
+              "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609:1550",
-                  "transactionHash": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609",
-                  "source": "https://eth.blockscout.com/tx/0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609"
-                },
-                {
-                  "id": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf:26",
-                  "transactionHash": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf",
-                  "source": "https://eth.blockscout.com/tx/0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf"
+                  "id": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d:13",
+                  "transactionHash": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d",
+                  "source": "https://eth.blockscout.com/tx/0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d"
                 }
               ]
             },
@@ -1509,23 +1490,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -81.09978,
+              "netTransferred": -64.98,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
+              "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609:1550",
-                  "transactionHash": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609",
-                  "source": "https://eth.blockscout.com/tx/0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609"
-                },
-                {
-                  "id": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf:26",
-                  "transactionHash": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf",
-                  "source": "https://eth.blockscout.com/tx/0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf"
+                  "id": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d:13",
+                  "transactionHash": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d",
+                  "source": "https://eth.blockscout.com/tx/0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d"
                 }
               ]
             },
@@ -1533,23 +1507,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -81.09978,
+              "netTransferred": -64.98,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
+              "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609:1550",
-                  "transactionHash": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609",
-                  "source": "https://eth.blockscout.com/tx/0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609"
-                },
-                {
-                  "id": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf:26",
-                  "transactionHash": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf",
-                  "source": "https://eth.blockscout.com/tx/0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf"
+                  "id": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d:13",
+                  "transactionHash": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d",
+                  "source": "https://eth.blockscout.com/tx/0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d"
                 }
               ]
             },
@@ -1557,129 +1524,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -81.09978,
+              "netTransferred": -64.98,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
+              "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609:1550",
-                  "transactionHash": "0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609",
-                  "source": "https://eth.blockscout.com/tx/0x6e3c51a3c88bca5a5c265b2fd2b6a432c87e0cf32739a1c98a7664859779b609"
-                },
-                {
-                  "id": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf:26",
-                  "transactionHash": "0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf",
-                  "source": "https://eth.blockscout.com/tx/0x2843144b8312b31ff81e6647c3a55fc79caa1f1deb661d45cf1f7f86b8c42edf"
-                }
-              ]
-            }
-          },
-          "netBuyUsd": 0,
-          "classification": "Movimentação observada",
-          "signal": false,
-          "confidence": "baixa"
-        },
-        {
-          "address": "0xe8736af1926e9d8f5a6602fbbb0893b26436d710",
-          "label": "Titular não identificado",
-          "windows": {
-            "1": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": 55.68937626141643,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
-              "evidence": [
-                {
-                  "id": "0x37206fcaab91a9d70f9c2a60584f41c0e17bb5816989839ef32fd3f449981ec5:2474",
-                  "transactionHash": "0x37206fcaab91a9d70f9c2a60584f41c0e17bb5816989839ef32fd3f449981ec5",
-                  "source": "https://eth.blockscout.com/tx/0x37206fcaab91a9d70f9c2a60584f41c0e17bb5816989839ef32fd3f449981ec5"
-                },
-                {
-                  "id": "0x6dc5f3db06e8b8c0affc714c44a6b23380efebaf714dac9404e7daa539b9ff0b:2428",
-                  "transactionHash": "0x6dc5f3db06e8b8c0affc714c44a6b23380efebaf714dac9404e7daa539b9ff0b",
-                  "source": "https://eth.blockscout.com/tx/0x6dc5f3db06e8b8c0affc714c44a6b23380efebaf714dac9404e7daa539b9ff0b"
-                }
-              ]
-            },
-            "7": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": 55.68937626141643,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
-              "evidence": [
-                {
-                  "id": "0x37206fcaab91a9d70f9c2a60584f41c0e17bb5816989839ef32fd3f449981ec5:2474",
-                  "transactionHash": "0x37206fcaab91a9d70f9c2a60584f41c0e17bb5816989839ef32fd3f449981ec5",
-                  "source": "https://eth.blockscout.com/tx/0x37206fcaab91a9d70f9c2a60584f41c0e17bb5816989839ef32fd3f449981ec5"
-                },
-                {
-                  "id": "0x6dc5f3db06e8b8c0affc714c44a6b23380efebaf714dac9404e7daa539b9ff0b:2428",
-                  "transactionHash": "0x6dc5f3db06e8b8c0affc714c44a6b23380efebaf714dac9404e7daa539b9ff0b",
-                  "source": "https://eth.blockscout.com/tx/0x6dc5f3db06e8b8c0affc714c44a6b23380efebaf714dac9404e7daa539b9ff0b"
-                }
-              ]
-            },
-            "30": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": 55.68937626141643,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
-              "evidence": [
-                {
-                  "id": "0x37206fcaab91a9d70f9c2a60584f41c0e17bb5816989839ef32fd3f449981ec5:2474",
-                  "transactionHash": "0x37206fcaab91a9d70f9c2a60584f41c0e17bb5816989839ef32fd3f449981ec5",
-                  "source": "https://eth.blockscout.com/tx/0x37206fcaab91a9d70f9c2a60584f41c0e17bb5816989839ef32fd3f449981ec5"
-                },
-                {
-                  "id": "0x6dc5f3db06e8b8c0affc714c44a6b23380efebaf714dac9404e7daa539b9ff0b:2428",
-                  "transactionHash": "0x6dc5f3db06e8b8c0affc714c44a6b23380efebaf714dac9404e7daa539b9ff0b",
-                  "source": "https://eth.blockscout.com/tx/0x6dc5f3db06e8b8c0affc714c44a6b23380efebaf714dac9404e7daa539b9ff0b"
-                }
-              ]
-            },
-            "90": {
-              "buys": 0,
-              "sells": 0,
-              "netTraded": 0,
-              "netTransferred": 55.68937626141643,
-              "buyUsd": 0,
-              "sellUsd": 0,
-              "buyDays": [],
-              "inflowDays": [
-                "2026-10-26"
-              ],
-              "evidence": [
-                {
-                  "id": "0x37206fcaab91a9d70f9c2a60584f41c0e17bb5816989839ef32fd3f449981ec5:2474",
-                  "transactionHash": "0x37206fcaab91a9d70f9c2a60584f41c0e17bb5816989839ef32fd3f449981ec5",
-                  "source": "https://eth.blockscout.com/tx/0x37206fcaab91a9d70f9c2a60584f41c0e17bb5816989839ef32fd3f449981ec5"
-                },
-                {
-                  "id": "0x6dc5f3db06e8b8c0affc714c44a6b23380efebaf714dac9404e7daa539b9ff0b:2428",
-                  "transactionHash": "0x6dc5f3db06e8b8c0affc714c44a6b23380efebaf714dac9404e7daa539b9ff0b",
-                  "source": "https://eth.blockscout.com/tx/0x6dc5f3db06e8b8c0affc714c44a6b23380efebaf714dac9404e7daa539b9ff0b"
+                  "id": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d:13",
+                  "transactionHash": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d",
+                  "source": "https://eth.blockscout.com/tx/0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d"
                 }
               ]
             }
@@ -1697,7 +1551,7 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 28.569778739999997,
+              "netTransferred": 64.98,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
@@ -1706,9 +1560,9 @@
               ],
               "evidence": [
                 {
-                  "id": "0xb9c8015c4affaf334129015f4f6e8aa73f961af43e4c662fa1e3599f8a89ef86:86",
-                  "transactionHash": "0xb9c8015c4affaf334129015f4f6e8aa73f961af43e4c662fa1e3599f8a89ef86",
-                  "source": "https://eth.blockscout.com/tx/0xb9c8015c4affaf334129015f4f6e8aa73f961af43e4c662fa1e3599f8a89ef86"
+                  "id": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d:13",
+                  "transactionHash": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d",
+                  "source": "https://eth.blockscout.com/tx/0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d"
                 }
               ]
             },
@@ -1716,7 +1570,7 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 28.569778739999997,
+              "netTransferred": 64.98,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
@@ -1725,9 +1579,9 @@
               ],
               "evidence": [
                 {
-                  "id": "0xb9c8015c4affaf334129015f4f6e8aa73f961af43e4c662fa1e3599f8a89ef86:86",
-                  "transactionHash": "0xb9c8015c4affaf334129015f4f6e8aa73f961af43e4c662fa1e3599f8a89ef86",
-                  "source": "https://eth.blockscout.com/tx/0xb9c8015c4affaf334129015f4f6e8aa73f961af43e4c662fa1e3599f8a89ef86"
+                  "id": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d:13",
+                  "transactionHash": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d",
+                  "source": "https://eth.blockscout.com/tx/0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d"
                 }
               ]
             },
@@ -1735,7 +1589,7 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 28.569778739999997,
+              "netTransferred": 64.98,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
@@ -1744,9 +1598,9 @@
               ],
               "evidence": [
                 {
-                  "id": "0xb9c8015c4affaf334129015f4f6e8aa73f961af43e4c662fa1e3599f8a89ef86:86",
-                  "transactionHash": "0xb9c8015c4affaf334129015f4f6e8aa73f961af43e4c662fa1e3599f8a89ef86",
-                  "source": "https://eth.blockscout.com/tx/0xb9c8015c4affaf334129015f4f6e8aa73f961af43e4c662fa1e3599f8a89ef86"
+                  "id": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d:13",
+                  "transactionHash": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d",
+                  "source": "https://eth.blockscout.com/tx/0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d"
                 }
               ]
             },
@@ -1754,7 +1608,7 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 28.569778739999997,
+              "netTransferred": 64.98,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
@@ -1763,9 +1617,9 @@
               ],
               "evidence": [
                 {
-                  "id": "0xb9c8015c4affaf334129015f4f6e8aa73f961af43e4c662fa1e3599f8a89ef86:86",
-                  "transactionHash": "0xb9c8015c4affaf334129015f4f6e8aa73f961af43e4c662fa1e3599f8a89ef86",
-                  "source": "https://eth.blockscout.com/tx/0xb9c8015c4affaf334129015f4f6e8aa73f961af43e4c662fa1e3599f8a89ef86"
+                  "id": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d:13",
+                  "transactionHash": "0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d",
+                  "source": "https://eth.blockscout.com/tx/0x5a305c998c08ed60e5368052b9827cf70b46b3351880ccd94c983731e0bcb77d"
                 }
               ]
             }
@@ -1776,23 +1630,23 @@
           "confidence": "baixa"
         },
         {
-          "address": "0x1a353a852ba8ec5ac634695e0d65f2729223471d",
+          "address": "0x3971eb20db797e53797c95cfa17a12915f1273b6",
           "label": "Titular não identificado",
           "windows": {
             "1": {
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -18.324486415489858,
+              "netTransferred": -60.008,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c:1280",
-                  "transactionHash": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c",
-                  "source": "https://eth.blockscout.com/tx/0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c"
+                  "id": "0x5c4f27a0e054a1a253f356cc24b29aeef2a54a80be99e5fc516dd1d212e7c5cc:73",
+                  "transactionHash": "0x5c4f27a0e054a1a253f356cc24b29aeef2a54a80be99e5fc516dd1d212e7c5cc",
+                  "source": "https://eth.blockscout.com/tx/0x5c4f27a0e054a1a253f356cc24b29aeef2a54a80be99e5fc516dd1d212e7c5cc"
                 }
               ]
             },
@@ -1800,16 +1654,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -18.324486415489858,
+              "netTransferred": -60.008,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c:1280",
-                  "transactionHash": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c",
-                  "source": "https://eth.blockscout.com/tx/0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c"
+                  "id": "0x5c4f27a0e054a1a253f356cc24b29aeef2a54a80be99e5fc516dd1d212e7c5cc:73",
+                  "transactionHash": "0x5c4f27a0e054a1a253f356cc24b29aeef2a54a80be99e5fc516dd1d212e7c5cc",
+                  "source": "https://eth.blockscout.com/tx/0x5c4f27a0e054a1a253f356cc24b29aeef2a54a80be99e5fc516dd1d212e7c5cc"
                 }
               ]
             },
@@ -1817,16 +1671,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -18.324486415489858,
+              "netTransferred": -60.008,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c:1280",
-                  "transactionHash": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c",
-                  "source": "https://eth.blockscout.com/tx/0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c"
+                  "id": "0x5c4f27a0e054a1a253f356cc24b29aeef2a54a80be99e5fc516dd1d212e7c5cc:73",
+                  "transactionHash": "0x5c4f27a0e054a1a253f356cc24b29aeef2a54a80be99e5fc516dd1d212e7c5cc",
+                  "source": "https://eth.blockscout.com/tx/0x5c4f27a0e054a1a253f356cc24b29aeef2a54a80be99e5fc516dd1d212e7c5cc"
                 }
               ]
             },
@@ -1834,16 +1688,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -18.324486415489858,
+              "netTransferred": -60.008,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c:1280",
-                  "transactionHash": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c",
-                  "source": "https://eth.blockscout.com/tx/0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c"
+                  "id": "0x5c4f27a0e054a1a253f356cc24b29aeef2a54a80be99e5fc516dd1d212e7c5cc:73",
+                  "transactionHash": "0x5c4f27a0e054a1a253f356cc24b29aeef2a54a80be99e5fc516dd1d212e7c5cc",
+                  "source": "https://eth.blockscout.com/tx/0x5c4f27a0e054a1a253f356cc24b29aeef2a54a80be99e5fc516dd1d212e7c5cc"
                 }
               ]
             }
@@ -1854,14 +1708,14 @@
           "confidence": "baixa"
         },
         {
-          "address": "0xcfff3f08d75e1be3e0c119963ed32f626095e0dc",
+          "address": "0xe8736af1926e9d8f5a6602fbbb0893b26436d710",
           "label": "Titular não identificado",
           "windows": {
             "1": {
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 18.324486415489858,
+              "netTransferred": 58.80796085395184,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
@@ -1870,9 +1724,14 @@
               ],
               "evidence": [
                 {
-                  "id": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c:1280",
-                  "transactionHash": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c",
-                  "source": "https://eth.blockscout.com/tx/0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c"
+                  "id": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f:149",
+                  "transactionHash": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f",
+                  "source": "https://eth.blockscout.com/tx/0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f"
+                },
+                {
+                  "id": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f:114",
+                  "transactionHash": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f",
+                  "source": "https://eth.blockscout.com/tx/0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f"
                 }
               ]
             },
@@ -1880,7 +1739,7 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 18.324486415489858,
+              "netTransferred": 58.80796085395184,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
@@ -1889,9 +1748,14 @@
               ],
               "evidence": [
                 {
-                  "id": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c:1280",
-                  "transactionHash": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c",
-                  "source": "https://eth.blockscout.com/tx/0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c"
+                  "id": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f:149",
+                  "transactionHash": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f",
+                  "source": "https://eth.blockscout.com/tx/0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f"
+                },
+                {
+                  "id": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f:114",
+                  "transactionHash": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f",
+                  "source": "https://eth.blockscout.com/tx/0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f"
                 }
               ]
             },
@@ -1899,7 +1763,7 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 18.324486415489858,
+              "netTransferred": 58.80796085395184,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
@@ -1908,9 +1772,14 @@
               ],
               "evidence": [
                 {
-                  "id": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c:1280",
-                  "transactionHash": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c",
-                  "source": "https://eth.blockscout.com/tx/0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c"
+                  "id": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f:149",
+                  "transactionHash": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f",
+                  "source": "https://eth.blockscout.com/tx/0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f"
+                },
+                {
+                  "id": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f:114",
+                  "transactionHash": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f",
+                  "source": "https://eth.blockscout.com/tx/0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f"
                 }
               ]
             },
@@ -1918,7 +1787,7 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": 18.324486415489858,
+              "netTransferred": 58.80796085395184,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
@@ -1927,9 +1796,14 @@
               ],
               "evidence": [
                 {
-                  "id": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c:1280",
-                  "transactionHash": "0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c",
-                  "source": "https://eth.blockscout.com/tx/0x8b97d6c0b9b66826ae089932ddd4362eb0040cf1a420367a4fcdb473524d676c"
+                  "id": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f:149",
+                  "transactionHash": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f",
+                  "source": "https://eth.blockscout.com/tx/0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f"
+                },
+                {
+                  "id": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f:114",
+                  "transactionHash": "0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f",
+                  "source": "https://eth.blockscout.com/tx/0xc0657cea8e5cc343ad6c5989947ff0e359d32926ec36699258085143af69f48f"
                 }
               ]
             }
@@ -1940,23 +1814,23 @@
           "confidence": "baixa"
         },
         {
-          "address": "0xed9ab5bc05a0152b9dc2f7902e8369af7bc18771",
-          "label": "Titular não identificado",
+          "address": "0x916ed5586bb328e0ec1a428af060dc3d10919d84",
+          "label": "CoinSpot Exchange CoinSpot 7 note_0",
           "windows": {
             "1": {
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -16.73110991,
+              "netTransferred": -40.13134369,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0xb6ac8396002edd00f2032729ddff103e1f071ca8c73e6c41aca6b4930631eedd:398",
-                  "transactionHash": "0xb6ac8396002edd00f2032729ddff103e1f071ca8c73e6c41aca6b4930631eedd",
-                  "source": "https://eth.blockscout.com/tx/0xb6ac8396002edd00f2032729ddff103e1f071ca8c73e6c41aca6b4930631eedd"
+                  "id": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341:1602",
+                  "transactionHash": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341",
+                  "source": "https://eth.blockscout.com/tx/0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341"
                 }
               ]
             },
@@ -1964,16 +1838,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -16.73110991,
+              "netTransferred": -40.13134369,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0xb6ac8396002edd00f2032729ddff103e1f071ca8c73e6c41aca6b4930631eedd:398",
-                  "transactionHash": "0xb6ac8396002edd00f2032729ddff103e1f071ca8c73e6c41aca6b4930631eedd",
-                  "source": "https://eth.blockscout.com/tx/0xb6ac8396002edd00f2032729ddff103e1f071ca8c73e6c41aca6b4930631eedd"
+                  "id": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341:1602",
+                  "transactionHash": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341",
+                  "source": "https://eth.blockscout.com/tx/0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341"
                 }
               ]
             },
@@ -1981,16 +1855,16 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -16.73110991,
+              "netTransferred": -40.13134369,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0xb6ac8396002edd00f2032729ddff103e1f071ca8c73e6c41aca6b4930631eedd:398",
-                  "transactionHash": "0xb6ac8396002edd00f2032729ddff103e1f071ca8c73e6c41aca6b4930631eedd",
-                  "source": "https://eth.blockscout.com/tx/0xb6ac8396002edd00f2032729ddff103e1f071ca8c73e6c41aca6b4930631eedd"
+                  "id": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341:1602",
+                  "transactionHash": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341",
+                  "source": "https://eth.blockscout.com/tx/0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341"
                 }
               ]
             },
@@ -1998,16 +1872,102 @@
               "buys": 0,
               "sells": 0,
               "netTraded": 0,
-              "netTransferred": -16.73110991,
+              "netTransferred": -40.13134369,
               "buyUsd": 0,
               "sellUsd": 0,
               "buyDays": [],
               "inflowDays": [],
               "evidence": [
                 {
-                  "id": "0xb6ac8396002edd00f2032729ddff103e1f071ca8c73e6c41aca6b4930631eedd:398",
-                  "transactionHash": "0xb6ac8396002edd00f2032729ddff103e1f071ca8c73e6c41aca6b4930631eedd",
-                  "source": "https://eth.blockscout.com/tx/0xb6ac8396002edd00f2032729ddff103e1f071ca8c73e6c41aca6b4930631eedd"
+                  "id": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341:1602",
+                  "transactionHash": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341",
+                  "source": "https://eth.blockscout.com/tx/0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341"
+                }
+              ]
+            }
+          },
+          "netBuyUsd": 0,
+          "classification": "Movimentação observada",
+          "signal": false,
+          "confidence": "baixa"
+        },
+        {
+          "address": "0xffe94ab4bf5ce179ff2025ac6f903765b3473674",
+          "label": "Titular não identificado",
+          "windows": {
+            "1": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 40.13134369,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341:1602",
+                  "transactionHash": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341",
+                  "source": "https://eth.blockscout.com/tx/0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341"
+                }
+              ]
+            },
+            "7": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 40.13134369,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341:1602",
+                  "transactionHash": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341",
+                  "source": "https://eth.blockscout.com/tx/0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341"
+                }
+              ]
+            },
+            "30": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 40.13134369,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341:1602",
+                  "transactionHash": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341",
+                  "source": "https://eth.blockscout.com/tx/0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341"
+                }
+              ]
+            },
+            "90": {
+              "buys": 0,
+              "sells": 0,
+              "netTraded": 0,
+              "netTransferred": 40.13134369,
+              "buyUsd": 0,
+              "sellUsd": 0,
+              "buyDays": [],
+              "inflowDays": [
+                "2026-10-26"
+              ],
+              "evidence": [
+                {
+                  "id": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341:1602",
+                  "transactionHash": "0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341",
+                  "source": "https://eth.blockscout.com/tx/0x433ed52b150a3b610e30f0f566a6998248f790d89f074ca38a2951db9979d341"
                 }
               ]
             }
@@ -2018,8 +1978,8 @@
           "confidence": "baixa"
         }
       ],
-      "exchangeInflow": 5.143224358738524,
-      "exchangeInflowUsd": 705.0846273394643,
+      "exchangeInflow": 1.14773966,
+      "exchangeInflowUsd": 154.15291373460002,
       "interpretation": "Transferências não comprovam compras, vendas, identidade, informação privilegiada ou posição líquida em outras redes e derivativos.",
       "positions": [
         {
@@ -2060,7 +2020,7 @@
               "delta": 30.03639224419021,
               "percent": 0.012558093580227025,
               "newPosition": false,
-              "priceNeutralUsd": 4117.689012756036,
+              "priceNeutralUsd": 4034.1878423171875,
               "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             },
             "90": {
@@ -2070,23 +2030,23 @@
               "delta": -16369.963607755839,
               "percent": -6.405036450381953,
               "newPosition": false,
-              "priceNeutralUsd": -2244158.310987248,
+              "priceNeutralUsd": -2198649.812157687,
               "interpretation": "Posição em tokens diminuiu."
             }
           },
           "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
           },
           "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
           },
           "source": "https://eth.blockscout.com/address/0x1d48963dd8fada6ab5c2c7b92eba81ecc5030270",
           "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
@@ -2140,23 +2100,23 @@
               "delta": 4409.196302100405,
               "percent": 1.9488288963151343,
               "newPosition": false,
-              "priceNeutralUsd": 604456.7210549446,
+              "priceNeutralUsd": 592199.1553351054,
               "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             }
           },
           "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
           },
           "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
           },
           "source": "https://eth.blockscout.com/address/0x46e946468f747d0e563527bd069d4ded731f33a4",
           "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
@@ -2168,7 +2128,7 @@
           "balances": {
             "0": 218544.91047421444,
             "1": 218544.91047421444,
-            "7": 215174.01663753446,
+            "7": 215675.22472563444,
             "30": 229400.28364683653,
             "90": 223113.52643328777
           },
@@ -2185,12 +2145,12 @@
             },
             "7": {
               "available": true,
-              "initial": 215174.01663753446,
+              "initial": 215675.22472563444,
               "current": 218544.91047421444,
-              "delta": 3370.893836679985,
-              "percent": 1.5665896325941306,
+              "delta": 2869.685748579999,
+              "percent": 1.3305588308673815,
               "newPosition": false,
-              "priceNeutralUsd": 462115.8360704591,
+              "priceNeutralUsd": 385427.4928917797,
               "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             },
             "30": {
@@ -2200,7 +2160,7 @@
               "delta": -10855.373172622087,
               "percent": -4.7320661509442665,
               "newPosition": false,
-              "priceNeutralUsd": -1488163.108234762,
+              "priceNeutralUsd": -1457985.1708148725,
               "interpretation": "Posição em tokens diminuiu."
             },
             "90": {
@@ -2210,23 +2170,23 @@
               "delta": -4568.61595907333,
               "percent": -2.047664268548672,
               "newPosition": false,
-              "priceNeutralUsd": -626311.5618293628,
+              "priceNeutralUsd": -613610.8094631389,
               "interpretation": "Posição em tokens diminuiu."
             }
           },
           "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
           },
           "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
           },
           "source": "https://eth.blockscout.com/address/0x5a801a9418d036fd453078c3adcb761fdc5ae695",
           "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
@@ -2285,95 +2245,165 @@
             }
           },
           "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
           },
           "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
           },
           "source": "https://eth.blockscout.com/address/0x45292a0eafa4d1625c06902f359c5ee819afb026",
           "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
           "precision": "Quantidades aproximadas para exibição; não usar para execução financeira."
         },
         {
-          "address": "0xe2d4c380854ec331e5db5fb32b4ea43c1cb413cd",
+          "address": "0xbe963450ebe63cff4bf80c7de6ef5dda409b691b",
           "label": "Titular não identificado",
           "balances": {
-            "0": 1000.0401931060503,
-            "1": 1000.0401931060503,
-            "7": 0.04019310605026,
-            "30": 0.000078425861669,
-            "90": 0.000038009079745
+            "0": 12.392686093528496,
+            "1": 175.6838566135285,
+            "7": 13.254363703528496,
+            "30": 701.9169132135285,
+            "90": 4.8072895
           },
           "changes": {
             "1": {
               "available": true,
-              "initial": 1000.0401931060503,
-              "current": 1000.0401931060503,
-              "delta": 0,
-              "percent": 0,
+              "initial": 175.6838566135285,
+              "current": 12.392686093528496,
+              "delta": -163.29117051999998,
+              "percent": -92.94603025433914,
               "newPosition": false,
-              "priceNeutralUsd": 0,
-              "interpretation": "Posição em tokens estável."
+              "priceNeutralUsd": -21931.637112541197,
+              "interpretation": "Posição em tokens diminuiu."
             },
             "7": {
               "available": true,
-              "initial": 0.04019310605026,
-              "current": 1000.0401931060503,
-              "delta": 1000,
-              "percent": 2487988.857466096,
+              "initial": 13.254363703528496,
+              "current": 12.392686093528496,
+              "delta": -0.8616776099999992,
+              "percent": -6.501086202807372,
               "newPosition": false,
-              "priceNeutralUsd": 137090,
-              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
+              "priceNeutralUsd": -115.7319197990999,
+              "interpretation": "Posição em tokens diminuiu."
             },
             "30": {
               "available": true,
-              "initial": 0.000078425861669,
-              "current": 1000.0401931060503,
-              "delta": 1000.0401146801886,
-              "percent": 1275140742.3496404,
+              "initial": 701.9169132135285,
+              "current": 12.392686093528496,
+              "delta": -689.52422712,
+              "percent": -98.2344511351362,
               "newPosition": false,
-              "priceNeutralUsd": 137095.49932150706,
-              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
+              "priceNeutralUsd": -92609.9989444872,
+              "interpretation": "Posição em tokens diminuiu."
             },
             "90": {
               "available": true,
-              "initial": 0.000038009079745,
-              "current": 1000.0401931060503,
-              "delta": 1000.0401550969706,
-              "percent": 2631055952.436005,
+              "initial": 4.8072895,
+              "current": 12.392686093528496,
+              "delta": 7.585396593528496,
+              "percent": 157.7894693782951,
               "newPosition": false,
-              "priceNeutralUsd": 137095.5048622437,
+              "priceNeutralUsd": 1018.7946164768123,
               "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             }
           },
           "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
           },
           "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
           },
-          "source": "https://eth.blockscout.com/address/0xe2d4c380854ec331e5db5fb32b4ea43c1cb413cd",
+          "source": "https://eth.blockscout.com/address/0xbe963450ebe63cff4bf80c7de6ef5dda409b691b",
           "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
           "precision": "Quantidades aproximadas para exibição; não usar para execução financeira."
         },
         {
-          "address": "0xfc442a70f8f4e3d436f1cf8d666d29aa02c3594b",
+          "address": "0xf239ccf1594fc47f8c5f29c965f4c3a2d09f6581",
+          "label": "Titular não identificado",
+          "balances": {
+            "0": 819.3114359936811,
+            "1": 233.61853032368109,
+            "7": 356.4969808236811,
+            "30": 400.45489358368104,
+            "90": 23.1930115
+          },
+          "changes": {
+            "1": {
+              "available": true,
+              "initial": 233.61853032368109,
+              "current": 819.3114359936811,
+              "delta": 585.6929056700001,
+              "percent": 250.70481560624322,
+              "newPosition": false,
+              "priceNeutralUsd": 78664.41416053771,
+              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
+            },
+            "7": {
+              "available": true,
+              "initial": 356.4969808236811,
+              "current": 819.3114359936811,
+              "delta": 462.81445517000003,
+              "percent": 129.82282601683582,
+              "newPosition": false,
+              "priceNeutralUsd": 62160.60947388271,
+              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
+            },
+            "30": {
+              "available": true,
+              "initial": 400.45489358368104,
+              "current": 819.3114359936811,
+              "delta": 418.8565424100001,
+              "percent": 104.59518640455163,
+              "newPosition": false,
+              "priceNeutralUsd": 56256.62221108711,
+              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
+            },
+            "90": {
+              "available": true,
+              "initial": 23.1930115,
+              "current": 819.3114359936811,
+              "delta": 796.1184244936811,
+              "percent": 3432.5789235851544,
+              "newPosition": false,
+              "priceNeutralUsd": 106926.66559374631,
+              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
+            }
+          },
+          "blocks": {
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
+          },
+          "timestamps": {
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
+          },
+          "source": "https://eth.blockscout.com/address/0xf239ccf1594fc47f8c5f29c965f4c3a2d09f6581",
+          "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
+          "precision": "Quantidades aproximadas para exibição; não usar para execução financeira."
+        },
+        {
+          "address": "0x36d6617ee82521ba4fdaa81dc7b64dc874971d3d",
           "label": "Titular não identificado",
           "balances": {
             "0": 0,
@@ -2425,160 +2455,90 @@
             }
           },
           "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
           },
           "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
           },
-          "source": "https://eth.blockscout.com/address/0xfc442a70f8f4e3d436f1cf8d666d29aa02c3594b",
+          "source": "https://eth.blockscout.com/address/0x36d6617ee82521ba4fdaa81dc7b64dc874971d3d",
           "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
           "precision": "Quantidades aproximadas para exibição; não usar para execução financeira."
         },
         {
-          "address": "0x7d94077f58593f8b97c5cab56c8924e13b49946e",
+          "address": "0xad85405cbb1476825b78a021fa9e543bf7937549",
           "label": "Titular não identificado",
           "balances": {
-            "0": 88050.2145856189,
-            "1": 87723.31004240869,
-            "7": 85284.27701619927,
-            "30": 72082.4597554702,
-            "90": 74138.18477933508
+            "0": 106462.8922635387,
+            "1": 96380.16430267296,
+            "7": 95236.21506868237,
+            "30": 130729.1496889475,
+            "90": 140047.82900066406
           },
           "changes": {
             "1": {
               "available": true,
-              "initial": 87723.31004240869,
-              "current": 88050.2145856189,
-              "delta": 326.9045432102139,
-              "percent": 0.37265413611521975,
+              "initial": 96380.16430267296,
+              "current": 106462.8922635387,
+              "delta": 10082.72796086574,
+              "percent": 10.461413957753662,
               "newPosition": false,
-              "priceNeutralUsd": 44815.34382868822,
+              "priceNeutralUsd": 1354211.1924238778,
               "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             },
             "7": {
               "available": true,
-              "initial": 85284.27701619927,
-              "current": 88050.2145856189,
-              "delta": 2765.937569419635,
-              "percent": 3.24319753439929,
+              "initial": 95236.21506868237,
+              "current": 106462.8922635387,
+              "delta": 11226.677194856326,
+              "percent": 11.788243775500613,
               "newPosition": false,
-              "priceNeutralUsd": 379182.3813917378,
+              "priceNeutralUsd": 1507855.014041153,
               "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
             },
             "30": {
               "available": true,
-              "initial": 72082.4597554702,
-              "current": 88050.2145856189,
-              "delta": 15967.754830148697,
-              "percent": 22.15206706918313,
+              "initial": 130729.1496889475,
+              "current": 106462.8922635387,
+              "delta": -24266.257425408796,
+              "percent": -18.562239166358157,
               "newPosition": false,
-              "priceNeutralUsd": 2189019.509665085,
-              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
-            },
-            "90": {
-              "available": true,
-              "initial": 74138.18477933508,
-              "current": 88050.2145856189,
-              "delta": 13912.029806283826,
-              "percent": 18.76499923445873,
-              "newPosition": false,
-              "priceNeutralUsd": 1907200.1661434497,
-              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
-            }
-          },
-          "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
-          },
-          "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
-          },
-          "source": "https://eth.blockscout.com/address/0x7d94077f58593f8b97c5cab56c8924e13b49946e",
-          "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
-          "precision": "Quantidades aproximadas para exibição; não usar para execução financeira."
-        },
-        {
-          "address": "0xe8736af1926e9d8f5a6602fbbb0893b26436d710",
-          "label": "Titular não identificado",
-          "balances": {
-            "0": 56.19660938188147,
-            "1": 19.359884182081778,
-            "7": 61.189525648491134,
-            "30": 120.8046318302556,
-            "90": 178.69869015937027
-          },
-          "changes": {
-            "1": {
-              "available": true,
-              "initial": 19.359884182081778,
-              "current": 56.19660938188147,
-              "delta": 36.836725199799695,
-              "percent": 190.27347918689162,
-              "newPosition": false,
-              "priceNeutralUsd": 5049.94665764054,
-              "interpretation": "Posição em tokens aumentou; origem das entradas ainda precisa ser classificada."
-            },
-            "7": {
-              "available": true,
-              "initial": 61.189525648491134,
-              "current": 56.19660938188147,
-              "delta": -4.992916266609662,
-              "percent": -8.159756451278817,
-              "newPosition": false,
-              "priceNeutralUsd": -684.4788909895185,
-              "interpretation": "Posição em tokens diminuiu."
-            },
-            "30": {
-              "available": true,
-              "initial": 120.8046318302556,
-              "current": 56.19660938188147,
-              "delta": -64.60802244837413,
-              "percent": -53.48141165576816,
-              "newPosition": false,
-              "priceNeutralUsd": -8857.11379744761,
+              "priceNeutralUsd": -3259201.0348066553,
               "interpretation": "Posição em tokens diminuiu."
             },
             "90": {
               "available": true,
-              "initial": 178.69869015937027,
-              "current": 56.19660938188147,
-              "delta": -122.5020807774888,
-              "percent": -68.55231041046625,
+              "initial": 140047.82900066406,
+              "current": 106462.8922635387,
+              "delta": -33584.93673712536,
+              "percent": -23.981047744029016,
               "newPosition": false,
-              "priceNeutralUsd": -16793.81025378594,
+              "priceNeutralUsd": -4510792.8531633075,
               "interpretation": "Posição em tokens diminuiu."
             }
           },
           "blocks": {
-            "0": 26273399,
-            "1": 26266288,
-            "7": 26223226,
-            "30": 26058233,
-            "90": 25627920
+            "0": 26274896,
+            "1": 26267786,
+            "7": 26224720,
+            "30": 26059727,
+            "90": 25629412
           },
           "timestamps": {
-            "0": "2026-10-26T00:53:11.000Z",
-            "1": "2026-10-25T01:06:11.000Z",
-            "7": "2026-10-19T01:06:11.000Z",
-            "30": "2026-09-26T01:06:11.000Z",
-            "90": "2026-07-28T01:06:11.000Z"
+            "0": "2026-10-26T05:53:11.000Z",
+            "1": "2026-10-25T06:06:11.000Z",
+            "7": "2026-10-19T06:06:11.000Z",
+            "30": "2026-09-26T06:06:11.000Z",
+            "90": "2026-07-28T06:06:11.000Z"
           },
-          "source": "https://eth.blockscout.com/address/0xe8736af1926e9d8f5a6602fbbb0893b26436d710",
+          "source": "https://eth.blockscout.com/address/0xad85405cbb1476825b78a021fa9e543bf7937549",
           "priceSource": "Blockscout, cotação indicativa consultada nesta coleta",
           "precision": "Quantidades aproximadas para exibição; não usar para execução financeira."
         }
@@ -2593,5 +2553,5 @@
   "unlocks": [],
   "errors": [],
   "coverageNote": "Piloto gratuito Ethereum: candidatos descobertos em titulares e transferências recentes, não todas as carteiras. Variação de saldo não comprova compra. Calendário de desbloqueios não conectado.",
-  "requestCount": 180
+  "requestCount": 179
 }
