@@ -209,6 +209,50 @@ body.sentinel-light-dashboard main > .controls .scanner-strategy-count{
   border:1px solid #8fd5b7!important;
 }
 
+/* Tema interno único: verde-água KuCoin claro com divisórias escuras. */
+body.sentinel-light-dashboard{
+  --dash-teal:#079b70!important;
+  --dash-teal-soft:#e1f7ee!important;
+  --dash-green:#067b5a!important;
+  --dash-green-soft:#d9f3e7!important;
+  --dash-line:#0b7355!important;
+}
+body.sentinel-light-dashboard .controls,
+body.sentinel-light-dashboard .panel,
+body.sentinel-light-dashboard .filter-group{
+  border-color:#0b7355!important;
+}
+body.sentinel-light-dashboard .panel .section-heading,
+body.sentinel-light-dashboard #scannerAuditPanel > .section-heading,
+body.sentinel-light-dashboard #signalsPanel > .section-heading,
+body.sentinel-light-dashboard #backtestPanel .backtest-section-heading,
+body.sentinel-light-dashboard #rsiFinderPanel > .section-heading{
+  background:#e1f7ee!important;
+  border-bottom-color:#0b7355!important;
+}
+body.sentinel-light-dashboard .table-wrap table th,
+body.sentinel-light-dashboard #signalsPanel thead th,
+body.sentinel-light-dashboard #backtestPanel thead th,
+body.sentinel-light-dashboard #rsiFinderPanel thead th{
+  background:#d4f1e3!important;
+  border-color:#0b7355!important;
+  color:#075d47!important;
+}
+body.sentinel-light-dashboard .table-wrap table td,
+body.sentinel-light-dashboard .table-wrap table tr:nth-child(even) td{
+  border-bottom-color:#77c9aa!important;
+}
+body.sentinel-light-dashboard .primary{
+  background:#079b70!important;
+  border-color:#056d50!important;
+  color:#fff!important;
+}
+body.sentinel-light-dashboard .primary:hover{background:#067b5a!important;}
+body.sentinel-light-dashboard input[type="checkbox"]:checked{
+  background:#bcebd6!important;
+  border-color:#0b7355!important;
+}
+
 /* Moldura permanente em verde escuro KuCoin. */
 body.sentinel-light-dashboard .dashboard-sidebar{
   background:linear-gradient(180deg,#075d47 0%,#064d3c 100%)!important;
