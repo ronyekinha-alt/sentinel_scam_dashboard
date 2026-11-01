@@ -1137,7 +1137,7 @@
 <script src="sentinel-core.js?v=20261014-short-watchlist-1"></script>
   <script src="sentinel-backtest.js?v=20261014-short-watchlist-1"></script>
 <script src="app.js?v=20261014-short-watchlist-1"></script>
-<link rel="stylesheet" href="dashboard-layout.css?v=20261101-kucoin-dark-shell-2" />
+<link rel="stylesheet" href="dashboard-layout.css?v=20261101-kucoin-unified-1" />
 <style id="sentinel-final-contrast-lock">
   body.sentinel-light-dashboard #scannerAuditPanel > .section-heading *,
   body.sentinel-light-dashboard #signalsPanel > .section-heading *,
@@ -1346,6 +1346,29 @@
   body.sentinel-light-dashboard .kucoin-panel > .controls label,
   body.sentinel-light-dashboard .kucoin-panel > .controls .muted,
   body.sentinel-light-dashboard #kucoinStatus { color:#175548 !important; text-shadow:none !important; opacity:1 !important; }
+  /* Unificação: o verde do layout usa a paleta KuCoin. */
+  body.sentinel-light-dashboard { --dash-teal:#079b70; --dash-teal-soft:#e1f7ee; --dash-green-soft:#d9f3e7; }
+  body.sentinel-light-dashboard main > .controls,
+  body.sentinel-light-dashboard #signalsPanel > .section-heading,
+  body.sentinel-light-dashboard #scannerAuditPanel > .section-heading,
+  body.sentinel-light-dashboard #backtestPanel > .section-heading,
+  body.sentinel-light-dashboard #rsiFinderPanel > .section-heading,
+  body.sentinel-light-dashboard #backtestPanel .backtest-section-heading { background:#e1f7ee !important; border-color:#0b7355 !important; }
+  body.sentinel-light-dashboard main > .controls #scannerStrategyFilters { background:#f6fdf9 !important; border-color:#0b7355 !important; }
+  body.sentinel-light-dashboard #signalsPanel thead th,
+  body.sentinel-light-dashboard #scannerAuditPanel thead th,
+  body.sentinel-light-dashboard #backtestPanel thead th,
+  body.sentinel-light-dashboard #rsiFinderPanel thead th { background:#d4f1e3 !important; border-color:#0b7355 !important; color:#075d47 !important; }
+  body.sentinel-light-dashboard #scanButton,
+  body.sentinel-light-dashboard #backtestButton,
+  body.sentinel-light-dashboard #rsiFinderButton,
+  body.sentinel-light-dashboard #signalsPanel .primary { background:#079b70 !important; border-color:#056d50 !important; color:#fff !important; }
+  body.sentinel-light-dashboard #scanButton:hover,
+  body.sentinel-light-dashboard #backtestButton:hover,
+  body.sentinel-light-dashboard #rsiFinderButton:hover,
+  body.sentinel-light-dashboard #signalsPanel .primary:hover { background:#067b5a !important; }
+  body.sentinel-light-dashboard #scannerStrategyFilters,
+  body.sentinel-light-dashboard #backtestPanel .filter-group { border-color:#0b7355 !important; }
 </style>
 <script src="onchain-panel.js?v=20261025-1"></script>
 <script src="dashboard-layout.js?v=20261020-light-dashboard-1"></script>
