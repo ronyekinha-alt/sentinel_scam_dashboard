@@ -2,6 +2,8 @@
   const navItems = [
     ['⌕', 'Scanner de sinais', 'scannerAuditPanel'],
     ['⌁', 'Acompanhamento ao vivo', 'mexcLivePanel'],
+    ['◈', 'MEXC · conta', 'importedTradesPanel'],
+    ['K', 'KuCoin · conta', 'kucoinPanel'],
     ['▥', 'Relatório / histórico', 'importedTradesPanel'],
     ['⌬', 'Validação / simulador', 'backtestPanel'],
     ['◎', 'Gerenciamento de risco', 'signalsPanel'],
