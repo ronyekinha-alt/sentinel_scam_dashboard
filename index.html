@@ -1270,6 +1270,55 @@
   body.sentinel-light-dashboard #backtestPanel #backtestButton { grid-column:7 / 10 !important; grid-row:3 !important; align-self:end !important; }
   body.sentinel-light-dashboard #backtestPanel #backtestStatus { grid-column:1 / 10 !important; grid-row:4 !important; margin:0 !important; }
   @media (max-width:1100px) { body.sentinel-light-dashboard #backtestPanel .controls { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } body.sentinel-light-dashboard #backtestStrategyFilters, body.sentinel-light-dashboard #backtestTimeframeFilters, body.sentinel-light-dashboard #backtestPanel .backtest-symbol-field, body.sentinel-light-dashboard #backtestPanel .backtest-date-field:nth-of-type(2), body.sentinel-light-dashboard #backtestPanel .backtest-date-field:nth-of-type(3), body.sentinel-light-dashboard #backtestPanel .capital-field, body.sentinel-light-dashboard #backtestPanel .check:has(#backtestReinvest), body.sentinel-light-dashboard #backtestPanel #backtestButton, body.sentinel-light-dashboard #backtestPanel #backtestStatus { grid-column:auto !important; grid-row:auto !important; } body.sentinel-light-dashboard #backtestTimeframeFilters { grid-template-columns:1fr !important; } }
+  /* Dados por corretora: MEXC em azul; KuCoin em verde-água. */
+  body.sentinel-light-dashboard #importedTradesPanel > .section-heading,
+  body.sentinel-light-dashboard #importedTradesPanel .mexc-balance-heading,
+  body.sentinel-light-dashboard #mexcLivePanel > .section-heading,
+  body.sentinel-light-dashboard #mexcPanel > .section-heading {
+    background:#e0f4fb !important; border-color:#afdce9 !important;
+  }
+  body.sentinel-light-dashboard #importedTradesPanel > .section-heading *,
+  body.sentinel-light-dashboard #importedTradesPanel .mexc-balance-heading *,
+  body.sentinel-light-dashboard #mexcLivePanel > .section-heading *,
+  body.sentinel-light-dashboard #mexcPanel > .section-heading * { color:#063a50 !important; text-shadow:none !important; opacity:1 !important; }
+  body.sentinel-light-dashboard #importedTradesPanel > .controls,
+  body.sentinel-light-dashboard #mexcLivePanel > .controls,
+  body.sentinel-light-dashboard #mexcPanel > .controls { background:#f4fbfe !important; border-color:#b9dfe9 !important; }
+  body.sentinel-light-dashboard #importedTradesPanel .stat,
+  body.sentinel-light-dashboard #mexcLivePanel .stat { background:#f6fcfe !important; border-color:#b9dfe9 !important; }
+  body.sentinel-light-dashboard #importedTradesPanel .stat .value,
+  body.sentinel-light-dashboard #mexcLivePanel .stat .value { color:#075978 !important; text-shadow:none !important; }
+  body.sentinel-light-dashboard #importedTradesPanel th,
+  body.sentinel-light-dashboard #mexcLivePanel th,
+  body.sentinel-light-dashboard #mexcPanel th { background:#cdebf5 !important; border-color:#afdce9 !important; color:#063a50 !important; }
+  body.sentinel-light-dashboard #importedTradesPanel td,
+  body.sentinel-light-dashboard #mexcLivePanel td,
+  body.sentinel-light-dashboard #mexcPanel td { background:#fbfeff !important; border-color:#d2eaf1 !important; color:#1d3944 !important; }
+  body.sentinel-light-dashboard #importedTradesPanel tr:nth-child(even) td,
+  body.sentinel-light-dashboard #mexcLivePanel tr:nth-child(even) td,
+  body.sentinel-light-dashboard #mexcPanel tr:nth-child(even) td { background:#f1f9fc !important; }
+  body.sentinel-light-dashboard #importedTradesPanel .primary,
+  body.sentinel-light-dashboard #mexcLivePanel .primary,
+  body.sentinel-light-dashboard #mexcPanel .primary { background:#0b9fdc !important; border-color:#0787bd !important; color:#fff !important; }
+  /* Pronto para a futura área de dados da KuCoin. */
+  body.sentinel-light-dashboard #kucoinPanel > .section-heading,
+  body.sentinel-light-dashboard #kucoinLivePanel > .section-heading,
+  body.sentinel-light-dashboard .kucoin-panel > .section-heading { background:#dff5ed !important; border-color:#a9dfca !important; }
+  body.sentinel-light-dashboard #kucoinPanel > .section-heading *,
+  body.sentinel-light-dashboard #kucoinLivePanel > .section-heading *,
+  body.sentinel-light-dashboard .kucoin-panel > .section-heading * { color:#075d47 !important; text-shadow:none !important; opacity:1 !important; }
+  body.sentinel-light-dashboard #kucoinPanel .stat,
+  body.sentinel-light-dashboard #kucoinLivePanel .stat,
+  body.sentinel-light-dashboard .kucoin-panel .stat { background:#f4fcf8 !important; border-color:#b9e5d2 !important; }
+  body.sentinel-light-dashboard #kucoinPanel th,
+  body.sentinel-light-dashboard #kucoinLivePanel th,
+  body.sentinel-light-dashboard .kucoin-panel th { background:#cceede !important; border-color:#a9dfca !important; color:#075d47 !important; }
+  body.sentinel-light-dashboard #kucoinPanel td,
+  body.sentinel-light-dashboard #kucoinLivePanel td,
+  body.sentinel-light-dashboard .kucoin-panel td { background:#fbfffd !important; border-color:#d1eee1 !important; color:#17463a !important; }
+  body.sentinel-light-dashboard #kucoinPanel .primary,
+  body.sentinel-light-dashboard #kucoinLivePanel .primary,
+  body.sentinel-light-dashboard .kucoin-panel .primary { background:#079b70 !important; border-color:#067b5a !important; color:#fff !important; }
 </style>
 <script src="onchain-panel.js?v=20261025-1"></script>
 <script src="dashboard-layout.js?v=20261020-light-dashboard-1"></script>
