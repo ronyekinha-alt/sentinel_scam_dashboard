@@ -192,6 +192,23 @@ body.sentinel-light-dashboard .dashboard-hamburger,
 body.sentinel-light-dashboard .dashboard-breadcrumb{color:#28725b!important;}
 body.sentinel-light-dashboard .topbar .pill{background:#c9f0dc!important;color:#075d47!important;}
 
+/* Área principal de filtros do scanner em verde-claro KuCoin. */
+body.sentinel-light-dashboard main > .controls{
+  background:#eaf9f1!important;
+  border-color:#b2e3cd!important;
+}
+body.sentinel-light-dashboard main > .controls #scannerStrategyFilters{
+  background:#f6fdf9!important;
+  border-color:#c6ead9!important;
+}
+body.sentinel-light-dashboard main > .controls .scanner-strategy-intro,
+body.sentinel-light-dashboard main > .controls #strategyHelp{color:#356a59!important;}
+body.sentinel-light-dashboard main > .controls .scanner-strategy-count{
+  background:#d8f4e5!important;
+  color:#075d47!important;
+  border:1px solid #8fd5b7!important;
+}
+
 /* Moldura permanente em verde escuro KuCoin. */
 body.sentinel-light-dashboard .dashboard-sidebar{
   background:linear-gradient(180deg,#075d47 0%,#064d3c 100%)!important;
