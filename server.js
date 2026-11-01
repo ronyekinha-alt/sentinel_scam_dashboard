@@ -88,6 +88,15 @@ async function kucoinFills(apiKey, secret, passphrase) {
   }
   return { fills, errors };
 }
+async function kucoinClosedPositions(apiKey, secret, passphrase) {
+  const end = Date.now(), start = end - 90 * 86400000, positions = [], errors = [];
+  for (let from = start; from < end; from += 7 * 86400000) {
+    const to = Math.min(end, from + 7 * 86400000), path = `/api/v1/history-positions?from=${from}&to=${to}&limit=500`;
+    try { const result = await kucoinGet('https://api-futures.kucoin.com', apiKey, secret, passphrase, path); positions.push(...(result.data?.items || [])); }
+    catch (error) { errors.push(error.message); }
+  }
+  return { positions, errors };
+}
 
 http.createServer((request, response) => {
   if (request.method === 'GET' && request.url.startsWith('/api/public?')) return proxyPublicMarket(request, response);
@@ -106,18 +115,19 @@ http.createServer((request, response) => {
   } catch (error) { json(response, 400, { error: error.message || 'Falha ao consultar saldo MEXC.' }); } }); }  if (request.method === 'GET' && request.url === '/api/mexc/exchange-info') return get('https://api.mexc.com/api/v3/exchangeInfo').then(data => json(response, 200, data)).catch(error => json(response, 502, { error: error.message }));
   if (request.method === 'POST' && request.url === '/api/kucoin/overview') { let body = ''; request.on('data', chunk => body += chunk); return request.on('end', async () => { try {
     const { apiKey, secret, passphrase } = JSON.parse(body); if (!apiKey || !secret || !passphrase) throw new Error('Informe API Key, Secret e Senha da API da KuCoin.');
-    const [accountsResult, futuresResult, positionsResult, tickersResult, fillsResult] = await Promise.allSettled([
+    const [accountsResult, futuresResult, positionsResult, tickersResult, fillsResult, historyResult] = await Promise.allSettled([
       kucoinGet('https://api.kucoin.com', apiKey, secret, passphrase, '/api/v1/accounts'),
       kucoinGet('https://api-futures.kucoin.com', apiKey, secret, passphrase, '/api/v1/account-overview?currency=USDT'),
       kucoinGet('https://api-futures.kucoin.com', apiKey, secret, passphrase, '/api/v1/positions'),
       get('https://api.kucoin.com/api/v1/market/allTickers'),
-      kucoinFills(apiKey, secret, passphrase)
+      kucoinFills(apiKey, secret, passphrase),
+      kucoinClosedPositions(apiKey, secret, passphrase)
     ]);
     if (accountsResult.status === 'rejected') throw accountsResult.reason;
     const tickers = new Map((tickersResult.status === 'fulfilled' ? tickersResult.value.data?.ticker : []).map(item => [String(item.symbol || '').toUpperCase(), +item.last || 0]));
     const balances = (accountsResult.value.data || []).filter(item => +item.balance > 0).map(item => { const currency = String(item.currency || '').toUpperCase(), amount = +item.balance || 0, stable = ['USDT', 'USDC', 'USD'].includes(currency), price = stable ? 1 : tickers.get(`${currency}-USDT`) || 0; return { currency, type: item.type, amount, usdt: amount * price }; });
-    const spotUsdt = balances.reduce((sum, item) => sum + item.usdt, 0), futures = futuresResult.status === 'fulfilled' ? futuresResult.value.data || {} : {}, futureUsdt = +futures.accountEquity || +futures.availableBalance || 0, positions = positionsResult.status === 'fulfilled' ? positionsResult.value.data || [] : [], fills = fillsResult.status === 'fulfilled' ? fillsResult.value.fills : [];
-    json(response, 200, { spotUsdt, futureUsdt, totalUsdt: spotUsdt + futureUsdt, balances, positions, fills, errors: [...(futuresResult.status === 'rejected' ? [futuresResult.reason.message] : []), ...(positionsResult.status === 'rejected' ? [positionsResult.reason.message] : []), ...(fillsResult.status === 'fulfilled' ? fillsResult.value.errors : [fillsResult.reason.message])] });
+    const spotUsdt = balances.reduce((sum, item) => sum + item.usdt, 0), futures = futuresResult.status === 'fulfilled' ? futuresResult.value.data || {} : {}, futureUsdt = +futures.accountEquity || +futures.availableBalance || 0, positions = positionsResult.status === 'fulfilled' ? positionsResult.value.data || [] : [], fills = fillsResult.status === 'fulfilled' ? fillsResult.value.fills : [], closedPositions = historyResult.status === 'fulfilled' ? historyResult.value.positions : [];
+    json(response, 200, { spotUsdt, futureUsdt, totalUsdt: spotUsdt + futureUsdt, balances, positions, fills, closedPositions, errors: [...(futuresResult.status === 'rejected' ? [futuresResult.reason.message] : []), ...(positionsResult.status === 'rejected' ? [positionsResult.reason.message] : []), ...(fillsResult.status === 'fulfilled' ? fillsResult.value.errors : [fillsResult.reason.message]), ...(historyResult.status === 'fulfilled' ? historyResult.value.errors : [historyResult.reason.message])] });
   } catch (error) { json(response, 400, { error: error.message || 'Falha ao consultar a KuCoin.' }); } }); }
   const pathname = new URL(request.url, `http://${host}:${port}`).pathname;
   const relative = pathname === '/' ? 'index.html' : decodeURIComponent(pathname).replace(/^\/+/, '');
