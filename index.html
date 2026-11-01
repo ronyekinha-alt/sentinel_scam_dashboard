@@ -1088,8 +1088,10 @@
         <label>API Key <input id="kucoinApiKey" type="password" autocomplete="off" placeholder="Cole somente no painel local" /></label>
         <label>Secret <input id="kucoinSecret" type="password" autocomplete="off" placeholder="Nunca envie pelo chat" /></label>
         <label>Senha da API <input id="kucoinPassphrase" type="password" autocomplete="off" placeholder="A senha criada junto com a chave" /></label>
+        <label class="check"><input id="kucoinRemember" type="checkbox" /> Lembrar neste computador</label>
         <button id="kucoinRefreshButton" class="primary" type="button">Ler conta KuCoin</button>
-        <p id="kucoinStatus" class="muted">As credenciais ficam apenas nesta sessão do navegador e são usadas somente para chamadas de leitura.</p>
+        <button id="kucoinForgetButton" type="button" class="secondary">Esquecer chaves</button>
+        <p id="kucoinStatus" class="muted">As credenciais só serão salvas se “Lembrar neste computador” estiver marcado; as chamadas continuam somente de leitura.</p>
       </div>
       <section class="stats" id="kucoinMetrics"><div class="empty">Informe as três credenciais para consultar a conta.</div></section>
       <div class="section-heading kucoin-balance-heading"><div><p class="eyebrow">HISTÓRICO DE SALDO · KUCOIN</p><h3>Evolução por semana</h3></div><p class="muted">Registra um snapshot ao consultar o saldo; valores antigos não são inventados.</p></div>
