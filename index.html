@@ -1082,6 +1082,21 @@
         <p id="mexcStatus" class="muted">Importa fills dos pares spot informados e ordens de futuros dos últimos 90 dias. A MEXC exige um par para consultar fills spot.</p>
       </div>
     </section>
+    <section class="panel kucoin-panel" id="kucoinPanel">
+      <div class="section-heading"><div><p class="eyebrow">KUCOIN · SOMENTE LEITURA</p><h2>Conta, saldo e histórico</h2></div><p class="muted">Consulta saldo, posições e execuções; não envia ordens, transferências nem saques.</p></div>
+      <div class="controls" aria-label="Consulta da conta KuCoin">
+        <label>API Key <input id="kucoinApiKey" type="password" autocomplete="off" placeholder="Cole somente no painel local" /></label>
+        <label>Secret <input id="kucoinSecret" type="password" autocomplete="off" placeholder="Nunca envie pelo chat" /></label>
+        <label>Senha da API <input id="kucoinPassphrase" type="password" autocomplete="off" placeholder="A senha criada junto com a chave" /></label>
+        <button id="kucoinRefreshButton" class="primary" type="button">Ler conta KuCoin</button>
+        <p id="kucoinStatus" class="muted">As credenciais ficam apenas nesta sessão do navegador e são usadas somente para chamadas de leitura.</p>
+      </div>
+      <section class="stats" id="kucoinMetrics"><div class="empty">Informe as três credenciais para consultar a conta.</div></section>
+      <div class="section-heading kucoin-balance-heading"><div><p class="eyebrow">HISTÓRICO DE SALDO · KUCOIN</p><h3>Evolução por semana</h3></div><p class="muted">Registra um snapshot ao consultar o saldo; valores antigos não são inventados.</p></div>
+      <div class="table-wrap"><table><thead><tr><th>Semana</th><th>Data do snapshot</th><th>Saldo (US$)</th><th>Variação</th></tr></thead><tbody id="kucoinBalanceHistoryBody"><tr><td colspan="4" class="empty">Consulte a KuCoin para registrar o primeiro saldo.</td></tr></tbody></table></div>
+      <div class="section-heading kucoin-history-heading"><div><p class="eyebrow">EXECUÇÕES DE FUTUROS · KUCOIN</p><h3>Histórico recente</h3></div><p class="muted">Dados disponíveis pela API dentro da janela de retenção da corretora.</p></div>
+      <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Lado</th><th>Preço</th><th>Quantidade</th><th>Taxa</th><th>Data</th></tr></thead><tbody id="kucoinFillsBody"><tr><td colspan="6" class="empty">Consulte a KuCoin para carregar execuções.</td></tr></tbody></table></div>
+    </section>
     <section class="panel" id="backtestPanel">
       <div class="section-heading"><div><p class="eyebrow">SIMULAÇÃO HISTÓRICA</p><h2>Validação do setup</h2></div><p class="muted">Candles reais · sem taxas, slippage ou funding · alvo 2R</p></div>
       <div class="controls" aria-label="Configuração da simulação">
