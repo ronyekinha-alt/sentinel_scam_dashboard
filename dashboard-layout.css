@@ -192,6 +192,35 @@ body.sentinel-light-dashboard .dashboard-hamburger,
 body.sentinel-light-dashboard .dashboard-breadcrumb{color:#28725b!important;}
 body.sentinel-light-dashboard .topbar .pill{background:#c9f0dc!important;color:#075d47!important;}
 
+/* Moldura permanente em verde escuro KuCoin. */
+body.sentinel-light-dashboard .dashboard-sidebar{
+  background:linear-gradient(180deg,#075d47 0%,#064d3c 100%)!important;
+  border-right-color:#0d8a68!important;
+  color:#f2fff8!important;
+}
+body.sentinel-light-dashboard .dashboard-brand{color:#fff!important;}
+body.sentinel-light-dashboard .dashboard-mark{background:#14b88a!important;color:#fff!important;}
+body.sentinel-light-dashboard .dashboard-menu-label,
+body.sentinel-light-dashboard .dashboard-side-status p{color:#bcebd9!important;}
+body.sentinel-light-dashboard .dashboard-nav-item{color:#ebfff5!important;}
+body.sentinel-light-dashboard .dashboard-nav-item span{color:#aee8d3!important;}
+body.sentinel-light-dashboard .dashboard-nav-item:hover,
+body.sentinel-light-dashboard .dashboard-nav-item.active{background:#0c8d69!important;color:#fff!important;}
+body.sentinel-light-dashboard .dashboard-side-status{border-top-color:#218e70!important;}
+body.sentinel-light-dashboard .dashboard-side-status div{color:#c9f5e2!important;}
+body.sentinel-light-dashboard .dashboard-side-status b{color:#fff!important;}
+body.sentinel-light-dashboard .topbar{
+  background:linear-gradient(90deg,#075d47,#08765a)!important;
+  border-bottom-color:#20ad82!important;
+  box-shadow:0 2px 12px rgba(4,74,57,.24)!important;
+}
+body.sentinel-light-dashboard .topbar h1,
+body.sentinel-light-dashboard .dashboard-breadcrumb b{color:#fff!important;}
+body.sentinel-light-dashboard .dashboard-hamburger,
+body.sentinel-light-dashboard .dashboard-breadcrumb,
+body.sentinel-light-dashboard .dashboard-breadcrumb i{color:#cbf7e4!important;}
+body.sentinel-light-dashboard .topbar .pill{background:#c9f0dc!important;color:#075d47!important;}
+
 /* Cabeçalhos sage: cada texto auxiliar também fica preto, sem exceções herdadas. */
 body.sentinel-light-dashboard #scannerAuditPanel>.section-heading p,body.sentinel-light-dashboard #scannerAuditPanel>.section-heading label,body.sentinel-light-dashboard #scannerAuditPanel>.section-heading span,body.sentinel-light-dashboard #signalsPanel>.section-heading p,body.sentinel-light-dashboard #signalsPanel>.section-heading label,body.sentinel-light-dashboard #signalsPanel>.section-heading span,body.sentinel-light-dashboard #importedTradesPanel>.section-heading p,body.sentinel-light-dashboard #importedTradesPanel>.section-heading label,body.sentinel-light-dashboard #importedTradesPanel>.section-heading span,body.sentinel-light-dashboard #mexcLivePanel>.section-heading p,body.sentinel-light-dashboard #mexcLivePanel>.section-heading label,body.sentinel-light-dashboard #mexcLivePanel>.section-heading span,body.sentinel-light-dashboard #mexcPanel>.section-heading p,body.sentinel-light-dashboard #mexcPanel>.section-heading label,body.sentinel-light-dashboard #mexcPanel>.section-heading span,body.sentinel-light-dashboard #backtestPanel>.section-heading p,body.sentinel-light-dashboard #backtestPanel>.section-heading label,body.sentinel-light-dashboard #backtestPanel>.section-heading span,body.sentinel-light-dashboard #rsiFinderPanel>.section-heading p,body.sentinel-light-dashboard #rsiFinderPanel>.section-heading label,body.sentinel-light-dashboard #rsiFinderPanel>.section-heading span,body.sentinel-light-dashboard #importedTradesPanel .mexc-balance-heading p,body.sentinel-light-dashboard #importedTradesPanel .mexc-balance-heading span{color:#172217!important;opacity:1!important;text-shadow:none!important;font-size:13px!important}
 body.sentinel-light-dashboard #mexcLiveStatus,body.sentinel-light-dashboard #mexcStatus,body.sentinel-light-dashboard #mexcImportStatus,body.sentinel-light-dashboard #backtestStatus,body.sentinel-light-dashboard #rsiFinderStatus{color:#344334!important;text-shadow:none!important;font-size:13px!important;opacity:1!important}
