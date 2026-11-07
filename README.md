@@ -37,6 +37,17 @@ Setup experimental de reversão em sobrevenda. Só fica elegível quando todos o
 
 Os níveis informativos são **stop de 4%** e **alvo de 8%** (R:R 2:1). O filtro de espaço técnico não prevê preço nem garante probabilidade: ele apenas evita alertas sem margem gráfica mínima para uma alta de 3%. O alerta continua como `EXPERIMENTAL · CONFIRME O GRÁFICO`; a execução, tamanho e alavancagem são decisões manuais.
 
+### 1-2-3 · tendência + rompimento · 2H
+
+Setup de continuação/reversão confirmada, disponível no scanner, no Telegram e no simulador. O sinal só é emitido após o fechamento do candle de rompimento:
+
+- **Long:** mínima do candle 2 abaixo da mínima do candle 1; mínima do candle 3 acima da do candle 2; fechamento posterior acima da máxima do candle 3.
+- **Short:** a estrutura inversa, com máxima do candle 2 acima da do candle 1, máxima do candle 3 abaixo da do candle 2 e fechamento posterior abaixo da mínima do candle 3.
+- Em ambos os lados, o preço precisa estar do lado correto das EMAs **8 e 80** no 2H, e as duas médias precisam inclinar na mesma direção nos cinco candles anteriores.
+- A entrada técnica é o rompimento da extrema do candle 3; o stop fica na extrema oposta do próprio candle 3; TP 2R e TP 3R são calculados pelo risco técnico.
+
+O relatório dedicado também registra extensões de +2%, +4%, +6% e +8% atingidas antes do stop técnico original. Isso informa a frequência dos movimentos para orientar uma futura regra de stop móvel; não presume uma regra de trailing inexistente.
+
 ## Telegram
 
 O workflow existente continua no repositório `sentinel-trade-telegram`, com sua programação preservada. Secrets necessários: `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID`.
@@ -49,7 +60,7 @@ Mesmo motor e mesmas configurações produzem os mesmos setups **para os mesmos 
 
 ## Backtest
 
-Todos os setups históricos existentes, inclusive os experimentais EMA/RSI, rompimentos 30/60 e retestes com stop/alvo fixos, ficam em `sentinel-backtest.js`. O Double Oversold Bounce usa entrada no fechamento do candle de confirmação no estudo dedicado; demais simuladores podem usar a abertura seguinte conforme sua metodologia. O histórico só consulta candles macro que já fecharam no instante do sinal.
+Todos os setups históricos existentes, inclusive os experimentais EMA/RSI, 1-2-3, rompimentos 30/60 e retestes com stop/alvo fixos, ficam em `sentinel-backtest.js`. O Double Oversold Bounce usa entrada no fechamento do candle de confirmação no estudo dedicado; os demais simuladores usam a abertura posterior quando a metodologia exigir confirmação fechada. O histórico só consulta candles macro que já fecharam no instante do sinal.
 
 Pode executar o mesmo motor no Node, sem enviar Telegram:
 
