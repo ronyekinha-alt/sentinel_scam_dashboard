@@ -87,7 +87,7 @@ function pullback1hConfirmationCriteria(extension, day, confirmation, one) {
   const confirmed = confirmation.close >= confirmation.ema51 && confirmation.aligned && confirmation.rising && (confirmation.pivot.bullish || confirmation.pattern.bullish || confirmation.momentum) && one.previousSellerExhaustion !== false;
   return { valid: macro && pullback1h && confirmed, pullback1h, confirmed };
 }
-const VERSION = '2026-10-20-multivenue-v4';
+const VERSION = '2026-11-07-123-breakout-v1';
 const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', futuresData: 'https://fapi.binance.com/futures/data', mexc: 'https://api.mexc.com/api/v3', okx: 'https://www.okx.com/api/v5', coinbase: 'https://api.coinbase.com/api/v3/brokerage/market', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', paprika: 'https://api.coinpaprika.com/v1' });
 const DEFAULTS = Object.freeze({ minScore: 90, minVolume: 1000000, assetLimit: 700, strategy: 'both', maxSignals: 20, enforceRiskPolicy: false, maxEntryDeviationPct: 2, minimumRewardRisk: 1.7, allowMexcTradfi: true });
 const INTERVALS = ['1w', '1d', '4h', '2h', '1h'];
@@ -113,7 +113,7 @@ function isUsRegularMarketSession(asOf = Date.now()) {
   const minute=Number(parts.hour)*60+Number(parts.minute), year=Number(parts.year), month=Number(parts.month)-1, day=Number(parts.day);
   return !['Sat','Sun'].includes(parts.weekday) && !isUsMarketHoliday(year,month,day) && minute>=9*60+30 && minute<16*60;
 }
-const STRATEGIES = Object.freeze({ trend: 'Tendência + pivô', 'aggressive-pullback': 'Pullback 2H + confirmação 4H', 'flexible-pullback-2h': 'Pullback 2H · diário flexível', 'ema-cross-retest-2h': 'Cruzamento EMA 9 + reteste 22/52 · 2H', 'compression-expansion-1h': '1H antecipado · Compressão + expansão', 'vwap-retest-1h-2h': 'Experimental · VWAP semanal + reteste', 'rsi-ema-recovery': 'Experimental · Recuperação RSI + EMA 8/22/80', 'double-oversold-bounce': 'Experimental · Double Oversold Bounce · 2H', 'bearish-breakdown': 'SHORT · Tendência baixista + rompimento' });
+const STRATEGIES = Object.freeze({ trend: 'Tendência + pivô', 'aggressive-pullback': 'Pullback 2H + confirmação 4H', 'flexible-pullback-2h': 'Pullback 2H · diário flexível', 'ema-cross-retest-2h': 'Cruzamento EMA 9 + reteste 22/52 · 2H', 'compression-expansion-1h': '1H antecipado · Compressão + expansão', 'vwap-retest-1h-2h': 'Experimental · VWAP semanal + reteste', 'rsi-ema-recovery': 'Experimental · Recuperação RSI + EMA 8/22/80', 'double-oversold-bounce': 'Experimental · Double Oversold Bounce · 2H', '123-trend-breakout': '1-2-3 · tendência + rompimento · 2H', 'bearish-breakdown': 'SHORT · Tendência baixista + rompimento' });
 function settings(input = {}) {
   const result = { ...DEFAULTS, ...input };
   const selectedStrategies = Array.isArray(result.strategies) ? [...new Set(result.strategies)] : null;
@@ -247,6 +247,52 @@ function evaluateDoubleOversoldBounce(asset, series, analyses, config, triggerTi
   if (score<config.minScore) return reject(`Score ${score}, abaixo do mínimo ${config.minScore}`);
   return {...asset,source:asset.source||'BINANCE',direction:'LONG',strategy:'double-oversold-bounce',strategyName:STRATEGIES['double-oversold-bounce'],setup:STRATEGIES['double-oversold-bounce'],tier:'WATCH',tierLabel:'EXPERIMENTAL · CONFIRME O GRÁFICO',triggerTimeframe:'2h',triggerLabel:'2H · sobrevenda tripla + pavio de rejeição',timeframe:'2H',score,entry,maxEntry:entry*(1+config.maxEntryDeviationPct/100),minimumRewardRisk:2,stop,tp2,tp3:tp2,target:tp2,targetLabel:'ALVO 8%',target3Label:'ALVO 8%',candleTime:series['2h'].at(-1).time,rsi:setup.rsi,adx:analyses.two.adx,volumeRatio:analyses.two.relativeVolume,context:'Experimental: macro diário acima da EMA 80 ou ascendente; Stoch RSI 2H ≤ 5, RSI ≤ 30 em 1H/2H/4H, rejeição em suporte e espaço técnico mínimo de 3% até a resistência.',trigger:`Stoch RSI 2H ${setup.stochK.toFixed(1)} · RSI 1H/2H/4H ${setup.rsi1h.toFixed(1)}/${setup.rsi.toFixed(1)}/${setup.rsi4h.toFixed(1)} · ${setup.support.label} a ${(setup.support.distance*100).toFixed(1)}% · espaço técnico ${Number.isFinite(setup.upsideToResistance)?setup.upsideToResistance.toFixed(1):'≥3'}%`,entryStretchPct:0,entryWarning:'Stop fixo 4%, alvo 8% (2:1). Só alerta com RSI ≤ 30 em 1H/2H/4H e espaço técnico mínimo de 3%; confirmar visualmente.',support:setup.support.level,resistance:setup.resistance,weeklyRise:analyses.extension.rise12,weeklyRsi:analyses.extension.weekly.rsi,lateEntryAllowed:false,riskPct:.04,maxLeverage:3,riskTier:'EXPERIMENTAL_3X',engineVersion:VERSION};
 }
+function oneTwoThreeTrendBreakoutCriteria(series) {
+  const candles=series['2h'];
+  if (!Array.isArray(candles) || candles.length<86) return {valid:false,reason:'Candles insuficientes para o padrão 1-2-3'};
+  const [first,second,third,breakout]=candles.slice(-4);
+  const closes=candles.map(c=>c.close), ema8=ema(closes,8), ema80=ema(closes,80), i=candles.length-1;
+  const longTrend=breakout.close>ema8[i]&&breakout.close>ema80[i]&&ema8[i]>=ema8[i-5]&&ema80[i]>=ema80[i-5];
+  const shortTrend=breakout.close<ema8[i]&&breakout.close<ema80[i]&&ema8[i]<=ema8[i-5]&&ema80[i]<=ema80[i-5];
+  const longPattern=second.low<first.low&&third.low>second.low&&breakout.close>third.high;
+  const shortPattern=second.high>first.high&&third.high<second.high&&breakout.close<third.low;
+  if (longPattern&&longTrend) return {valid:true,direction:'LONG',entry:third.high,stop:third.low,first,second,third,breakout,ema8:ema8[i],ema80:ema80[i]};
+  if (shortPattern&&shortTrend) return {valid:true,direction:'SHORT',entry:third.low,stop:third.high,first,second,third,breakout,ema8:ema8[i],ema80:ema80[i]};
+  return {valid:false,reason:longPattern||shortPattern?'Rompimento ocorreu, mas preço e inclinação não estão alinhados com EMA 8 e EMA 80 no 2H':'Sequência 1-2-3 e rompimento fechado ainda não confirmados'};
+}
+function evaluateOneTwoThreeTrendBreakout(asset, series, analyses, config, triggerTimeframe, reject) {
+  if (triggerTimeframe!=='2h') return reject('O setup 1-2-3 usa confirmação fechada no 2H');
+  const setup=oneTwoThreeTrendBreakoutCriteria(series);
+  if (!setup.valid) return reject(setup.reason);
+  const {direction,entry,stop}=setup, risk=direction==='LONG'?entry-stop:stop-entry, tp2=direction==='LONG'?entry+2*risk:entry-2*risk, tp3=direction==='LONG'?entry+3*risk:entry-3*risk;
+  if (![entry,stop,risk,tp2,tp3].every(Number.isFinite)||risk<=0||tp2<=0) return reject('Níveis do padrão 1-2-3 inválidos');
+  const riskPct=risk/entry;
+  if (riskPct>.08) return reject(`Stop técnico do 1-2-3 muito distante (${(riskPct*100).toFixed(1)}%)`);
+  if (Math.abs(tp2/entry-1)<.03) return reject('Alvo 2R do 1-2-3 abaixo do mínimo de 3%');
+  const tickerPrice=Number(asset.price??asset.lastPrice), latestPrice=Number.isFinite(tickerPrice)&&tickerPrice>0?tickerPrice:setup.breakout.close;
+  const maxEntry=direction==='LONG'?(tp2+config.minimumRewardRisk*stop)/(1+config.minimumRewardRisk):(tp2+config.minimumRewardRisk*stop)/(1+config.minimumRewardRisk);
+  if (direction==='LONG') {
+    if (latestPrice<entry) return reject('Rompimento 1-2-3 perdeu a máxima do candle 3 antes da leitura');
+    if (latestPrice<=stop) return reject('Sinal 1-2-3 vencido: preço já perdeu o stop');
+    if (latestPrice>=tp2) return reject('Sinal 1-2-3 vencido: preço já atingiu o TP 2R');
+    if (latestPrice>maxEntry) return reject(`Entrada 1-2-3 esticada: excede o limite para manter ${config.minimumRewardRisk.toFixed(1)}R`);
+  } else {
+    if (latestPrice>entry) return reject('Rompimento 1-2-3 perdeu a mínima do candle 3 antes da leitura');
+    if (latestPrice>=stop) return reject('Sinal SHORT 1-2-3 vencido: preço já rompeu o stop');
+    if (latestPrice<=tp2) return reject('Sinal SHORT 1-2-3 vencido: preço já atingiu o TP 2R');
+    if (latestPrice<maxEntry) return reject(`Entrada SHORT 1-2-3 esticada: excede o limite para manter ${config.minimumRewardRisk.toFixed(1)}R`);
+  }
+  const deviation=Math.abs(latestPrice/entry-1)*100;
+  if (config.maxEntryDeviationPct>0&&deviation>config.maxEntryDeviationPct) return reject(`Entrada 1-2-3 distante do rompimento (${deviation.toFixed(1)}%)`);
+  let score=90;
+  if (analyses.two.relativeVolume>=1.05) score+=4;
+  if (analyses.two.strong) score+=3;
+  if ((direction==='LONG'&&analyses.two.rsi>=50)||(direction==='SHORT'&&analyses.two.rsi<=50)) score+=3;
+  score=Math.min(score,100);
+  if(score<config.minScore) return reject(`Score ${score}, abaixo do mínimo ${config.minScore}`);
+  const side=direction==='LONG'?'compra':'venda', highRisk=riskPct>.04;
+  return {...asset,source:asset.source||'BINANCE',direction,strategy:'123-trend-breakout',strategyName:STRATEGIES['123-trend-breakout'],setup:STRATEGIES['123-trend-breakout'],tier:'VALIDATED',tierLabel:'ENTRADA VALIDADA · ROMPIMENTO FECHADO',triggerTimeframe:'2h',triggerLabel:'2H',timeframe:'2H',score,entry,maxEntry:direction==='LONG'?maxEntry:undefined,minEntry:direction==='SHORT'?maxEntry:undefined,minimumRewardRisk:config.minimumRewardRisk,stop,tp2,tp3,target:tp2,candleTime:setup.breakout.time,rsi:analyses.two.rsi,adx:analyses.two.adx,volumeRatio:analyses.two.relativeVolume,context:`${direction} 1-2-3 no 2H: preço e inclinação alinhados com EMA 8 e EMA 80; entrada no rompimento fechado do candle 3.`,trigger:`1-2-3 de ${side} · rompimento fechado · EMA 8/80 alinhadas · RSI ${analyses.two.rsi.toFixed(1)}`,entryStretchPct:deviation,entryWarning:highRisk?'Risco acima de 4%; reduzir exposição e confirmar o gráfico':'Stop na extrema do candle 3 · alvo base 2R.',support:direction==='LONG'?stop:undefined,resistance:direction==='SHORT'?stop:undefined,weeklyRise:analyses.extension.rise12,weeklyRsi:analyses.extension.weekly.rsi,lateEntryAllowed:false,riskPct,maxLeverage:config.enforceRiskPolicy?(highRisk?1:2):3,riskTier:config.enforceRiskPolicy?(highRisk?'HIGH_RISK_SPOT':'STANDARD_LEVERAGE_2X'):null,engineVersion:VERSION};
+}
 function bearishBreakdownCriteria(series, analyses, timeframe) {
   const candles=series[timeframe], timing={'1h':analyses.one,'2h':analyses.two,'4h':analyses.four}[timeframe];
   if (!Array.isArray(candles) || candles.length<80 || !timing) return {valid:false,reason:'Candles insuficientes para o rompimento baixista'};
@@ -295,6 +341,7 @@ function evaluateAnalyses(asset, series, analyses, strategy, options = DEFAULTS,
   if (!analyses || !Object.hasOwn(STRATEGIES,strategy) || !['1h','2h','4h','8h','1d'].includes(triggerTimeframe)) return reject('Dados de candles insuficientes ou configuração inválida');
   if (strategy==='bearish-breakdown') return evaluateBearishBreakdown(asset,series,analyses,config,triggerTimeframe,reject);
   if (strategy==='double-oversold-bounce') return evaluateDoubleOversoldBounce(asset,series,analyses,config,triggerTimeframe,reject);
+  if (strategy==='123-trend-breakout') return evaluateOneTwoThreeTrendBreakout(asset,series,analyses,config,triggerTimeframe,reject);
   const { extension, day:d, four, two, one } = analyses;
   const recovery=strategy==='rsi-ema-recovery'?rsiEmaRecoveryCriteria(series,analyses,triggerTimeframe):null;
   const timing = recovery?.analysis || { '1h':one,'2h':two,'4h':four,'1d':d }[triggerTimeframe], triggerSeries = recovery?.candles || series[triggerTimeframe], emaCross = strategy==='ema-cross-retest-2h' ? emaCrossRetest2hCriteria(series,analyses) : null, early1h=strategy==='compression-expansion-1h'?compressionExpansion1hCriteria(series,analyses):null, vwap=strategy==='vwap-retest-1h-2h'?vwapRetestCriteria(series,analyses,triggerTimeframe):null;
@@ -347,13 +394,13 @@ function evaluate(asset, series, options = DEFAULTS, diagnostics = null) {
   if (!Number.isFinite(volume) || volume < config.minVolume) { if (diagnostics) diagnostics.push({strategy:'geral',reason:`Volume do par abaixo de US$ ${config.minVolume.toLocaleString('en-US')}`}); return null; }
   const strategies = config.strategies || (config.strategy === 'both' ? Object.keys(STRATEGIES) : [config.strategy]);
   const attempts = strategies.flatMap(strategy => {
-    const timeframes=strategy==='rsi-ema-recovery'?['8h','4h','2h','1h']:strategy==='compression-expansion-1h'?['1h']:strategy==='vwap-retest-1h-2h'?['1h','2h']:strategy==='flexible-pullback-2h'||strategy==='ema-cross-retest-2h'||strategy==='double-oversold-bounce'?['2h']:['1h','2h','4h'];
+    const timeframes=strategy==='rsi-ema-recovery'?['8h','4h','2h','1h']:strategy==='compression-expansion-1h'?['1h']:strategy==='vwap-retest-1h-2h'?['1h','2h']:strategy==='flexible-pullback-2h'||strategy==='ema-cross-retest-2h'||strategy==='double-oversold-bounce'||strategy==='123-trend-breakout'?['2h']:['1h','2h','4h'];
     return timeframes.map(triggerTimeframe=>{const trace={strategy:`${strategy} · ${triggerTimeframe.toUpperCase()}`,reason:null};const signal=evaluateAnalyses(asset,series,analyses,strategy,config,triggerTimeframe,trace);if(diagnostics)diagnostics.push(trace);return signal;});
   });
   return attempts.filter(Boolean).sort(compareSignals)[0] || null;
 }
 function compareSignals(a,b) {
-  const priority={trend:0,'aggressive-pullback':1,'flexible-pullback-2h':2,'ema-cross-retest-2h':3,'compression-expansion-1h':4,'vwap-retest-1h-2h':5,'double-oversold-bounce':6,'bearish-breakdown':7,'rsi-ema-recovery':99};
+  const priority={trend:0,'aggressive-pullback':1,'flexible-pullback-2h':2,'ema-cross-retest-2h':3,'compression-expansion-1h':4,'vwap-retest-1h-2h':5,'double-oversold-bounce':6,'123-trend-breakout':7,'bearish-breakdown':8,'rsi-ema-recovery':99};
   return (priority[a.strategy]??99)-(priority[b.strategy]??99) || b.score-a.score || (a.rank||99999)-(b.rank||99999) || a.symbol.localeCompare(b.symbol);
 }
 function consolidate(signals, limit = 20) { const seen=new Set(); return signals.slice().sort(compareSignals).filter(s=>{if(seen.has(s.symbol))return false; seen.add(s.symbol); return true;}).slice(0,limit); }
