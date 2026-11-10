@@ -1055,58 +1055,6 @@
       <div class="section-heading"><div><p class="eyebrow">OPORTUNIDADES ATUAIS · TOP 20</p><h2>Setups qualificados</h2></div><p class="muted">Melhor critério por ativo · sem entrada esticada · futuros até 3×</p></div>
       <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Score</th><th>Contexto macro</th><th>Validações</th><th>Entrada</th><th>Stop</th><th>TP 2R / 3R</th><th></th></tr></thead><tbody id="signalsBody"><tr><td colspan="8" class="empty">Nenhuma análise executada ainda.</td></tr></tbody></table></div>
     </section>
-    <section class="panel" id="importedTradesPanel">
-      <div class="section-heading"><div><p class="eyebrow">HISTÓRICO IMPORTADO · MEXC</p><h2>Operações lidas da corretora</h2></div><div><label class="check"><input id="mexcHistoryAuto" type="checkbox" checked /> Atualizar a cada 20 s</label><button id="mexcHistoryRefreshButton" class="primary" type="button">Atualizar posições</button><p class="muted">Consulta somente leitura; não compõe as métricas do diário.</p></div></div>
-      <section class="stats mexc-metrics-primary" id="mexcMetricsPrimary"><div class="empty">Importe as operações da MEXC para ver as métricas reais.</div></section>
-      <section class="stats mexc-metrics-performance" id="mexcMetricsPerformance"></section>
-      <p id="mexcMetricsNote" class="muted"></p>
-      <div class="section-heading"><div><p class="eyebrow">PADRÕES DAS OPERAÇÕES REAIS</p><h3>Qual dia da semana foi melhor para operar?</h3></div><div><button id="mexcWeekdayRefreshButton" class="secondary mini" type="button">Atualizar análise</button><p class="muted" id="mexcWeekdayNote">Usa todas as posições fechadas importadas da MEXC, no horário de Brasília.</p></div></div>
-      <div class="table-wrap"><table><thead><tr><th>Dia</th><th>Trades</th><th>Wins</th><th>Losses</th><th>% acerto</th><th>PnL líquido</th></tr></thead><tbody id="mexcWeekdayBody"><tr><td colspan="6" class="empty">Importe ou atualize as posições para analisar os dias.</td></tr></tbody></table></div>
-      <div class="section-heading mexc-balance-heading"><div><p class="eyebrow">HISTÓRICO DE SALDO</p><h3>Saldo MEXC por período</h3></div><p class="muted">Registra um snapshot quando o saldo é consultado; valores antigos não são inventados.</p></div>
-      <div class="table-wrap"><table><thead><tr><th>Semana</th><th>Mês</th><th>Data do snapshot</th><th>Saldo (US$)</th><th>Saldo (R$)</th><th>Variação</th></tr></thead><tbody id="mexcBalanceHistoryBody"><tr><td colspan="6" class="empty">Atualize as posições para registrar o primeiro saldo.</td></tr></tbody></table></div>
-      <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Total de trades</th><th>Wins</th><th>Losses</th><th>% acerto</th><th>Gains</th><th>Losses</th><th>PnL líquido</th></tr></thead><tbody id="mexcResultsBody"><tr><td colspan="8" class="empty">Nenhuma operação fechada importada ainda.</td></tr></tbody></table></div>
-      <div class="controls mexc-results-pagination" id="mexcResultsPagination" hidden><label>Ativos por página <select id="mexcResultsPageSize"><option value="10">10</option><option value="20">20</option><option value="30">30</option></select></label><button id="mexcResultsPrevious" class="secondary mini" type="button">← Anterior</button><span id="mexcResultsPageText" class="muted"></span><button id="mexcResultsNext" class="secondary mini" type="button">Próxima →</button></div>
-      <div class="table-wrap" id="importedTradesDetail" hidden><table><thead><tr><th>Ativo</th><th>Tipo</th><th>Preço executado</th><th>Data</th><th>Detalhes</th></tr></thead><tbody id="importedTradesBody"><tr><td colspan="5" class="empty">Detalhamento oculto.</td></tr></tbody></table></div>
-    </section>
-    <section class="panel" id="mexcLivePanel">
-      <div class="section-heading"><div><p class="eyebrow">MEXC · POSIÇÕES REAIS EM ABERTO</p><h2>Acompanhamento ao vivo</h2></div><div><label class="check"><input id="mexcLiveAuto" type="checkbox" checked /> Atualizar a cada 20 s</label><button id="mexcPositionsButton" class="primary">Atualizar posições</button></div></div>
-      <p id="mexcLiveStatus" class="muted">Importe ou atualize as posições para acompanhar operações em aberto.</p>
-      <section class="stats" id="mexcLiveMetrics"><div class="empty">Nenhuma posição consultada.</div></section>
-      <div class="table-wrap"><table><thead><tr><th>Ativo / direção</th><th>Entrada → atual</th><th>Alavancagem / margem</th><th>PnL estimado</th><th>SL / TP</th><th>Liquidação</th><th>Status</th></tr></thead><tbody id="mexcPositionsBody"><tr><td colspan="7" class="empty">Nenhuma posição consultada.</td></tr></tbody></table></div>
-    </section>
-    <section class="panel" id="mexcPanel">
-      <div class="section-heading"><div><p class="eyebrow">IMPORTAÇÃO MEXC · SOMENTE LEITURA</p><h2>Trazer operações realizadas</h2></div><p class="muted">Nenhuma ordem, saque ou movimentação é autorizado pelo painel.</p></div>
-      <div class="controls" aria-label="Importação de operações MEXC">
-        <label>API Key <input id="mexcApiKey" type="password" autocomplete="off" placeholder="Cole somente no painel local" /></label>
-        <label>Secret Key <input id="mexcSecret" type="password" autocomplete="off" placeholder="Nunca envie pelo chat" /></label>
-        <label>Pares Spot <input id="mexcSpotSymbol" value="BTCUSDT" maxlength="140" placeholder="BTCUSDT, ETHUSDT" /></label>
-        <label class="check"><input id="mexcRemember" type="checkbox" /> Lembrar chaves neste computador</label>
-        <button id="mexcImportButton" class="primary">Importar MEXC</button>
-        <button id="mexcForgetButton" type="button" class="secondary">Esquecer chaves</button>
-        <p id="mexcStatus" class="muted">Importa fills dos pares spot informados e ordens de futuros dos últimos 90 dias. A MEXC exige um par para consultar fills spot.</p>
-      </div>
-    </section>
-    <section class="panel kucoin-panel" id="kucoinPanel">
-      <div class="section-heading"><div><p class="eyebrow">KUCOIN · SOMENTE LEITURA</p><h2>Conta, saldo e histórico</h2></div><p class="muted">Consulta saldo, posições e execuções; não envia ordens, transferências nem saques.</p></div>
-      <div class="controls" aria-label="Consulta da conta KuCoin">
-        <label>API Key <input id="kucoinApiKey" type="password" autocomplete="off" placeholder="Cole somente no painel local" /></label>
-        <label>Secret <input id="kucoinSecret" type="password" autocomplete="off" placeholder="Nunca envie pelo chat" /></label>
-        <label>Senha da API <input id="kucoinPassphrase" type="password" autocomplete="off" placeholder="A senha criada junto com a chave" /></label>
-        <label class="check"><input id="kucoinRemember" type="checkbox" /> Lembrar neste computador</label>
-        <button id="kucoinRefreshButton" class="primary" type="button">Ler conta KuCoin</button>
-        <button id="kucoinForgetButton" type="button" class="secondary">Esquecer chaves</button>
-        <p id="kucoinStatus" class="muted">As credenciais só serão salvas se “Lembrar neste computador” estiver marcado; as chamadas continuam somente de leitura.</p>
-      </div>
-      <section class="stats" id="kucoinMetrics"><div class="empty">Informe as três credenciais para consultar a conta.</div></section>
-      <section class="stats" id="kucoinPerformanceMetrics"><div class="empty">O resumo de resultados aparecerá após a leitura do histórico.</div></section>
-      <div class="section-heading kucoin-history-heading"><div><p class="eyebrow">PADRÕES DAS OPERAÇÕES REAIS · KUCOIN</p><h3>Qual dia da semana foi melhor para operar?</h3></div><p id="kucoinWeekdayNote" class="muted">A leitura do histórico preencherá este resumo.</p></div>
-      <div class="table-wrap"><table><thead><tr><th>Dia</th><th>Trades</th><th>Wins</th><th>Losses</th><th>% acerto</th><th>PnL líquido</th></tr></thead><tbody id="kucoinWeekdayBody"><tr><td colspan="6" class="empty">Consulte a KuCoin para analisar as posições fechadas.</td></tr></tbody></table></div>
-      <div class="section-heading kucoin-balance-heading"><div><p class="eyebrow">HISTÓRICO DE SALDO · KUCOIN</p><h3>Evolução por semana</h3></div><p class="muted">Registra um snapshot ao consultar o saldo; valores antigos não são inventados.</p></div>
-      <div class="table-wrap"><table><thead><tr><th>Semana</th><th>Data do snapshot</th><th>Saldo (US$)</th><th>Variação</th></tr></thead><tbody id="kucoinBalanceHistoryBody"><tr><td colspan="4" class="empty">Consulte a KuCoin para registrar o primeiro saldo.</td></tr></tbody></table></div>
-      <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Total de trades</th><th>Wins</th><th>Losses</th><th>% acerto</th><th>Gains</th><th>Losses</th><th>PnL líquido</th></tr></thead><tbody id="kucoinAssetResultsBody"><tr><td colspan="8" class="empty">Consulte a KuCoin para analisar os resultados por ativo.</td></tr></tbody></table></div>
-      <div class="section-heading kucoin-history-heading"><div><p class="eyebrow">EXECUÇÕES DE FUTUROS · KUCOIN</p><h3>Histórico recente</h3></div><p class="muted">Dados disponíveis pela API dentro da janela de retenção da corretora.</p></div>
-      <div class="table-wrap"><table><thead><tr><th>Ativo</th><th>Lado</th><th>Preço</th><th>Quantidade</th><th>Taxa</th><th>Data</th></tr></thead><tbody id="kucoinFillsBody"><tr><td colspan="6" class="empty">Consulte a KuCoin para carregar execuções.</td></tr></tbody></table></div>
-    </section>
     <section class="panel" id="backtestPanel">
       <div class="section-heading"><div><p class="eyebrow">SIMULAÇÃO HISTÓRICA</p><h2>Validação do setup</h2></div><p class="muted">Candles reais · sem taxas, slippage ou funding · alvo 2R</p></div>
       <div class="controls" aria-label="Configuração da simulação">
