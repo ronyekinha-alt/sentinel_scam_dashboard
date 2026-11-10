@@ -87,17 +87,17 @@ function pullback1hConfirmationCriteria(extension, day, confirmation, one) {
   const confirmed = confirmation.close >= confirmation.ema51 && confirmation.aligned && confirmation.rising && (confirmation.pivot.bullish || confirmation.pattern.bullish || confirmation.momentum) && one.previousSellerExhaustion !== false;
   return { valid: macro && pullback1h && confirmed, pullback1h, confirmed };
 }
-const VERSION = '2026-11-07-123-breakout-v1';
-const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', futuresData: 'https://fapi.binance.com/futures/data', mexc: 'https://api.mexc.com/api/v3', okx: 'https://www.okx.com/api/v5', coinbase: 'https://api.coinbase.com/api/v3/brokerage/market', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', paprika: 'https://api.coinpaprika.com/v1' });
+const VERSION = '2026-11-10-venues-binance-okx-bybit-kucoin-v1';
+const SOURCES = Object.freeze({ spot: 'https://data-api.binance.vision/api/v3', futures: 'https://fapi.binance.com/fapi/v1', futuresData: 'https://fapi.binance.com/futures/data', okx: 'https://www.okx.com/api/v5', bybit: 'https://api.bybit.com/v5/market', kucoin: 'https://api.kucoin.com/api/v1', mexc: 'https://api.mexc.com/api/v3', ranking: 'https://api.coingecko.com/api/v3', cmc: 'https://pro-api.coinmarketcap.com/public-api/v3', paprika: 'https://api.coinpaprika.com/v1' });
 const DEFAULTS = Object.freeze({ minScore: 90, minVolume: 1000000, assetLimit: 700, strategy: 'both', maxSignals: 20, enforceRiskPolicy: false, maxEntryDeviationPct: 2, minimumRewardRisk: 1.7, allowMexcTradfi: true });
 const INTERVALS = ['1w', '1d', '4h', '2h', '1h'];
 const STABLE_BASES = new Set(['USDT','USDC','USDE','USD1','DAI','FDUSD','TUSD','USDD','BUSD','PYUSD','USDP','FRAX','GUSD','EURC','EURS','USDY']);
-const VENUE_PRIORITY = Object.freeze(['BINANCE','OKX','MEXC','COINBASE']);
+const VENUE_PRIORITY = Object.freeze(['BINANCE','OKX','BYBIT','KUCOIN']);
 const QUOTE_PRIORITY = Object.freeze(['USDT','USDC']);
 function baseOf(symbol) { return String(symbol||'').toUpperCase().replace(/[-_/]/g,'').replace(/(USDT|USDC|USD)$/, ''); }
 function isStableAsset(symbol) { return STABLE_BASES.has(baseOf(symbol)); }
 function canonicalSymbol(base) { return `${baseOf(base)}USDT`; }
-function sourceForAsset(asset = {}) { return ({ BINANCE:SOURCES.spot, OKX:SOURCES.okx, MEXC:SOURCES.mexc, COINBASE:SOURCES.coinbase })[String(asset.source||'BINANCE').toUpperCase()] || SOURCES.spot; }
+function sourceForAsset(asset = {}) { return ({ BINANCE:SOURCES.spot, OKX:SOURCES.okx, BYBIT:SOURCES.bybit, KUCOIN:SOURCES.kucoin, MEXC:SOURCES.mexc })[String(asset.source||'BINANCE').toUpperCase()] || SOURCES.spot; }
 function sourceLabel(asset = {}) { const venue=String(asset.source||'BINANCE').toUpperCase(), pair=asset.exchangeSymbol||asset.symbol, quote=asset.quoteAsset||'USDT'; return `${venue} · ${pair||canonicalSymbol(asset.symbol)}${quote&&pair&&!String(pair).endsWith(quote)?`/${quote}`:''}`; }
 // Símbolos exclusivos das versões tokenizadas. Tickers genéricos (como META ou COIN)
 // não entram aqui, pois também podem representar projetos cripto legítimos.
@@ -439,10 +439,10 @@ async function marketUniverse(getJson, options = DEFAULTS) {
   }
   function selectVenuePair(book,base,minVolume=0){const pairs=book?.pairsByBase.get(base)||[];return pairs.filter(pair=>pair.volume>=minVolume).sort((a,b)=>quoteRank(a.quoteAsset)-quoteRank(b.quoteAsset)||b.volume-a.volume)[0]||null;}
   async function loadBinance(){const [info,quotes]=await Promise.all([getJson(`${SOURCES.spot}/exchangeInfo`),getJson(`${SOURCES.spot}/ticker/24hr`)]);if(!Array.isArray(info.symbols)||!Array.isArray(quotes))throw new Error('Universo Binance inválido');const book=createVenueBook('BINANCE'),quoteMap=new Map(quotes.map(q=>[q.symbol,q])),valid=info.symbols.filter(p=>p.status==='TRADING'&&p.isSpotTradingAllowed!==false);for(const p of valid){const q=quoteMap.get(p.symbol)||{};registerUsdQuote(book,baseOf(p.baseAsset||p.symbol),String(p.quoteAsset||'').toUpperCase(),q.lastPrice);}for(const p of valid){const q=quoteMap.get(p.symbol)||{};addVenuePair(book,baseOf(p.baseAsset||p.symbol),p.quoteAsset,p.symbol,q.quoteVolume,q.lastPrice,p);}return book;}
-  async function loadMexc(){const [info,quotes]=await Promise.all([getJson(`${SOURCES.mexc}/exchangeInfo`),getJson(`${SOURCES.mexc}/ticker/24hr`)]);if(!Array.isArray(info.symbols)||!Array.isArray(quotes))throw new Error('Universo MEXC inválido');const book=createVenueBook('MEXC'),quoteMap=new Map(quotes.map(q=>[q.symbol,q])),valid=info.symbols.filter(p=>p.status==='1'&&p.isSpotTradingAllowed!==false);for(const p of valid){const q=quoteMap.get(p.symbol)||{};registerUsdQuote(book,baseOf(p.baseAsset||p.baseCoin||p.symbol),String(p.quoteAsset||'').toUpperCase(),q.lastPrice);}for(const p of valid){const q=quoteMap.get(p.symbol)||{};addVenuePair(book,baseOf(p.baseAsset||p.baseCoin||p.symbol),p.quoteAsset,p.symbol,q.quoteVolume,q.lastPrice,p);}return book;}
   async function loadOkx(){const [info,tickerPayload]=await Promise.all([getJson(`${SOURCES.okx}/public/instruments?instType=SPOT`),getJson(`${SOURCES.okx}/market/tickers?instType=SPOT`)]);const instruments=info?.data,quotes=tickerPayload?.data;if(!Array.isArray(instruments)||!Array.isArray(quotes))throw new Error('Universo OKX inválido');const book=createVenueBook('OKX'),quoteMap=new Map(quotes.map(q=>[q.instId,q])),valid=instruments.filter(p=>p.state==='live');for(const p of valid){const q=quoteMap.get(p.instId)||{};registerUsdQuote(book,baseOf(p.baseCcy||p.instId),String(p.quoteCcy||'').toUpperCase(),q.last);}for(const p of valid){const q=quoteMap.get(p.instId)||{};addVenuePair(book,baseOf(p.baseCcy||p.instId),p.quoteCcy,p.instId,q.volCcy24h,q.last,p);}return book;}
-  async function loadCoinbase(){const payload=await getJson(`${SOURCES.coinbase}/products?limit=1000`),products=Array.isArray(payload?.products)?payload.products:Array.isArray(payload)?payload:null;if(!products)throw new Error('Universo Coinbase inválido');const book=createVenueBook('COINBASE'),valid=products.filter(p=>!(p.trading_disabled||p.is_disabled));for(const p of valid){const quote=String(p.quote_currency_id||p.quote_currency||'').toUpperCase(),base=String(p.base_currency_id||p.base_currency||'').toUpperCase();registerUsdQuote(book,base,quote,p.price);}for(const p of valid){const quote=String(p.quote_currency_id||p.quote_currency||'').toUpperCase(),base=String(p.base_currency_id||p.base_currency||'').toUpperCase(),pair=p.product_id;addVenuePair(book,base,quote,pair,p.approximate_quote_24h_volume||p.quote_volume_24h,p.price,p);}return book;}
-  const venueSettled=await Promise.allSettled([loadBinance(),loadOkx(),loadMexc(),loadCoinbase()]);
+  async function loadBybit(){const [infoPayload,tickerPayload]=await Promise.all([getJson(`${SOURCES.bybit}/instruments-info?category=spot`),getJson(`${SOURCES.bybit}/tickers?category=spot`)]),instruments=infoPayload?.result?.list,tickers=tickerPayload?.result?.list;if(!Array.isArray(instruments)||!Array.isArray(tickers))throw new Error('Universo Bybit inválido');const book=createVenueBook('BYBIT'),tickerMap=new Map(tickers.map(q=>[q.symbol,q])),valid=instruments.filter(p=>p.status==='Trading');for(const p of valid){const q=tickerMap.get(p.symbol)||{};registerUsdQuote(book,baseOf(p.baseCoin||p.symbol),String(p.quoteCoin||'').toUpperCase(),q.lastPrice);}for(const p of valid){const q=tickerMap.get(p.symbol)||{};addVenuePair(book,baseOf(p.baseCoin||p.symbol),p.quoteCoin,p.symbol,q.turnover24h,q.lastPrice,p);}return book;}
+  async function loadKucoin(){const [symbolsPayload,tickerPayload]=await Promise.all([getJson(`${SOURCES.kucoin}/symbols`),getJson(`${SOURCES.kucoin}/market/allTickers`)]),symbols=symbolsPayload?.data,tickers=tickerPayload?.data?.ticker;if(!Array.isArray(symbols)||!Array.isArray(tickers))throw new Error('Universo KuCoin inválido');const book=createVenueBook('KUCOIN'),tickerMap=new Map(tickers.map(q=>[q.symbol,q])),valid=symbols.filter(p=>p.enableTrading!==false);for(const p of valid){const q=tickerMap.get(p.symbol)||{};registerUsdQuote(book,baseOf(p.baseCurrency||p.symbol),String(p.quoteCurrency||'').toUpperCase(),q.last);}for(const p of valid){const q=tickerMap.get(p.symbol)||{};addVenuePair(book,baseOf(p.baseCurrency||p.symbol),p.quoteCurrency,p.symbol,q.volValue,q.last,p);}return book;}
+  const venueSettled=await Promise.allSettled([loadBinance(),loadOkx(),loadBybit(),loadKucoin()]);
   venueSettled.forEach((result,index)=>{const venue=VENUE_PRIORITY[index];if(result.status==='fulfilled')venueBooks.set(venue,result.value);else warnings.push(`${venue}: ${result.reason.message}`);});
   if(!venueBooks.has('BINANCE'))warnings.push('Binance indisponível: o regime BTC e derivativos continuam em modo de proteção.');
   function selectVenue(base,minVolume=0){for(const venue of VENUE_PRIORITY){const pair=selectVenuePair(venueBooks.get(venue),base,minVolume);if(pair)return pair;}return null;}
@@ -479,16 +479,19 @@ async function marketUniverse(getJson, options = DEFAULTS) {
 }
 function venueFromSource(source) {
   if(source==='BINANCE'||source===SOURCES.spot)return 'BINANCE';
-  if(source==='MEXC'||source===SOURCES.mexc)return 'MEXC';
   if(source==='OKX'||source===SOURCES.okx)return 'OKX';
-  if(source==='COINBASE'||source===SOURCES.coinbase)return 'COINBASE';
+  if(source==='BYBIT'||source===SOURCES.bybit)return 'BYBIT';
+  if(source==='KUCOIN'||source===SOURCES.kucoin)return 'KUCOIN';
+  if(source==='MEXC'||source===SOURCES.mexc)return 'MEXC';
   return 'BINANCE';
 }
 function intervalMs(interval){return ({'1h':3600000,'2h':7200000,'4h':14400000,'1d':86400000,'1w':604800000})[interval]||3600000;}
 function normaliseVenueCandles(raw,venue,interval,asOf){
   if(venue==='BINANCE'||venue==='MEXC')return closedCandles(raw,asOf);
   if(venue==='OKX'){const rows=Array.isArray(raw?.data)?raw.data:[];return rows.map(row=>({time:+row[0],closeTime:+row[0]+intervalMs(interval)-1,open:+row[1],high:+row[2],low:+row[3],close:+row[4],volume:+row[5],takerBuyVolume:null,confirmed:String(row[8]??'1')})).filter(c=>c.confirmed==='1'&&c.closeTime<asOf&&[c.time,c.closeTime,c.open,c.high,c.low,c.close,c.volume].every(Number.isFinite)).sort((a,b)=>a.time-b.time);}
-  const rows=Array.isArray(raw?.candles)?raw.candles:Array.isArray(raw)?raw:[];return rows.map(row=>({time:Number(row.start??row.start_time)*1000,open:+row.open,high:+row.high,low:+row.low,close:+row.close,volume:+row.volume,takerBuyVolume:null})).map(c=>({...c,closeTime:c.time+intervalMs(interval)-1})).filter(c=>c.closeTime<asOf&&[c.time,c.closeTime,c.open,c.high,c.low,c.close,c.volume].every(Number.isFinite)).sort((a,b)=>a.time-b.time);
+  if(venue==='BYBIT'){const rows=Array.isArray(raw?.result?.list)?raw.result.list:[];return rows.map(row=>({time:+row[0],closeTime:+row[0]+intervalMs(interval)-1,open:+row[1],high:+row[2],low:+row[3],close:+row[4],volume:+row[5],takerBuyVolume:null})).filter(c=>c.closeTime<asOf&&[c.time,c.closeTime,c.open,c.high,c.low,c.close,c.volume].every(Number.isFinite)).sort((a,b)=>a.time-b.time);}
+  if(venue==='KUCOIN'){const rows=Array.isArray(raw?.data)?raw.data:[];return rows.map(row=>({time:+row[0]*1000,closeTime:+row[0]*1000+intervalMs(interval)-1,open:+row[1],close:+row[2],high:+row[3],low:+row[4],volume:+row[5],takerBuyVolume:null})).filter(c=>c.closeTime<asOf&&[c.time,c.closeTime,c.open,c.high,c.low,c.close,c.volume].every(Number.isFinite)).sort((a,b)=>a.time-b.time);}
+  return [];
 }
 async function fetchSeries(getJson,symbol,asOf,source=SOURCES.spot,hourlyLimit=210) {
   const limitFor=interval=>interval==='1h'?hourlyLimit:210;
@@ -509,10 +512,14 @@ async function fetchSeries(getJson,symbol,asOf,source=SOURCES.spot,hourlyLimit=2
     const values=await Promise.all(INTERVALS.map(interval=>getJson(`${SOURCES.okx}/market/candles?instId=${encodeURIComponent(symbol)}&bar=${bars[interval]}&limit=${limitFor(interval)}`).then(raw=>normaliseVenueCandles(raw,'OKX',interval,asOf))));
     return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
   }
-  if(venue==='COINBASE'){
-    const grains={'1w':'ONE_WEEK','1d':'ONE_DAY','4h':'FOUR_HOUR','2h':'TWO_HOUR','1h':'ONE_HOUR'};
-    const start=Math.floor((asOf-intervalMs('1w')*Math.max(210,Math.ceil(hourlyLimit/168)))/1000), end=Math.floor(asOf/1000);
-    const values=await Promise.all(INTERVALS.map(interval=>getJson(`${SOURCES.coinbase}/products/${encodeURIComponent(symbol)}/candles?start=${start}&end=${end}&granularity=${grains[interval]}`).then(raw=>normaliseVenueCandles(raw,'COINBASE',interval,asOf))));
+  if(venue==='BYBIT'){
+    const bars={'1w':'W','1d':'D','4h':'240','2h':'120','1h':'60'};
+    const values=await Promise.all(INTERVALS.map(interval=>getJson(`${SOURCES.bybit}/kline?category=spot&symbol=${encodeURIComponent(symbol)}&interval=${bars[interval]}&limit=${limitFor(interval)}`).then(raw=>normaliseVenueCandles(raw,'BYBIT',interval,asOf))));
+    return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
+  }
+  if(venue==='KUCOIN'){
+    const types={'1w':'1week','1d':'1day','4h':'4hour','2h':'2hour','1h':'1hour'}, end=Math.floor(asOf/1000), start=Math.floor((asOf-intervalMs('1w')*Math.max(210,Math.ceil(hourlyLimit/168)))/1000);
+    const values=await Promise.all(INTERVALS.map(interval=>getJson(`${SOURCES.kucoin}/market/candles?symbol=${encodeURIComponent(symbol)}&type=${types[interval]}&startAt=${start}&endAt=${end}`).then(raw=>normaliseVenueCandles(raw,'KUCOIN',interval,asOf))));
     return Object.fromEntries(INTERVALS.map((interval,i)=>[interval,values[i]]));
   }
   const values=await Promise.all(INTERVALS.map(interval=>getJson(`${source}/klines?symbol=${encodeURIComponent(symbol)}&interval=${interval}&limit=${limitFor(interval)}&endTime=${asOf-1}`).then(raw=>closedCandles(raw,asOf))));
