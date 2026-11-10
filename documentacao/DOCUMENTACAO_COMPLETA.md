@@ -22,7 +22,7 @@ O Sentinel Trade possui dois produtos que usam o mesmo motor de analise: o dashb
 | `app.js` | Scanner no navegador, renderizacao, buscador RSI, diario local, alertas e tela de backtest. |
 | `sentinel-core.js` | Motor compartilhado: indicadores, filtros, setups, score, risco, ranking, universo, deduplicacao e veiculo. |
 | `telegram-scanner.mjs` | Execucao agendada, mensagens de setups, watchlist RSI e deduplicacao persistente. |
-| `server.js` | Servidor local e proxy; integra a MEXC privada somente para leitura. |
+| `server.js` | Servidor local e proxy das fontes públicas do scanner. |
 | `sentinel-backtest.js` e `backtest-*.mjs` | Estudos e simulacoes historicas. |
 | `tests/parity.test.cjs` | Testes de paridade e seguranca do motor. |
 | `signal-state.json` | Estado local do Telegram para impedir reenvio indevido. |
@@ -36,17 +36,16 @@ Existem dois repositorios publicados: `sentinel_scam_dashboard` e `sentinel-trad
 | Binance Data API | Fonte prioritaria de candles, preco, volume e horario de corte. O motor tenta USDT e, se necessario, USDC. |
 | api.binance.com | Contingencia do Telegram quando `data-api.binance.vision` falha; duas tentativas por endereco. |
 | OKX Spot publica | Primeiro fallback de candles e volume. Aceita USDT e USDC, com 1H, 2H, 4H, diario e semanal nativos. |
-| MEXC Spot publica | Segundo fallback quando o par nao esta negociavel nas fontes anteriores. Aceita USDT e USDC; busca 1H, 4H, diario e semanal e agrega 1H fechado em 2H localmente. |
-| Coinbase Advanced Trade | Fallback final, somente para pares USDT/USDC elegiveis e com candles suficientes. |
+| Bybit Spot publica | Segundo fallback de pares, volume e candles. Aceita USDT e USDC e fornece os tempos do scanner. |
+| KuCoin Spot publica | Fallback final de pares, volume e candles. Aceita USDT e USDC e fornece os tempos do scanner. |
 | CoinGecko e CoinMarketCap | Ranking e capitalizacao para montar o universo. |
-| MEXC privada | Saldo, fills, ordens e posicoes somente leitura, via servidor local. |
 
-CoinGecko e CoinMarketCap continuam sendo fontes de ranking, nao de candles. A ordem de mercado ativa e **Binance -> OKX -> MEXC -> Coinbase**. Dentro de cada corretora, USDT tem preferencia e USDC e usado somente quando USDT nao esta valido.
+CoinGecko e CoinMarketCap continuam sendo fontes de ranking, nao de candles. A ordem de mercado ativa e **Binance -> OKX -> Bybit -> KuCoin**. Dentro de cada corretora, USDT tem preferencia e USDC e usado somente quando USDT nao esta valido.
 
 Selecao do universo:
 
 1. Consulta as fontes de ranking, une candidatos e remove duplicidades.
-2. Procura um par spot valido na ordem Binance, OKX, MEXC e Coinbase; em cada fonte testa primeiro USDT e depois USDC.
+2. Procura um par spot valido na ordem Binance, OKX, Bybit e KuCoin; em cada fonte testa primeiro USDT e depois USDC.
 3. Escolhe **uma unica corretora e um unico par** por ativo e usa essa mesma serie de candles em todos os tempos. Nunca mistura 1H de uma corretora com 4H de outra.
 4. Aplica volume minimo configurado ao proprio par e a propria corretora.
 5. Exclui BTC, ETH, moedas estaveis e valores sem par valido.
@@ -163,9 +162,9 @@ O estudo estrutural de 18/10/2026 avaliou NEAR, ORCA, RAY, LINK e TAO, R$200 por
 
 Em 180 dias: 1H/10% terminou em R$1.843 a partir de R$1.000; 1H/15% em R$2.383; 2H/10% em R$1.222; 2H/15% em R$1.644; 4H/15% em R$1.434. Sao simulacoes, nao regra ativa. Aplicando a definicao atual de suporte forte houve somente um trade elegivel (LINK 1H) em 180 dias; nao ha amostra para afirmar melhora. O filtro a estudar e “tocou suporte diario nos ultimos 7 a 10 dias e confirmou recuperacao”, nao obrigatoriamente RSI diario <=35 na entrada.
 
-## 11. MEXC privada e seguranca
+## 11. Privacidade e dados da conta
 
-MEXC privada e somente leitura: fills spot, historico de futuros, posicoes fechadas, stops, saldo e posicoes abertas. Atualizacao de posicoes e polling a cada 20 segundos quando habilitada, nao streaming. Criar chave exclusiva de leitura, sem saque, transferencia, trading ou alteracao de margem; usar restricao de IP quando possivel. Se o usuario optar por lembrar chaves, elas ficam no `localStorage` sem criptografia; usar computador protegido e esquecer chaves ao final.
+O dashboard atual não coleta nem consulta saldo, histórico, posições ou credenciais privadas de corretoras. Os dados de mercado usados pelo scanner são públicos. Credenciais antigas eventualmente mantidas no navegador não são lidas, exibidas ou enviadas pelo painel.
 
 ## 12. Operacao, testes e manutencao
 
