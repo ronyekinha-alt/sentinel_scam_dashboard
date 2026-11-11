@@ -972,9 +972,13 @@
 <body>
   <header class="topbar">
     <div><p class="eyebrow">ANÁLISE QUANTITATIVA · SPOT</p><h1>Sentinel Trade</h1></div>
-    <div class="header-actions"><a id="fearGreed" class="fear-greed-pill" href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" rel="noopener noreferrer" title="Índice diário de sentimento cripto, fornecido por Alternative.me">Fear &amp; Greed <b>—</b><small>carregando</small></a><span id="connection" class="pill neutral">Aguardando consulta</span></div>
+    <div class="header-actions"><a class="market-sentiment-shortcut" href="#fearGreed" title="Ir para o sentimento do mercado">Sentimento do mercado</a><span id="connection" class="pill neutral">Aguardando consulta</span></div>
   </header>
   <main>
+    <section id="fearGreed" class="market-sentiment-card is-loading" aria-live="polite" aria-label="Sentimento do mercado">
+      <header><strong>Sentimento do mercado</strong><a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" rel="noopener noreferrer">Ver índice <span aria-hidden="true">→</span></a></header>
+      <div class="market-sentiment-content"><div class="sentiment-gauge"><div class="sentiment-gauge-value"><b>—</b><span>carregando</span></div></div><div class="sentiment-scale"><span>Medo</span><span>Ganância</span></div><p>Índice diário de sentimento cripto · Alternative.me</p></div>
+    </section>
     <section class="controls" aria-label="Filtros do scanner">
       <label class="scanner-limit-filter">Top por ranking ou volume 24h <select id="assetLimit"><option value="50">50</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="700" selected>700</option></select></label>
       <label class="scanner-score-filter" title="Score é uma pontuação de confluência técnica, não uma probabilidade matemática garantida.">Score mínimo <select id="minScore"><option value="85">85</option><option value="90">90</option><option value="100">100</option><option value="0" selected>Todos os Scores</option></select><span class="sub">85, 90, 100 ou todos · mesmo score do Telegram</span></label>
@@ -1092,8 +1096,8 @@
   <footer>Dados de mercado: CoinGecko, CoinMarketCap, CoinPaprika, Bybit, OKX, Binance, KuCoin e Alternative.me. Registros: somente neste navegador.</footer>
 <script src="sentinel-core.js?v=20261111-bybit-okx-priority-1"></script>
   <script src="sentinel-backtest.js?v=20261107-123-breakout-1"></script>
-<script src="app.js?v=20261111-fear-greed-1"></script>
-<link rel="stylesheet" href="dashboard-layout.css?v=20261111-chrome-layout-1" />
+<script src="app.js?v=20261111-fear-greed-2"></script>
+<link rel="stylesheet" href="dashboard-layout.css?v=20261111-chrome-layout-2" />
 <style id="sentinel-final-contrast-lock">
   body.sentinel-light-dashboard #scannerAuditPanel > .section-heading *,
   body.sentinel-light-dashboard #signalsPanel > .section-heading *,
