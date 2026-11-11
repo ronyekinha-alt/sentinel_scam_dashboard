@@ -102,32 +102,48 @@ function bybitError(payload) {
   return payload.result || {};
 }
 async function bybitReadAccount(apiKey, secret) {
-  const base = 'https://api.bybit.com', recvWindow = '5000';
-  const clock = await get(`${base}/v5/market/time`), timestamp = String(Math.floor(Number(clock?.result?.timeNano || Date.now() * 1000000) / 1000000));
+  const base = 'https://api.bybit.com', recvWindow = '5000', localClock = Date.now();
+  const clock = await get(`${base}/v5/market/time`), serverClock = Math.floor(Number(clock?.result?.timeNano || localClock * 1000000) / 1000000);
   const signedGet = async (path, params = {}) => {
-    const query = queryString(params), signature = crypto.createHmac('sha256', secret).update(`${timestamp}${apiKey}${recvWindow}${query}`).digest('hex');
+    const timestamp = String(serverClock + Date.now() - localClock), query = queryString(params), signature = crypto.createHmac('sha256', secret).update(`${timestamp}${apiKey}${recvWindow}${query}`).digest('hex');
     const url = `${base}${path}${query ? `?${query}` : ''}`;
     return bybitError(await get(url, { 'X-BAPI-API-KEY': apiKey, 'X-BAPI-TIMESTAMP': timestamp, 'X-BAPI-RECV-WINDOW': recvWindow, 'X-BAPI-SIGN': signature }));
+  };
+  const closedPnlHistory = async category => {
+    const sevenDays = 7 * 24 * 60 * 60 * 1000, now = Date.now(), oldest = now - 90 * 24 * 60 * 60 * 1000, rows = [];
+    for (let endTime = now; endTime > oldest; endTime -= sevenDays) {
+      const startTime = Math.max(oldest, endTime - sevenDays), page = await signedGet('/v5/position/closed-pnl', { category, startTime, endTime, limit: 100 });
+      rows.push(...(page.list || []));
+    }
+    const unique = new Map(); rows.forEach(row => unique.set(`${row.orderId || ''}:${row.updatedTime || row.createdTime || ''}:${row.symbol || ''}`, row));
+    return { list: [...unique.values()] };
   };
   const settled = await Promise.allSettled([
     signedGet('/v5/user/query-api'),
     signedGet('/v5/account/info'),
     signedGet('/v5/account/wallet-balance', { accountType: 'UNIFIED' }),
     signedGet('/v5/position/list', { category: 'linear', settleCoin: 'USDT', limit: 200 }),
+    signedGet('/v5/position/list', { category: 'linear', settleCoin: 'USDC', limit: 200 }),
     signedGet('/v5/position/list', { category: 'inverse', limit: 200 }),
     signedGet('/v5/execution/list', { category: 'linear', limit: 50 }),
+    signedGet('/v5/execution/list', { category: 'inverse', limit: 50 }),
     signedGet('/v5/execution/list', { category: 'spot', limit: 50 }),
+    closedPnlHistory('linear'),
+    closedPnlHistory('inverse'),
     signedGet('/v5/order/history', { category: 'linear', limit: 50 }),
+    signedGet('/v5/order/history', { category: 'inverse', limit: 50 }),
     signedGet('/v5/order/history', { category: 'spot', limit: 50 })
   ]);
   const read = index => settled[index].status === 'fulfilled' ? settled[index].value : null;
-  const errors = settled.map((result, index) => result.status === 'rejected' ? `${['chave', 'conta', 'saldo', 'posições lineares', 'posições inversas', 'execuções lineares', 'execuções spot', 'ordens lineares', 'ordens spot'][index]}: ${result.reason.message}` : null).filter(Boolean);
+  const labels = ['chave', 'conta', 'saldo', 'posições lineares USDT', 'posições lineares USDC', 'posições inversas', 'execuções lineares', 'execuções inversas', 'execuções spot', 'fechamentos lineares', 'fechamentos inversos', 'ordens lineares', 'ordens inversas', 'ordens spot'];
+  const errors = settled.map((result, index) => result.status === 'rejected' ? `${labels[index]}: ${result.reason.message}` : null).filter(Boolean);
   if (!read(0) || !read(1)) throw new Error(errors[0] || 'Não foi possível validar a conta Bybit.');
   return {
     key: read(0), account: read(1), wallet: read(2),
-    positions: [...(read(3)?.list || []), ...(read(4)?.list || [])].filter(position => Number(position.size) > 0),
-    executions: [...(read(5)?.list || []), ...(read(6)?.list || [])].sort((a, b) => Number(b.execTime || 0) - Number(a.execTime || 0)).slice(0, 100),
-    orders: [...(read(7)?.list || []), ...(read(8)?.list || [])].sort((a, b) => Number(b.updatedTime || b.createdTime || 0) - Number(a.updatedTime || a.createdTime || 0)).slice(0, 100),
+    positions: [...(read(3)?.list || []), ...(read(4)?.list || []), ...(read(5)?.list || [])].filter(position => Number(position.size) > 0),
+    executions: [...(read(6)?.list || []), ...(read(7)?.list || []), ...(read(8)?.list || [])].sort((a, b) => Number(b.execTime || 0) - Number(a.execTime || 0)).slice(0, 150),
+    closedPnl: [...(read(9)?.list || []), ...(read(10)?.list || [])].sort((a, b) => Number(b.updatedTime || b.createdTime || 0) - Number(a.updatedTime || a.createdTime || 0)).slice(0, 200),
+    orders: [...(read(11)?.list || []), ...(read(12)?.list || []), ...(read(13)?.list || [])].sort((a, b) => Number(b.updatedTime || b.createdTime || 0) - Number(a.updatedTime || a.createdTime || 0)).slice(0, 150),
     errors
   };
 }
