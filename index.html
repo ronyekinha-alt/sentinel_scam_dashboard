@@ -1097,7 +1097,7 @@
 <script src="sentinel-core.js?v=20261111-bybit-okx-priority-1"></script>
   <script src="sentinel-backtest.js?v=20261107-123-breakout-1"></script>
 <script src="app.js?v=20261111-fear-greed-2"></script>
-<link rel="stylesheet" href="dashboard-layout.css?v=20261111-chrome-layout-5" />
+<link rel="stylesheet" href="dashboard-layout.css?v=20261111-chrome-layout-7" />
 <style id="sentinel-final-contrast-lock">
   body.sentinel-light-dashboard #scannerAuditPanel > .section-heading *,
   body.sentinel-light-dashboard #signalsPanel > .section-heading *,
@@ -1357,6 +1357,37 @@
   body.sentinel-light-dashboard #importedTradesPanel #mexcResultsPrevious,
   body.sentinel-light-dashboard #importedTradesPanel #mexcResultsNext { background:#0b9fdc !important; border-color:#0787bd !important; color:#fff !important; }
 </style>
+<style id="market-sentiment-position-lock">
+  /* Contexto de mercado integrado ao topo: faixa horizontal, sem área vazia. */
+  body.sentinel-light-dashboard .market-sentiment-card {
+    width:auto !important;
+    min-height:128px;
+    margin:0 0 14px !important;
+    padding:15px 24px !important;
+    display:grid !important;
+    grid-template-columns:minmax(220px,1fr) auto !important;
+    align-items:center !important;
+    gap:24px !important;
+    border-color:#a5b4c2 !important;
+    border-left:5px solid #788793 !important;
+    border-radius:10px !important;
+    box-shadow:0 5px 16px rgba(43,55,62,.09) !important;
+  }
+  body.sentinel-light-dashboard .market-sentiment-card header { display:flex !important; flex-direction:column; align-items:flex-start !important; gap:6px; }
+  body.sentinel-light-dashboard .market-sentiment-card header strong { font-size:18px !important; }
+  body.sentinel-light-dashboard .market-sentiment-card header strong::after { content:'Índice diário de contexto para o mercado cripto — não é um sinal operacional isolado.'; display:block; max-width:440px; margin-top:7px; color:#617079; font-size:11px; font-weight:500; line-height:1.45; letter-spacing:0; }
+  body.sentinel-light-dashboard .market-sentiment-card header a { font-size:11px !important; }
+  body.sentinel-light-dashboard .market-sentiment-card .market-sentiment-content { display:grid !important; grid-template-columns:auto auto; grid-template-rows:auto auto; column-gap:12px; padding:0 !important; align-items:end; }
+  body.sentinel-light-dashboard .market-sentiment-card .sentiment-gauge { width:176px !important; height:90px !important; grid-row:1 / span 2; }
+  body.sentinel-light-dashboard .market-sentiment-card .sentiment-gauge::before { inset:8px 8px 0 !important; }
+  body.sentinel-light-dashboard .market-sentiment-card .sentiment-gauge::after { left:calc(50% + (var(--sentiment-value) - 50) * 1.34px) !important; bottom:3px !important; }
+  body.sentinel-light-dashboard .market-sentiment-card .sentiment-gauge-value { inset:auto 0 9px !important; }
+  body.sentinel-light-dashboard .market-sentiment-card .sentiment-gauge-value b { font-size:29px !important; }
+  body.sentinel-light-dashboard .market-sentiment-card .sentiment-gauge-value span { margin-top:3px !important; font-size:12px !important; }
+  body.sentinel-light-dashboard .market-sentiment-card .sentiment-scale { width:112px !important; margin:0 0 6px !important; gap:8px; font-size:10px !important; }
+  body.sentinel-light-dashboard .market-sentiment-card p { grid-column:2; width:112px; margin:0 !important; text-align:left !important; font-size:8px !important; }
+  @media(max-width:650px){body.sentinel-light-dashboard .market-sentiment-card{grid-template-columns:1fr!important;}body.sentinel-light-dashboard .market-sentiment-card .market-sentiment-content{justify-content:start!important;}}
+</style>
 <style id="chrome-palette-lock">
   /* Paleta estrutural única: #D3E2EF · #BCCBD8 · #A5B4C2 · #8E9DAB. */
   body.sentinel-light-dashboard { background:#d3e2ef !important; color:#263238 !important; }
@@ -1446,9 +1477,12 @@
   body.sentinel-light-dashboard .bybit-accounts-panel .primary { background:#59666f !important; border-color:#46525a !important; color:#ffffff !important; text-shadow:none !important; }
   body.sentinel-light-dashboard .bybit-accounts-panel .positive { color:#157a5d !important; background:transparent !important; }
   body.sentinel-light-dashboard .bybit-accounts-panel .negative { color:#b4233b !important; background:transparent !important; }
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-led.positive { background:#b9f4d5 !important; color:#10261e !important; }
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-led.negative { background:#8f1932 !important; color:#ffffff !important; }
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-led.zero { background:#d6e0e5 !important; color:#28363d !important; }
 </style>
 <script src="dashboard-layout.js?v=20261111-chrome-layout-1"></script>
-<script src="bybit-account-panel.js?v=20261111-readonly-2"></script>
+<script src="bybit-account-panel.js?v=20261111-readonly-4"></script>
   <script>
     (() => {
       const forceImportedHeadingText = () => {
