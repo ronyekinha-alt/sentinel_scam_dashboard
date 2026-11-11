@@ -1097,7 +1097,7 @@
 <script src="sentinel-core.js?v=20261111-bybit-okx-priority-1"></script>
   <script src="sentinel-backtest.js?v=20261107-123-breakout-1"></script>
 <script src="app.js?v=20261111-fear-greed-2"></script>
-<link rel="stylesheet" href="dashboard-layout.css?v=20261111-chrome-layout-3" />
+<link rel="stylesheet" href="dashboard-layout.css?v=20261111-chrome-layout-4" />
 <style id="sentinel-final-contrast-lock">
   body.sentinel-light-dashboard #scannerAuditPanel > .section-heading *,
   body.sentinel-light-dashboard #signalsPanel > .section-heading *,
@@ -1356,6 +1356,46 @@
   body.sentinel-light-dashboard #mexcPanel .primary,
   body.sentinel-light-dashboard #importedTradesPanel #mexcResultsPrevious,
   body.sentinel-light-dashboard #importedTradesPanel #mexcResultsNext { background:#0b9fdc !important; border-color:#0787bd !important; color:#fff !important; }
+</style>
+<style id="bybit-contrast-lock">
+  /* A área financeira é explicitamente clara: nenhum texto claro sobre fundo claro. */
+  body.sentinel-light-dashboard .bybit-accounts-panel,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-profile,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-result,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-read-section,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-table-wrap,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-table-wrap td,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-table-wrap th,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-summary span,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-operations-summary,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-operations-summary div,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-kpis span {
+    color:#202a31 !important;
+    text-shadow:none !important;
+    opacity:1 !important;
+  }
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-fields label,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-status,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-api-note,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-read-section p,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-operations-summary small,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-kpis small { color:#46555e !important; opacity:1 !important; }
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-fields input:not([type="checkbox"]) {
+    background:#ffffff !important;
+    color:#202a31 !important;
+    border:1px solid #8e9dab !important;
+    box-shadow:none !important;
+  }
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-fields input::placeholder { color:#66747c !important; opacity:1 !important; }
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-profile header strong,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-read-section h3,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-table-wrap th,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-kpis b,
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-operations-summary b { color:#202a31 !important; opacity:1 !important; }
+  body.sentinel-light-dashboard .bybit-accounts-panel .bybit-profile header small { color:#53616a !important; opacity:1 !important; }
+  body.sentinel-light-dashboard .bybit-accounts-panel .primary { background:#59666f !important; border-color:#46525a !important; color:#ffffff !important; text-shadow:none !important; }
+  body.sentinel-light-dashboard .bybit-accounts-panel .positive { color:#157a5d !important; background:transparent !important; }
+  body.sentinel-light-dashboard .bybit-accounts-panel .negative { color:#b4233b !important; background:transparent !important; }
 </style>
 <script src="dashboard-layout.js?v=20261111-chrome-layout-1"></script>
 <script src="bybit-account-panel.js?v=20261111-readonly-2"></script>
