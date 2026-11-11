@@ -1,13 +1,17 @@
 (() => {
   const storageKey = 'sentinel-trade-bybit-readonly-profiles-v1';
+  const autoRefreshKey = 'sentinel-trade-bybit-auto-refresh-v1';
+  const autoTimers = {};
   const money = value => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(Number(value) || 0);
   const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
   const fixed = value => Number(value || 0).toLocaleString('pt-BR', { maximumFractionDigits: 4 });
   const dateTime = value => value ? new Date(Number(value)).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '—';
   const load = () => { try { return JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch { return {}; } };
   const save = value => localStorage.setItem(storageKey, JSON.stringify(value));
+  const loadAutoRefresh = () => { try { return JSON.parse(localStorage.getItem(autoRefreshKey) || '{}'); } catch { return {}; } };
+  const saveAutoRefresh = value => localStorage.setItem(autoRefreshKey, JSON.stringify(value));
   function form(profile, label) {
-    return `<article class="bybit-profile" data-profile="${profile}"><header><span class="bybit-profile-mark">B</span><div><strong>${label}</strong><small>API Bybit · somente leitura</small></div></header><div class="bybit-fields"><label>API Key<input autocomplete="off" data-key placeholder="Cole a chave somente aqui" /></label><label>Secret<input type="password" autocomplete="new-password" data-secret placeholder="Nunca envie pelo chat" /></label><label class="bybit-remember"><input type="checkbox" data-remember /> Lembrar neste computador</label><button class="primary" type="button" data-read>Ler conta</button></div><p class="bybit-status muted" data-status>Sem consulta ainda.</p><div class="bybit-result" data-result hidden></div></article>`;
+    return `<article class="bybit-profile" data-profile="${profile}"><header><span class="bybit-profile-mark">B</span><div><strong>${label}</strong><small>API Bybit · somente leitura</small></div></header><div class="bybit-fields"><label>API Key<input autocomplete="off" data-key placeholder="Cole a chave somente aqui" /></label><label>Secret<input type="password" autocomplete="new-password" data-secret placeholder="Nunca envie pelo chat" /></label><label class="bybit-remember"><input type="checkbox" data-remember /> Lembrar neste computador</label><label class="bybit-auto-refresh"><input type="checkbox" data-auto-refresh /> Atualizar a cada 20 s</label><button class="primary" type="button" data-read>Ler conta</button></div><p class="bybit-status muted" data-status>Sem consulta ainda.</p><div class="bybit-result" data-result hidden></div></article>`;
   }
   function render(data) {
     const wallet = data.wallet?.list?.[0] || {}, positions = data.positions || [], executions = data.executions || [], orders = data.orders || [], closed = data.closedPnl || [];
@@ -26,7 +30,19 @@
     const assetRows = assets.length ? assets.slice(0, 20).map(asset => `<tr><td>${escape(asset.symbol)}</td><td>${asset.trades}</td><td class="positive">${asset.wins}</td><td class="negative">${asset.losses}</td><td class="${pnlTone(asset.pnl)}">${money(asset.pnl)}</td></tr>`).join('') : '<tr><td colspan="5">Ainda não há operações fechadas de derivativos para consolidar.</td></tr>';
     return `<div class="bybit-kpis"><span><small>Equity total</small><b>${money(wallet.totalEquity)}</b></span><span><small>Saldo carteira</small><b>${money(wallet.totalWalletBalance)}</b></span><span><small>Disponível</small><b>${money(wallet.totalAvailableBalance)}</b></span><span><small>Posições abertas</small><b>${positions.length}</b></span></div><div class="bybit-operations-summary"><div><small>Operações fechadas · 90d</small><b>${decisions}</b></div><div><small>Taxa de acerto · 90d</small><b>${hitRate.toFixed(1)}%</b></div><div><small>Gains · 90d</small><b class="positive">${money(stats.gain)}</b></div><div><small>Losses · 90d</small><b class="negative">-${money(stats.loss)}</b></div><div><small>Resultado líquido · 90d</small><b class="${pnlTone(stats.net)}">${money(stats.net)}</b></div></div><div class="bybit-summary"><span>Modo: <b>${escape(data.account?.unifiedMarginStatus ?? '—')}</b></span><span>Permissões: <b>${escape(permissions)}</b></span><span>Execuções recentes: <b>${executions.length}</b></span><span>Ordens recentes: <b>${orders.length}</b></span></div><section class="bybit-read-section"><h3>Posições em andamento — entrada, preço atual e resultado aberto</h3><p>Valor e margem em US$; para contratos inversos, a conversão usa o mark price informado pela Bybit. Retorno é PnL aberto ÷ margem inicial.</p><div class="bybit-table-wrap"><table><thead><tr><th>Ativo</th><th>Lado</th><th>Quantidade</th><th>Entrada</th><th>Preço atual</th><th>Valor atual</th><th>Margem</th><th>Alav.</th><th>PnL aberto</th><th>Retorno</th></tr></thead><tbody>${positionRows}</tbody></table></div></section><section class="bybit-read-section"><h3>Histórico fechado de derivativos · últimos 90 dias</h3><p>Resultado realizado informado pela Bybit. Operações spot continuam disponíveis nas execuções e ordens, mas não entram nesta taxa de acerto por não terem PnL fechado equivalente.</p><div class="bybit-table-wrap"><table><thead><tr><th>Ativo</th><th>Lado</th><th>Qtd.</th><th>Entrada</th><th>Saída</th><th>PnL</th><th>Fechamento</th></tr></thead><tbody>${closedRows}</tbody></table></div></section><section class="bybit-read-section"><h3>Ativos operados — consolidado dos fechamentos · 90 dias</h3><div class="bybit-table-wrap"><table><thead><tr><th>Ativo</th><th>Trades</th><th>Gains</th><th>Losses</th><th>PnL líquido</th></tr></thead><tbody>${assetRows}</tbody></table></div></section><details><summary>Ver execuções e ordens recentes</summary><div class="bybit-detail"><div><b>Execuções recentes</b>${executions.length ? `<ul>${executions.slice(0, 20).map(execution => `<li>${escape(execution.symbol)} · ${escape(execution.side)} · ${escape(execution.execQty)} @ ${escape(execution.execPrice)} · ${dateTime(execution.execTime)}</li>`).join('')}</ul>` : '<p>Nenhuma execução retornada.</p>'}</div><div><b>Ordens recentes</b>${orders.length ? `<ul>${orders.slice(0, 20).map(order => `<li>${escape(order.symbol)} · ${escape(order.side)} · ${escape(order.orderStatus)} · ${escape(order.cumExecQty || 0)} executado</li>`).join('')}</ul>` : '<p>Nenhuma ordem retornada.</p>'}</div></div></details>${data.errors?.length ? `<p class="bybit-warning">Leituras parciais: ${escape(data.errors.slice(0, 3).join(' | '))}</p>` : ''}`;
   }
-  async function read(profile) {
+  function stopAutoRefresh(profile) {
+    if (autoTimers[profile]) window.clearInterval(autoTimers[profile]);
+    delete autoTimers[profile];
+  }
+  function configureAutoRefresh(profile) {
+    const card = document.querySelector(`.bybit-profile[data-profile="${profile}"]`);
+    if (!card) return;
+    stopAutoRefresh(profile);
+    const enabled = card.querySelector('[data-auto-refresh]').checked;
+    if (!enabled || !card.querySelector('[data-key]').value.trim() || !card.querySelector('[data-secret]').value.trim()) return;
+    autoTimers[profile] = window.setInterval(() => read(profile, true), 20000);
+  }
+  async function read(profile, automatic = false) {
     const card = document.querySelector(`.bybit-profile[data-profile="${profile}"]`), key = card.querySelector('[data-key]').value.trim(), secret = card.querySelector('[data-secret]').value.trim(), status = card.querySelector('[data-status]'), result = card.querySelector('[data-result]'), remember = card.querySelector('[data-remember]').checked, button = card.querySelector('[data-read]');
     if (!key || !secret) { status.textContent = 'Informe API Key e Secret desta conta.'; return; }
     button.disabled = true; button.textContent = 'Lendo…'; status.textContent = 'Consultando saldo, posições, execuções e ordens — sem enviar nenhuma ordem.';
@@ -34,7 +50,7 @@
       const response = await fetch('/api/bybit/account', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apiKey: key, secret }) }), payload = await response.json();
       if (!response.ok) throw new Error(payload.error || 'Falha na leitura da Bybit.');
       if (remember) { const profiles = load(); profiles[profile] = { apiKey: key, secret }; save(profiles); } else { const profiles = load(); delete profiles[profile]; save(profiles); }
-      result.hidden = false; result.innerHTML = render(payload); status.textContent = `Atualizado às ${new Date().toLocaleTimeString('pt-BR')}. Consulta somente leitura.`;
+      result.hidden = false; result.innerHTML = render(payload); configureAutoRefresh(profile); status.textContent = `Atualizado às ${new Date().toLocaleTimeString('pt-BR')}. Consulta somente leitura${card.querySelector('[data-auto-refresh]').checked ? ' · Próxima atualização em até 20 s.' : '.'}`;
     } catch (error) { status.textContent = `Não foi possível consultar: ${error.message}`; }
     finally { button.disabled = false; button.textContent = 'Ler conta'; }
   }
@@ -43,7 +59,15 @@
     const panel = document.createElement('section'); panel.className = 'panel bybit-accounts-panel'; panel.id = 'bybitAccountsPanel';
     panel.innerHTML = `<div class="section-heading"><div><p class="eyebrow">BYBIT · CONTAS EM MODO SOMENTE LEITURA</p><h2>Saldo, posições e histórico</h2></div><p class="muted">Perfis separados. Nenhuma ordem, saque ou transferência é autorizada pelo painel.</p></div><div class="bybit-accounts-grid">${form('global', 'Bybit Internacional / Global')} ${form('brasil', 'Bybit Brasil')}</div><p class="bybit-api-note">Cada conta possui leitura e histórico independentes. A taxa de acerto e o PnL usam somente fechamentos de derivativos que a API retornar.</p>`;
     const anchor = document.getElementById('signalsPanel') || document.getElementById('backtestPanel'); anchor?.insertAdjacentElement('beforebegin', panel);
-    const profiles = load(); panel.querySelectorAll('.bybit-profile').forEach(card => { const profile = card.dataset.profile, saved = profiles[profile]; if (saved?.apiKey && saved?.secret) { card.querySelector('[data-key]').value = saved.apiKey; card.querySelector('[data-secret]').value = saved.secret; card.querySelector('[data-remember]').checked = true; } card.querySelector('[data-read]').addEventListener('click', () => read(profile)); });
+    const profiles = load(), autoRefresh = loadAutoRefresh();
+    panel.querySelectorAll('.bybit-profile').forEach(card => {
+      const profile = card.dataset.profile, saved = profiles[profile], auto = card.querySelector('[data-auto-refresh]');
+      auto.checked = autoRefresh[profile] !== false;
+      if (saved?.apiKey && saved?.secret) { card.querySelector('[data-key]').value = saved.apiKey; card.querySelector('[data-secret]').value = saved.secret; card.querySelector('[data-remember]').checked = true; }
+      card.querySelector('[data-read]').addEventListener('click', () => read(profile));
+      auto.addEventListener('change', () => { const preferences = loadAutoRefresh(); preferences[profile] = auto.checked; saveAutoRefresh(preferences); if (auto.checked) configureAutoRefresh(profile); else stopAutoRefresh(profile); });
+      if (saved?.apiKey && saved?.secret && auto.checked) window.setTimeout(() => read(profile, true), 300);
+    });
   }
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init) : init();
 })();
