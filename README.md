@@ -6,7 +6,7 @@ O painel local e o scanner Telegram executam `sentinel-core.js`, com os mesmos i
 
 Execute `iniciar-painel.bat` ou `npm start` e abra http://127.0.0.1:4173. Node.js 20 ou superior; nenhuma dependência npm precisa ser instalada.
 
-O diário e as preferências continuam no navegador. O dashboard não lê mais contas, saldos ou histórico privado por API; ele opera como scanner e simulador público.
+O diário e as preferências continuam no navegador. O dashboard opera como scanner e simulador público e oferece, opcionalmente, duas conexões **Bybit somente leitura** (Brasil e Internacional/Global), sempre separadas. As chaves não são enviadas para Telegram nem usadas para criar ordens, saques ou transferências.
 
 ## Padrão comum
 
@@ -15,7 +15,9 @@ O diário e as preferências continuam no navegador. O dashboard não lê mais c
 - CoinGecko e CoinMarketCap selecionam o universo por capitalização: união dos top N de cada fonte, sem duplicar o mesmo par. A união pode exceder N; somente pares spot USDT ou USDC negociáveis na Binance, OKX, Bybit ou KuCoin e com o volume mínimo são analisados. BTC/ETH continuam excluídos.
 - CoinMarketCap usa a API pública oficial sem chave. O painel acessa pelo servidor local, pois a fonte não libera acesso direto do navegador. Cada sinal informa fonte e posição no ranking; símbolo duplicado dentro de uma fonte é ignorado nessa fonte para evitar atribuição ambígua.
 - Se um ranking falhar, o outro mantém a busca com aviso de cobertura parcial. Se ambos falharem, a consulta é interrompida com erro explícito; não escolhe ativos por volume fora dos rankings. Estar no ranking não acrescenta pontos nem substitui a confirmação técnica.
-- Candles fechados nativos de 1W, 1D, 4H, 2H e 1H: prioridade exata **Binance → OKX → Bybit → KuCoin**, com USDT antes de USDC. Não troca a fonte por falha de consulta ou volume baixo. Todos os tempos do ativo usam a mesma corretora, com volume real em USDT do par. O horário da Binance fixa o instante de corte da consulta.
+- Candles fechados nativos de 1W, 1D, 4H, 2H e 1H: prioridade exata **Bybit → OKX → Binance → KuCoin**, com USDT antes de USDC. Não troca a fonte por falha de consulta ou volume baixo. Todos os tempos do ativo usam a mesma corretora, com volume real em USDT do par. O horário da Binance fixa o instante de corte da consulta.
+- A cobertura automática continua sendo o universo cripto por capitalização e pares spot USDT/USDC. Contratos TradFi/RWA, commodities, índices e ações da Bybit exigem um adaptador próprio de contrato, sessões e risco; portanto não são misturados silenciosamente ao scanner cripto.
+- O cabeçalho mostra o **Fear & Greed Index** de cripto, da Alternative.me. É contexto diário de mercado, atualizado no painel a cada cinco minutos e não é um gatilho nem bloqueio de sinal.
 - Confirmação alinhada e crescente em 1D/4H/2H, com 1H alinhado e momentum positivo; contexto semanal sem euforia.
 - Padrão comprador no gatilho: Engolfo de alta, Martelo comprador ou Rompimento de máxima (`pattern.bullish`).
 - Controle de entrada esticada, stop abaixo dos três candles anteriores com margem ATR, risco máximo 8%, alvo 2R de ao menos 3%, resistência distante ao menos 2R e alvo adicional 3R.
