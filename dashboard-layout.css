@@ -460,6 +460,75 @@ body.sentinel-light-dashboard .sentiment-scale{display:flex;justify-content:spac
 body.sentinel-light-dashboard .sentiment-scale span:last-child{color:#3a8b65;}
 body.sentinel-light-dashboard .market-sentiment-card p{margin:11px 0 0;color:#78848a;font-size:9px;text-align:center;}
 @media(max-width:760px){body.sentinel-light-dashboard .market-sentiment-card{width:100%;margin-right:0!important;}.market-sentiment-shortcut{display:none!important;}}
+/* Bybit: leitura de cada conta em sequência, com blocos amplos para dados financeiros. */
+body.sentinel-light-dashboard .bybit-accounts-grid{grid-template-columns:1fr!important;gap:22px!important;}
+body.sentinel-light-dashboard .bybit-profile{padding:18px!important;background:#fff!important;border:1px solid #cbd5d9!important;box-shadow:0 5px 18px rgba(27,38,44,.06)!important;}
+body.sentinel-light-dashboard .bybit-profile[data-profile="global"]{border-top:4px solid #19b995!important;}
+body.sentinel-light-dashboard .bybit-profile[data-profile="brasil"]{border-top:4px solid #64748b!important;}
+body.sentinel-light-dashboard .bybit-summary{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px!important;margin-top:12px!important;}
+body.sentinel-light-dashboard .bybit-summary span{min-width:0;padding:8px;border:1px solid #e1e7e9;border-radius:6px;background:#f8fafb;overflow-wrap:anywhere;}
+body.sentinel-light-dashboard .bybit-operations-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:12px;padding:11px;border:1px solid #dce5e8;border-radius:9px;background:#f6f9fa;}
+body.sentinel-light-dashboard .bybit-operations-summary div{padding:8px;border-left:3px solid #60707a;background:#fff;border-radius:5px;}
+body.sentinel-light-dashboard .bybit-operations-summary small,.bybit-operations-summary b{display:block;}
+body.sentinel-light-dashboard .bybit-operations-summary small{color:#66747b;font-size:9px;font-weight:750;}
+body.sentinel-light-dashboard .bybit-operations-summary b{margin-top:4px;color:#28353b;font-size:14px;}
+body.sentinel-light-dashboard .bybit-read-section{margin-top:16px;border:1px solid #dce5e8;border-radius:9px;overflow:hidden;background:#fff;}
+body.sentinel-light-dashboard .bybit-read-section h3{margin:0;padding:10px 12px;background:#eef3f5;border-bottom:1px solid #dce5e8;color:#27343a;font-size:12px;}
+body.sentinel-light-dashboard .bybit-read-section p{margin:0;padding:8px 12px;color:#65737a;font-size:10px;line-height:1.4;border-bottom:1px solid #e6ecee;}
+body.sentinel-light-dashboard .bybit-table-wrap{overflow:auto;}
+body.sentinel-light-dashboard .bybit-table-wrap table{width:100%;border-collapse:collapse;min-width:600px;font-size:10px;}
+body.sentinel-light-dashboard .bybit-table-wrap th{padding:8px 10px;text-align:left;background:#f8fafb;color:#46545b;font-size:9px;letter-spacing:.04em;text-transform:uppercase;}
+body.sentinel-light-dashboard .bybit-table-wrap td{padding:8px 10px;border-top:1px solid #edf1f2;color:#334047;white-space:nowrap;}
+body.sentinel-light-dashboard .bybit-table-wrap tr:nth-child(even) td{background:#fbfcfc;}
+body.sentinel-light-dashboard .bybit-table-wrap .positive,.bybit-operations-summary .positive{color:#157a5d!important;background:transparent!important;}
+body.sentinel-light-dashboard .bybit-table-wrap .negative,.bybit-operations-summary .negative{color:#b4233b!important;background:transparent!important;}
+@media(max-width:850px){body.sentinel-light-dashboard .bybit-summary{grid-template-columns:repeat(2,minmax(0,1fr));}body.sentinel-light-dashboard .bybit-operations-summary{grid-template-columns:repeat(2,minmax(0,1fr));}}
+/* Paleta estrutural única: os verdes do layout tornam-se cinza-cromo. Valores financeiros preservam suas cores semânticas. */
+body.sentinel-light-dashboard{--dash-bg:#e8edf0!important;--dash-paper:#fff!important;--dash-ink:#222a2f!important;--dash-muted:#66747c!important;--dash-line:#bccbd8!important;--dash-teal:#8e9dab!important;--dash-teal-soft:#e8edf1!important;}
+body.sentinel-light-dashboard main>.controls,
+body.sentinel-light-dashboard #scannerStrategyFilters,
+body.sentinel-light-dashboard #backtestPanel .controls{background:#d3e2ef!important;border-color:#a5b4c2!important;}
+body.sentinel-light-dashboard .controls .muted{border-left-color:#8e9dab!important;color:#52616a!important;}
+body.sentinel-light-dashboard .controls label,
+body.sentinel-light-dashboard .filter-group legend,
+body.sentinel-light-dashboard .scanner-strategy-intro,
+body.sentinel-light-dashboard .scanner-strategy-intro strong{color:#2d3940!important;}
+body.sentinel-light-dashboard .scanner-strategy-card,
+body.sentinel-light-dashboard #backtestStrategyFilters .filter-option,
+body.sentinel-light-dashboard #backtestTimeframeFilters .filter-option{background:#fff!important;border-color:#bccbd8!important;box-shadow:0 3px 10px rgba(58,71,80,.08)!important;}
+body.sentinel-light-dashboard .scanner-strategy-card-top,
+body.sentinel-light-dashboard .scanner-strategy-card-list,
+body.sentinel-light-dashboard .scanner-strategy-card-foot{color:#354148!important;}
+body.sentinel-light-dashboard .strategy-card-index,
+body.sentinel-light-dashboard .scanner-strategy-count,
+body.sentinel-light-dashboard .filter-all{background:#d3e2ef!important;color:#334149!important;border-color:#a5b4c2!important;}
+body.sentinel-light-dashboard .primary,
+body.sentinel-light-dashboard #backtestPanel .primary,
+body.sentinel-light-dashboard #rsiFinderPanel .primary,
+body.sentinel-light-dashboard #signalsPanel .primary,
+body.sentinel-light-dashboard #importedTradesPanel .primary,
+body.sentinel-light-dashboard #mexcLivePanel .primary,
+body.sentinel-light-dashboard #mexcPanel .primary{background:#788793!important;border-color:#65737e!important;color:#fff!important;}
+body.sentinel-light-dashboard .primary:hover{background:#65737e!important;}
+body.sentinel-light-dashboard input[type="checkbox"]:checked{background:#a5b4c2!important;border-color:#74828d!important;}
+body.sentinel-light-dashboard #signalsPanel>.section-heading,
+body.sentinel-light-dashboard #importedTradesPanel>.section-heading,
+body.sentinel-light-dashboard #mexcLivePanel>.section-heading,
+body.sentinel-light-dashboard #mexcPanel>.section-heading,
+body.sentinel-light-dashboard #backtestPanel>.section-heading,
+body.sentinel-light-dashboard #rsiFinderPanel>.section-heading,
+body.sentinel-light-dashboard #importedTradesPanel .mexc-balance-heading,
+body.sentinel-light-dashboard #scannerAuditPanel>.section-heading,
+body.sentinel-light-dashboard #backtestPanel .backtest-section-heading{background:#d3e2ef!important;border-color:#a5b4c2!important;}
+body.sentinel-light-dashboard #signalsPanel thead th,
+body.sentinel-light-dashboard #rsiFinderPanel thead th,
+body.sentinel-light-dashboard #importedTradesPanel thead th,
+body.sentinel-light-dashboard #mexcLivePanel thead th,
+body.sentinel-light-dashboard #backtestPanel thead th{background:#bccbd8!important;border-color:#a5b4c2!important;color:#27343b!important;}
+body.sentinel-light-dashboard .timeframe-badge,
+body.sentinel-light-dashboard #signalsPanel #signalsBody .tag.tp1,
+body.sentinel-light-dashboard #signalsPanel #signalsBody .tag.tp2{background:#d3e2ef!important;border-color:#a5b4c2!important;color:#334149!important;}
+body.sentinel-light-dashboard .bybit-profile[data-profile="global"]{border-top-color:#788793!important;}
 /* Simulador: setups em cards e tempos do gatilho na lateral. */
 body.sentinel-light-dashboard #backtestPanel .controls{grid-template-columns:repeat(12,minmax(0,1fr))!important;align-items:start!important;gap:10px!important}body.sentinel-light-dashboard #backtestStrategyFilters{grid-column:1/10!important;grid-row:1!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;align-content:start!important}body.sentinel-light-dashboard #backtestStrategyFilters legend,body.sentinel-light-dashboard #backtestStrategyFilters .filter-all,body.sentinel-light-dashboard #backtestStrategyFilters .sub{grid-column:1/-1!important}body.sentinel-light-dashboard #backtestStrategyFilters .filter-option{display:flex!important;align-items:center!important;min-height:34px!important;margin:0!important;padding:7px 8px!important;background:#f8fbf4!important;border:1px solid #d6e3c7!important;border-radius:6px!important}body.sentinel-light-dashboard #backtestStrategyFilters .filter-all{background:#eaf3e1!important}body.sentinel-light-dashboard #backtestTimeframeFilters{grid-column:10/-1!important;grid-row:1/span 4!important;display:grid!important;gap:7px!important;align-content:start!important}body.sentinel-light-dashboard #backtestTimeframeFilters .filter-option{display:flex!important;align-items:center!important;min-height:34px!important;margin:0!important;padding:7px 8px!important;background:#f8fbf4!important;border:1px solid #d6e3c7!important;border-radius:6px!important}body.sentinel-light-dashboard #backtestTimeframeFilters .filter-all{background:#eaf3e1!important}body.sentinel-light-dashboard #backtestPanel .backtest-symbol-field{grid-column:1/5!important;grid-row:2!important}body.sentinel-light-dashboard #backtestPanel .backtest-date-field:nth-of-type(2){grid-column:5/7!important;grid-row:2!important}body.sentinel-light-dashboard #backtestPanel .backtest-date-field:nth-of-type(3){grid-column:7/10!important;grid-row:2!important}body.sentinel-light-dashboard #backtestPanel .capital-field{grid-column:1/4!important;grid-row:3!important}body.sentinel-light-dashboard #backtestPanel .check:has(#backtestReinvest){grid-column:4/7!important;grid-row:3!important;align-self:end!important}body.sentinel-light-dashboard #backtestPanel #backtestButton{grid-column:7/10!important;grid-row:3!important;align-self:end!important}body.sentinel-light-dashboard #backtestPanel #backtestStatus{grid-column:1/10!important;grid-row:4!important;margin:0!important}@media (max-width:1100px){body.sentinel-light-dashboard #backtestPanel .controls{grid-template-columns:repeat(2,minmax(0,1fr))!important}body.sentinel-light-dashboard #backtestStrategyFilters,body.sentinel-light-dashboard #backtestTimeframeFilters,body.sentinel-light-dashboard #backtestPanel .backtest-symbol-field,body.sentinel-light-dashboard #backtestPanel .backtest-date-field:nth-of-type(2),body.sentinel-light-dashboard #backtestPanel .backtest-date-field:nth-of-type(3),body.sentinel-light-dashboard #backtestPanel .capital-field,body.sentinel-light-dashboard #backtestPanel .check:has(#backtestReinvest),body.sentinel-light-dashboard #backtestPanel #backtestButton,body.sentinel-light-dashboard #backtestPanel #backtestStatus{grid-column:auto!important;grid-row:auto!important}body.sentinel-light-dashboard #backtestTimeframeFilters{grid-template-columns:1fr!important}}
 
