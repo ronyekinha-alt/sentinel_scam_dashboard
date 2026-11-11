@@ -77,10 +77,10 @@ test('ativos do mercado tradicional tokenizados não entram no universo cripto',
  assert.equal(Core.isTradfiTokenized({symbol:'METAUSDT',name:'MetaDAO'}),false);
  assert.deepEqual(plain(Core.isTradfiTokenized({symbol:'KORUBUSDT',name:'South Korea Bull 3X ETF (bStocks Tokenized Stock)'})),plain(web.isTradfiTokenized({symbol:'KORUBUSDT',name:'South Korea Bull 3X ETF (bStocks Tokenized Stock)'})));
 });
-test('Binance é prioritária; ausência do par usa Bybit, antes da KuCoin',async()=>{
+test('Bybit é prioritária; ausência do par usa Binance antes da KuCoin',async()=>{
  const provider=rankingProvider({cmc:[cmcCoin('SHARED',1),cmcCoin('BYBITONLY',2),cmcCoin('BYBITLOW',3)]});
  const get=async url=>{if(url.includes('data-api.binance.vision')&&url.endsWith('/exchangeInfo'))return {symbols:[{symbol:'SHAREDUSDT',status:'TRADING',quoteAsset:'USDT',isSpotTradingAllowed:true}]};if(url.includes('data-api.binance.vision')&&url.includes('/ticker/24hr'))return [{symbol:'SHAREDUSDT',quoteVolume:2000000}];if(url.includes('okx.com'))return {data:[]};if(url.includes('api.bybit.com')&&url.includes('instruments-info'))return {result:{list:['SHARED','BYBITONLY','BYBITLOW'].map(baseCoin=>({symbol:baseCoin+'USDT',baseCoin,quoteCoin:'USDT',status:'Trading'}))}};if(url.includes('api.bybit.com')&&url.includes('tickers'))return {result:{list:[{symbol:'SHAREDUSDT',turnover24h:9000000,lastPrice:2},{symbol:'BYBITONLYUSDT',turnover24h:1000000,lastPrice:2},{symbol:'BYBITLOWUSDT',turnover24h:999999,lastPrice:2}]}};if(url.includes('api.kucoin.com'))return {data:[]};return provider(url);};
- const result=await Core.marketUniverse(get);assert.deepEqual(result.assets.map(a=>[a.symbol,a.source,a.volume]),[['SHAREDUSDT','BINANCE',2000000],['BYBITONLYUSDT','BYBIT',1000000]]);assert.equal(result.assets[1].exchangeSymbol,'BYBITONLYUSDT');assert.deepEqual(plain(result),plain(await web.marketUniverse(get)));
+ const result=await Core.marketUniverse(get);assert.deepEqual(result.assets.map(a=>[a.symbol,a.source,a.volume]),[['SHAREDUSDT','BYBIT',9000000],['BYBITONLYUSDT','BYBIT',1000000]]);assert.equal(result.assets[1].exchangeSymbol,'BYBITONLYUSDT');assert.deepEqual(plain(result),plain(await web.marketUniverse(get)));
 });
 test('Bybit assume o ativo quando Binance e OKX não atendem o volume mínimo',async()=>{
  const provider=rankingProvider({cmc:[cmcCoin('ALT',1)]});
