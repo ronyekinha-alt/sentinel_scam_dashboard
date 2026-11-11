@@ -140,7 +140,11 @@ async function bybitReadAccount(apiKey, secret) {
   if (!read(0) || !read(1)) throw new Error(errors[0] || 'Não foi possível validar a conta Bybit.');
   return {
     key: read(0), account: read(1), wallet: read(2),
-    positions: [...(read(3)?.list || []), ...(read(4)?.list || []), ...(read(5)?.list || [])].filter(position => Number(position.size) > 0),
+    positions: [
+      ...(read(3)?.list || []).map(position => ({ ...position, category: 'linear', settleCoin: 'USDT' })),
+      ...(read(4)?.list || []).map(position => ({ ...position, category: 'linear', settleCoin: 'USDC' })),
+      ...(read(5)?.list || []).map(position => ({ ...position, category: 'inverse' }))
+    ].filter(position => Number(position.size) > 0),
     executions: [...(read(6)?.list || []), ...(read(7)?.list || []), ...(read(8)?.list || [])].sort((a, b) => Number(b.execTime || 0) - Number(a.execTime || 0)).slice(0, 150),
     closedPnl: [...(read(9)?.list || []), ...(read(10)?.list || [])].sort((a, b) => Number(b.updatedTime || b.createdTime || 0) - Number(a.updatedTime || a.createdTime || 0)).slice(0, 200),
     orders: [...(read(11)?.list || []), ...(read(12)?.list || []), ...(read(13)?.list || [])].sort((a, b) => Number(b.updatedTime || b.createdTime || 0) - Number(a.updatedTime || a.createdTime || 0)).slice(0, 150),
