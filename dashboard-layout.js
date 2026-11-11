@@ -1,11 +1,10 @@
 (() => {
   const navItems = [
     ['⌕', 'Scanner de sinais', 'scannerAuditPanel'],
-    ['▥', 'Relatório / histórico', 'importedTradesPanel'],
+    ['B', 'Contas Bybit', 'bybitAccountsPanel'],
     ['⌬', 'Validação / simulador', 'backtestPanel'],
     ['◎', 'Gerenciamento de risco', 'signalsPanel'],
-    ['◌', 'Alertas do Telegram', 'signalsPanel'],
-    ['◈', 'Atividade on-chain', 'onchainPanel']
+    ['◌', 'Alertas do Telegram', 'signalsPanel']
   ];
 
   function init() {
