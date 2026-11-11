@@ -39,7 +39,7 @@ const signature = (secret, text) => crypto.createHmac('sha256', secret).update(t
 const queryString = params => Object.entries(params).filter(([, value]) => value != null).sort(([a], [b]) => a.localeCompare(b)).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 const ninetyDaysAgo = () => String(Date.now() - 90 * 86400000);
 // Lista fechada de fontes públicas do motor; o proxy não aceita destinos livres.
-const publicMarketHosts = new Set(['api.coingecko.com', 'data-api.binance.vision', 'api.binance.com', 'fapi.binance.com', 'www.okx.com', 'api.bybit.com', 'api.kucoin.com', 'pro-api.coinmarketcap.com', 'api.coinpaprika.com']);
+const publicMarketHosts = new Set(['api.coingecko.com', 'data-api.binance.vision', 'api.binance.com', 'fapi.binance.com', 'www.okx.com', 'api.bybit.com', 'api.kucoin.com', 'api.alternative.me', 'pro-api.coinmarketcap.com', 'api.coinpaprika.com']);
 const rankingCache = new Map();
 const mexcReadCache = { positions: null, at: 0 };
 async function publicData(target) {
@@ -97,9 +97,48 @@ async function kucoinClosedPositions(apiKey, secret, passphrase) {
   }
   return { positions, errors };
 }
+function bybitError(payload) {
+  if (!payload || Number(payload.retCode) !== 0) throw new Error(payload?.retMsg || 'Resposta Bybit inválida.');
+  return payload.result || {};
+}
+async function bybitReadAccount(apiKey, secret) {
+  const base = 'https://api.bybit.com', recvWindow = '5000';
+  const clock = await get(`${base}/v5/market/time`), timestamp = String(Math.floor(Number(clock?.result?.timeNano || Date.now() * 1000000) / 1000000));
+  const signedGet = async (path, params = {}) => {
+    const query = queryString(params), signature = crypto.createHmac('sha256', secret).update(`${timestamp}${apiKey}${recvWindow}${query}`).digest('hex');
+    const url = `${base}${path}${query ? `?${query}` : ''}`;
+    return bybitError(await get(url, { 'X-BAPI-API-KEY': apiKey, 'X-BAPI-TIMESTAMP': timestamp, 'X-BAPI-RECV-WINDOW': recvWindow, 'X-BAPI-SIGN': signature }));
+  };
+  const settled = await Promise.allSettled([
+    signedGet('/v5/user/query-api'),
+    signedGet('/v5/account/info'),
+    signedGet('/v5/account/wallet-balance', { accountType: 'UNIFIED' }),
+    signedGet('/v5/position/list', { category: 'linear', settleCoin: 'USDT', limit: 200 }),
+    signedGet('/v5/position/list', { category: 'inverse', limit: 200 }),
+    signedGet('/v5/execution/list', { category: 'linear', limit: 50 }),
+    signedGet('/v5/execution/list', { category: 'spot', limit: 50 }),
+    signedGet('/v5/order/history', { category: 'linear', limit: 50 }),
+    signedGet('/v5/order/history', { category: 'spot', limit: 50 })
+  ]);
+  const read = index => settled[index].status === 'fulfilled' ? settled[index].value : null;
+  const errors = settled.map((result, index) => result.status === 'rejected' ? `${['chave', 'conta', 'saldo', 'posições lineares', 'posições inversas', 'execuções lineares', 'execuções spot', 'ordens lineares', 'ordens spot'][index]}: ${result.reason.message}` : null).filter(Boolean);
+  if (!read(0) || !read(1)) throw new Error(errors[0] || 'Não foi possível validar a conta Bybit.');
+  return {
+    key: read(0), account: read(1), wallet: read(2),
+    positions: [...(read(3)?.list || []), ...(read(4)?.list || [])].filter(position => Number(position.size) > 0),
+    executions: [...(read(5)?.list || []), ...(read(6)?.list || [])].sort((a, b) => Number(b.execTime || 0) - Number(a.execTime || 0)).slice(0, 100),
+    orders: [...(read(7)?.list || []), ...(read(8)?.list || [])].sort((a, b) => Number(b.updatedTime || b.createdTime || 0) - Number(a.updatedTime || a.createdTime || 0)).slice(0, 100),
+    errors
+  };
+}
 
 http.createServer((request, response) => {
   if (request.method === 'GET' && request.url.startsWith('/api/public?')) return proxyPublicMarket(request, response);
+  if (request.method === 'POST' && request.url === '/api/bybit/account') { let body = ''; request.on('data', chunk => body += chunk); return request.on('end', async () => { try {
+    const { apiKey, secret } = JSON.parse(body); if (!apiKey || !secret) throw new Error('Informe API Key e Secret da Bybit.');
+    const account = await bybitReadAccount(String(apiKey), String(secret));
+    json(response, 200, account);
+  } catch (error) { json(response, 400, { error: error.message || 'Falha ao consultar a conta Bybit.' }); } }); }
   if (/^\/api\/(mexc|kucoin)\//.test(request.url)) return json(response, 410, { error: 'Leituras privadas de conta foram removidas deste dashboard.' });
   if (request.method === 'POST' && request.url === '/api/mexc/import') { let body = ''; request.on('data', chunk => body += chunk); return request.on('end', async () => { try { const { apiKey, secret, spotSymbol } = JSON.parse(body), symbols = String(spotSymbol || '').toUpperCase().split(/[\s,;]+/).filter(Boolean).slice(0, 20); if (!apiKey || !secret || !symbols.length || symbols.some(symbol => !/^[A-Z0-9]{5,14}$/.test(symbol))) throw new Error('Informe API Key, Secret Key e ao menos um par spot válido.'); const [spotResult, futuresResult, contractsResult, positionsResult, stopsHistoryResult] = await Promise.allSettled([mexcSpotTrades(apiKey, secret, symbols), mexcFuturesOrders(apiKey, secret), get('https://contract.mexc.com/api/v1/contract/detail'), mexcFuturesPrivate(apiKey, secret, '/api/v1/private/position/list/history_positions', { page_num: 1, page_size: 100 }), mexcFuturesPrivate(apiKey, secret, '/api/v1/private/stoporder/list/orders', { is_finished: 1, page_num: 1, page_size: 100, start_time: ninetyDaysAgo(), end_time: String(Date.now()) })]); const spot = spotResult.status === 'fulfilled' ? spotResult.value.trades : [], spotErrors = spotResult.status === 'fulfilled' ? spotResult.value.errors : [spotResult.reason.message], futures = futuresResult.status === 'fulfilled' && Array.isArray(futuresResult.value.data) ? futuresResult.value.data : [], futuresError = futuresResult.status === 'rejected' ? futuresResult.reason.message : null, contracts = contractsResult.status === 'fulfilled' && Array.isArray(contractsResult.value.data) ? contractsResult.value.data : [], closedPositions = positionsResult.status === 'fulfilled' && Array.isArray(positionsResult.value.data) ? positionsResult.value.data : [], positionsError = positionsResult.status === 'rejected' ? positionsResult.reason.message : null, stopHistory = stopsHistoryResult.status === 'fulfilled' && Array.isArray(stopsHistoryResult.value.data) ? stopsHistoryResult.value.data : [], stopsHistoryError = stopsHistoryResult.status === 'rejected' ? stopsHistoryResult.reason.message : null; json(response, 200, { spot, futures, contracts, closedPositions, stopHistory, errors: [...spotErrors, ...(futuresError ? [futuresError] : []), ...(positionsError ? [positionsError] : []), ...(stopsHistoryError ? [stopsHistoryError] : [])] }); } catch (error) { json(response, 400, { error: error.message || 'Falha ao importar operações.' }); } }); }
   if (request.method === 'POST' && request.url === '/api/mexc/positions') { let body = ''; request.on('data', chunk => body += chunk); return request.on('end', async () => { try { const { apiKey, secret } = JSON.parse(body); if (!apiKey || !secret) throw new Error('Informe API Key e Secret Key para atualizar posições.'); const [positionsResult, stopsResult, contractsResult] = await Promise.allSettled([mexcFuturesPrivate(apiKey, secret, '/api/v1/private/position/open_positions'), mexcFuturesPrivate(apiKey, secret, '/api/v1/private/stoporder/list/orders', { is_finished: 0, page_num: 1, page_size: 100 }), get('https://contract.mexc.com/api/v1/contract/detail')]); if (positionsResult.status === 'rejected') { if (mexcReadCache.positions) return json(response, 200, { ...mexcReadCache.positions, stale: true, staleError: positionsResult.reason.message }); throw positionsResult.reason; } const positions = Array.isArray(positionsResult.value.data) ? positionsResult.value.data : [], stopOrders = stopsResult.status === 'fulfilled' && Array.isArray(stopsResult.value.data) ? stopsResult.value.data : [], contracts = contractsResult.status === 'fulfilled' && Array.isArray(contractsResult.value.data) ? contractsResult.value.data : []; const tickers = await Promise.allSettled(positions.map(position => get(`https://contract.mexc.com/api/v1/contract/ticker?symbol=${position.symbol}`))); const payload = { positions, stopOrders, contracts, tickers: tickers.map((ticker, index) => ticker.status === 'fulfilled' ? ticker.value.data : { symbol: positions[index].symbol }), stopError: stopsResult.status === 'rejected' ? stopsResult.reason.message : null }; mexcReadCache.positions = payload; mexcReadCache.at = Date.now(); json(response, 200, payload); } catch (error) { json(response, 400, { error: error.message || 'Falha ao atualizar posições.' }); } }); }
