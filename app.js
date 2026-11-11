@@ -96,16 +96,17 @@ function fearGreedLabel(value, sourceLabel) {
   return labels[sourceLabel] || (value <= 24 ? 'medo extremo' : value <= 44 ? 'medo' : value >= 75 ? 'ganância extrema' : value >= 55 ? 'ganância' : 'neutro');
 }
 async function refreshFearGreed() {
-  const pill = $('fearGreed');
-  if (!pill) return;
+  const card = $('fearGreed');
+  if (!card) return;
   try {
     const payload = await getJson(`${API.fearGreed}?limit=1&format=json`), row = payload?.data?.[0], value = Number(row?.value);
     if (!Number.isFinite(value)) throw new Error('índice inválido');
-    pill.className = `fear-greed-pill ${fearGreedTone(value)}`;
-    pill.innerHTML = `Fear &amp; Greed <b>${Math.round(value)}</b><small>${escapeHtml(fearGreedLabel(value, row.value_classification))} · Alternative.me</small>`;
+    const rounded = Math.round(value), label = escapeHtml(fearGreedLabel(value, row.value_classification));
+    card.className = `market-sentiment-card ${fearGreedTone(value)}`;
+    card.innerHTML = `<header><strong>Sentimento do mercado</strong><a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" rel="noopener noreferrer">Ver índice <span aria-hidden="true">→</span></a></header><div class="market-sentiment-content"><div class="sentiment-gauge" style="--sentiment-value:${rounded}"><div class="sentiment-gauge-value"><b>${rounded}</b><span>${label}</span></div></div><div class="sentiment-scale"><span>Medo</span><span>Ganância</span></div><p>Índice diário de sentimento cripto · Alternative.me</p></div>`;
   } catch {
-    pill.className = 'fear-greed-pill is-unavailable';
-    pill.innerHTML = 'Fear &amp; Greed <b>—</b><small>indisponível</small>';
+    card.className = 'market-sentiment-card is-unavailable';
+    card.innerHTML = `<header><strong>Sentimento do mercado</strong><a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" rel="noopener noreferrer">Ver índice <span aria-hidden="true">→</span></a></header><div class="market-sentiment-content"><div class="sentiment-gauge"><div class="sentiment-gauge-value"><b>—</b><span>indisponível</span></div></div><div class="sentiment-scale"><span>Medo</span><span>Ganância</span></div><p>Índice diário de sentimento cripto · Alternative.me</p></div>`;
   }
 }
 async function universe(maxAssets=700) { const result=await SentinelCore.marketUniverse(getJson,{assetLimit:Math.min(700,maxAssets),minVolume:+$('volumeLimit').value}); state.universeMode=result.mode; return result.assets; }
